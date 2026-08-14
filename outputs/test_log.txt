@@ -1,0 +1,85 @@
+===== 2023c 一致性测试开始 =====
+
+--- T1 维度检查 ---
+[FAIL] T1 集成执行无异常
+  预期: 无异常
+  实际: 未定义与 'char' 类型的输入参数相对应的函数 'func_preprocess'。
+
+--- T2 特殊值与手算用例 ---
+[PASS] T2.1a 完全单调 Spearman ρ=+1
+[PASS] T2.1b 含并列秩: 手写秩实现与 corr 一致(<1e-12)
+[PASS] T2.2 需求回归系数精确恢复 a=10,b=-0.5
+
+找到最优解。
+
+[PASS] T2.3 方案A LP 手算用例 x=[5,5], 利润25
+Running HiGHS 1.11.0: Copyright (c) 2025 HiGHS under MIT licence terms
+MIP  has 3 rows; 4 cols; 6 nonzeros; 2 integer variables (2 binary)
+Coefficient ranges:
+  Matrix [1e+00, 1e+01]
+  Cost   [1e+00, 3e+00]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+00]
+Presolving model
+2 rows, 3 cols, 4 nonzeros  0s
+0 rows, 0 cols, 0 nonzeros  0s
+Presolve: Optimal
+
+Src: B => Branching; C => Central rounding; F => Feasibility pump; J => Feasibility jump;
+     H => Heuristic; L => Sub-MIP; P => Empty MIP; R => Randomized rounding; Z => ZI Round;
+     I => Shifting; S => Solve LP; T => Evaluate node; U => Unbounded; X => User solution;
+     z => Trivial zero; l => Trivial lower; u => Trivial upper; p => Trivial point
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -15             -15                0.00%        0      0      0         0     0.0s
+
+Solving report
+  Status            Optimal
+  Primal bound      -15
+  Dual bound        -15
+  Gap               0% (tolerance: 0.01%)
+  P-D integral      0
+  Solution status   feasible
+                    -15 (objective)
+                    0 (bound viol.)
+                    0 (int. viol.)
+                    0 (row viol.)
+  Timing            0.00 (total)
+                    0.00 (presolve)
+                    0.00 (solve)
+                    0.00 (postsolve)
+  Max sub-MIP depth 0
+  Nodes             0
+  Repair LPs        0 (0 feasible; 0 iterations)
+  LP iterations     0 (total)
+                    0 (strong br.)
+                    0 (separation)
+                    0 (heuristics)
+
+找到最优解。
+
+Intlinprog 在根节点处停止，因为目标值在最优值的间隙容差范围
+内，options.AbsoluteGapTolerance = 1e-06。intcon 变量是容差范围内的整
+数，options.ConstraintTolerance = 1e-06。
+
+[PASS] T2.4 方案B MILP 手算用例 选高价档, 利润15
+
+--- T3 约束满足性 ---
+[FAIL] T3 约束满足性(前置依赖)
+  预期: T1 集成通过
+  实际: T1 失败未产生结果
+
+--- T4 稳定性 ---
+[FAIL] T4 稳定性(前置依赖)
+  预期: T1 集成通过
+  实际: T1 失败未产生结果
+
+--- T5 交叉验证 ---
+[FAIL] T5 交叉验证(前置依赖)
+  预期: T1 集成通过
+  实际: T1 失败未产生结果
+
+===== 测试汇总: 通过 5 / 失败 4 =====
+结果已保存: outputs/test_results.mat
