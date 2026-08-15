@@ -1,0 +1,152 @@
+% appendix.tex — 附录（2026-08-15: A 支撑材料目录, B 核心代码）
+
+\subsection{附录A 支撑材料目录}
+
+\begin{description}
+\item[代码] \texttt{src/} 目录：\texttt{main\_vegetable.m}（主程序）、
+      \texttt{func\_preprocess.m}（数据预处理）、\texttt{func\_q1\_statistics.m}
+      （问题一）、\texttt{func\_q2\_category\_lp.m}（问题二）、
+      \texttt{func\_q3\_item\_milp.m}（问题三）、\texttt{func\_topsis.m}
+      （熵权 TOPSIS）；\texttt{scripts/} 目录：xlsx 转换、方案对比、下限扫描等
+      辅助脚本；\texttt{tests/} 目录：一致性测试脚本与测试记录。
+\item[数据] 附件 1--4 原始数据；\texttt{outputs/} 目录：预处理四表、问题一相关
+      统计与显著组合表、问题二补货定价表与敏感性表、问题三 TOPSIS 排名、单品
+      补货定价表与下限扫描表、正式运行结果 \texttt{final\_results.mat}。
+\item[图表] \texttt{figures/} 目录：论文全部插图（PNG 与 EPS 双格式）；
+      品类相关热图与单品聚类树状图等补充分析图随支撑材料提交。
+\end{description}
+
+\subsection{附录B 核心代码}
+
+以下代码与支撑材料中的实现一致，注释按论文展示需要精简。完整代码见支撑材料。
+
+\subsubsection{B.1 主程序（流水线总览）}
+
+{\footnotesize
+\begin{verbatim}
+% 主程序: 数据预处理 → 问题一 → 问题二 → 问题三 → 结果存档
+clear; close all; clc;
+PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
+OUT_DIR = fullfile(PROJ_ROOT, 'outputs');
+FIG_DIR = fullfile(PROJ_ROOT, 'figures');
+
+N_CLASS = 6;  HORIZON_Q2 = 7;                  % 题设常量
+L_SHELF = 27;  U_SHELF = 33;  MIN_DISPLAY = 2.5;
+V_QUANTILE = 0.95;  V_LOWER = 27 * 2.5;        % 空间容量估计
+N_PRICE_LEVELS = 10;  Q3_SAT_LB = 0.50;        % 价格档数/满足率下限
+BIG_M = 1000;
+
+prod_info = func_preprocess(PROJ_ROOT);        % 数据预处理(支撑材料)
+stats_q1 = func_q1_statistics(prod_info, PROJ_ROOT);   % 问题一: 公式(1)(2)
+result_q2 = func_q2_category_lp(stats_q1, prod_info, PROJ_ROOT);  % 问题二
+result_q3 = func_q3_item_milp(stats_q1, prod_info, PROJ_ROOT, true, Q3_SAT_LB);
+save(fullfile(OUT_DIR, 'final_results.mat'), ...
+     'prod_info', 'stats_q1', 'result_q2', 'result_q3');
+\end{verbatim}
+}
+
+\subsubsection{B.2 熵权 TOPSIS 评价（问题三选品）}
+
+{\footnotesize
+\begin{verbatim}
+% 熵权法+TOPSIS: 熵权(公式8), 距离与贴近度(公式10)(11)
+function [scores, weights] = func_topsis(X, is_benefit)
+n = size(X, 1);
+for j = 1:size(X, 2)
+    if ~is_benefit(j), X(:, j) = max(X(:, j)) - X(:, j); end  % 极小型转极大型
+end
+z = X ./ sqrt(sum(X.^2, 1));                    % 向量归一化
+z(:, all(X == 0, 1)) = 0;
+p = (z - min(z, [], 1)) ./ (max(z, [], 1) - min(z, [], 1) + eps);
+p = p ./ sum(p, 1);
+e = -sum(p .* log(p + eps), 1) / log(n);        % 信息熵
+d = 1 - e;
+weights = d / sum(d);                           % 熵权
+v = z .* weights;
+v_pos = max(v, [], 1);  v_neg = min(v, [], 1);
+D_pos = sqrt(sum((v - v_pos).^2, 2));           % 到正理想解距离
+D_neg = sqrt(sum((v - v_neg).^2, 2));           % 到负理想解距离
+scores = D_neg ./ (D_pos + D_neg);              % 相对贴近度
+\end{verbatim}
+}
+
+\subsubsection{B.3 问题二：方案A 线性规划与方案B 混合整数规划}
+
+{\footnotesize
+\begin{verbatim}
+% 方案A: 成本加成定价(公式6) + 线性规划, 目标含打折回收(公式5)
+w_eff_ct = w_ct .* (1 + loss_bar_c);
+p_ct_A = min(max((1 + markup_c) .* w_ct, p_min_c), p_max_c);
+recov_A = p_ct_A .* ((1 - loss_bar_c) + loss_bar_c .* d_c);
+margin_A = recov_A - w_eff_ct;
+x_ub_A = B_ct ./ (1 - loss_bar_c);              % 损耗约束上界
+for t = 1:HORIZON_Q2
+    [x, ~, flag] = linprog(-margin_A(:, t), ones(1, N_CLASS), V, ...
+                           [], [], zeros(N_CLASS, 1), x_ub_A(:, t));
+    if flag >= 1, x_ct_A(:, t) = x; end
+end
+profit_A = sum(sum(margin_A .* x_ct_A));
+
+% 方案B: 价格离散10档, 0-1 选价变量(公式7)
+function [x_day, p_day, profit_day] = solve_milp_day(p_grid, S_grid, margin_B, V)
+nC = size(p_grid, 1);  K = size(p_grid, 2);  nz = nC * K;
+c_obj = [zeros(nz, 1); -reshape(margin_B', [], 1)];  % 目标取负求最小
+intcon = 1:nz;                                    % z 为 0-1 变量
+Aineq = zeros(nz + 1, nz + nz);  bineq = zeros(nz + 1, 1);
+for c = 1:nC
+    for k = 1:K
+        row = (c - 1) * K + k;
+        Aineq(row, row) = -S_grid(c, k);          % x_k <= S_k * z_k
+        Aineq(row, nz + row) = 1;
+    end
+end
+Aineq(nz + 1, nz + 1:end) = 1;  bineq(nz + 1) = V;   % 空间约束
+Aeq = zeros(nC, nz + nz);  beq = ones(nC, 1);
+for c = 1:nC, Aeq(c, (c - 1) * K + (1:K)) = 1; end   % 每品类恰选一档
+opts = optimoptions('intlinprog', 'Display', 'off');
+[sol, ~, flag] = intlinprog(c_obj, intcon, Aineq, bineq, Aeq, beq, ...
+                            zeros(nz+nz,1), [ones(nz,1); inf(nz,1)], opts);
+z = reshape(sol(1:nz), K, nC);
+x_day = sum(reshape(sol(nz + 1:end), K, nC), 1);    % x_c = sum_k x_k
+p_day = sum(z .* p_grid', 1);                       % p_c = sum_k p_k * z_k
+profit_day = margin_B(:)' * sol(nz + 1:end);
+\end{verbatim}
+}
+
+\subsubsection{B.4 问题三：单品 0-1 规划的约束构建}
+
+{\footnotesize
+\begin{verbatim}
+% 问题三 MILP: 变量排布 [y; z; x; xk], 目标(公式13), 约束(6.3.2节)
+n_var = n_y + n_z + n_x + n_xk;
+c = [zeros(n_y, 1); zeros(n_z, 1); zeros(n_x, 1); -reshape(margin_k', [], 1)];
+intcon = [1:n_y, n_y + (1:n_z)];                    % y 与 z 为 0-1 变量
+Aeq = zeros(2 * n, n_var);  beq = zeros(2 * n, 1);
+row = 0;
+for i = 1:n
+    zs = n_y + (i - 1) * K + (1:K);
+    Aeq(2*i-1, [i, zs]) = [-1, ones(1, K)];         % sum_k z = y
+    xks = n_y + n_z + n_x + (i - 1) * K + (1:K);
+    Aeq(2*i, [n_y+n_z+i, xks]) = [1, -ones(1, K)];  % x = sum_k xk
+    for k = 1:K
+        row = row + 1;
+        Aineq(row, [zs(k), xks(k)]) = [-D_grid(i, k), 1];  % xk <= D*z
+    end
+    row = row + 1;
+    Aineq(row, [i, n_y + n_z + i]) = [MIN_DISPLAY, -1];     % x >= 2.5y
+    row = row + 1;
+    Aineq(row, [i, n_y + n_z + i]) = [-BIG_M, 1];           % x <= M*y
+end
+row = row + 1;  Aineq(row, 1:n_y) = 1;   bineq(row) = U_SHELF;  % 27..33
+row = row + 1;  Aineq(row, 1:n_y) = -1;  bineq(row) = -L_SHELF;
+row = row + 1;  Aineq(row, n_y + n_z + (1:n_x)) = 1;  bineq(row) = V; % 空间
+if sat_lb > 0                                       % 满足率下限(方案b)
+    for cc = 1:n_cat
+        row = row + 1;  idx = find(g_i == cc);
+        Aineq(row, n_y + n_z + idx) = -1;
+        bineq(row) = -sat_lb * sum(demand_bar(idx));
+    end
+end
+[sol, ~, flag] = intlinprog(c, intcon, Aineq, bineq, Aeq, beq, lb, ub, opts);
+\end{verbatim}
+}

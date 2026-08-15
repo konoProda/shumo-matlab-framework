@@ -103,8 +103,9 @@ fprintf('[q1] 显著相关组合: 品类 %d 对, 单品 %d 对 (表已存档)\n'
 if save_figs
 % ---- 图1 (A1): 品类总销量占比扇形图 ----
 f = figure('Position', [100 100 640 480], 'Color', 'w');
-pie(sum(cat_qty, 2), string(cat_names));
-title('图1 六品类蔬菜三年总销量占比');
+pct = sum(cat_qty, 2) / sum(cat_qty, 'all') * 100;   % 占比(与论文文本同源)
+pie(sum(cat_qty, 2), strcat(string(cat_names), ' ', string(round(pct, 1)), '%'));
+title('六品类蔬菜三年总销量占比');
 exportgraphics(f, fullfile(FIG_DIR, 'q1_pie_share.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_pie_share.eps'), '-depsc');
 close(f);                                          % 导出后立即关闭, 释放图形内存(3GB无GPU环境)
@@ -115,11 +116,14 @@ for mm = 1:12
     monthly(:, mm) = sum(cat_qty(:, month(dates) == mm), 2);
 end
 f = figure('Position', [100 100 760 440], 'Color', 'w');
-bar(monthly', 'stacked');                    % 本环境bar: 行=组 → 12月组×6品类
+b = bar(monthly', 'stacked');                    % 本环境bar: 行=组 → 12月组×6品类
 legend(cat_names, 'Location', 'eastoutside');
 xlabel('月份');  ylabel('销售量(kg)');
-title('图2 六品类蔬菜各月销售量堆叠柱状图');
+title('六品类蔬菜各月销售量堆叠柱状图');
 xticklabels(1:12);
+mtot = sum(monthly, 1);                          % 各月总量标注(与绘图数据同源)
+text(b(end).XEndPoints, b(end).YEndPoints, string(round(mtot)), ...
+    'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', 'FontSize', 7);
 exportgraphics(f, fullfile(FIG_DIR, 'q1_monthly_stacked.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_monthly_stacked.eps'), '-depsc');
 close(f);
@@ -128,7 +132,7 @@ close(f);
 f = figure('Position', [100 100 760 440], 'Color', 'w');
 boxplot(monthly', 'Labels', cat_names);
 xlabel('品类');  ylabel('月销售量(kg)');
-title('图3 六品类蔬菜月销售量箱线图');
+title('六品类蔬菜月销售量箱线图');
 grid on;
 exportgraphics(f, fullfile(FIG_DIR, 'q1_monthly_boxplot.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_monthly_boxplot.eps'), '-depsc');
@@ -145,10 +149,14 @@ for c = 1:n_cat
     edges = logspace(log10(max(min(vals), 0.1)), log10(max(vals)), 12);  % 对数分箱
     histogram(vals, edges);
     set(gca, 'XScale', 'log');
+    [N, ED] = histcounts(vals, edges);
+    centers = sqrt(ED(1:end-1) .* ED(2:end));    % 对数区间几何中心
+    text(centers, N, string(N), 'VerticalAlignment', 'bottom', ...
+        'HorizontalAlignment', 'center', 'FontSize', 6);   % 频数标注
     xlabel('三年总销量(kg, 对数轴)');  ylabel('单品数');
     title(sprintf('%s (零销量%d个)', cat_names(c), n_zero));
 end
-sgtitle('图4 各品类单品三年总销量直方图 (对数分箱, 长尾分布)');
+sgtitle('各品类单品三年总销量直方图 (对数分箱, 长尾分布)');
 exportgraphics(f, fullfile(FIG_DIR, 'q1_item_hist.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_item_hist.eps'), '-depsc');
 close(f);
@@ -160,11 +168,15 @@ for d = 1:7
     weekly(:, d) = sum(cat_qty(:, wd == d), 2);
 end
 f = figure('Position', [100 100 760 440], 'Color', 'w');
-bar(weekly', 'grouped');
+b = bar(weekly', 'grouped');
 legend(cat_names, 'Location', 'eastoutside');
 xlabel('星期');  ylabel('销售量(kg)');
 xticklabels({'周日', '周一', '周二', '周三', '周四', '周五', '周六'});
-title('图5 六品类蔬菜周内销售量分布');
+title('六品类蔬菜周内销售量分布');
+for k = 1:numel(b)                               % 每根柱数值标注
+    text(b(k).XEndPoints, b(k).YEndPoints, string(round(b(k).YData)), ...
+        'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', 'FontSize', 6);
+end
 exportgraphics(f, fullfile(FIG_DIR, 'q1_weekly_dist.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_weekly_dist.eps'), '-depsc');
 close(f);
@@ -176,11 +188,19 @@ pm_c = accumarray(iC, cat.qty_pm, [n_cat, 1]);
 time_pct = [am_c, noon_c, pm_c];             % n_cat×3
 time_pct = time_pct ./ sum(time_pct, 2);     % 行归一化 → 百分比
 f = figure('Position', [100 100 760 440], 'Color', 'w');
-bar(time_pct, 'stacked');
+b = bar(time_pct, 'stacked');
 legend({'早上(8-13时)', '下午(13-17时)', '晚上(17-23时)'}, 'Location', 'eastoutside');
 xlabel('品类');  ylabel('销量占比');
 xticklabels(cat_names);
-title('图6 六品类蔬菜早中晚时间段销量占比');
+title('六品类蔬菜早中晚时间段销量占比');
+cum_bot = zeros(1, n_cat);                       % 各分段百分比标注(段中点)
+for k = 1:numel(b)
+    cum_top = cum_bot + b(k).YData;
+    text(b(k).XEndPoints, (cum_bot + cum_top) / 2, ...
+        string(round(b(k).YData * 100, 1)) + "%", ...
+        'HorizontalAlignment', 'center', 'FontSize', 7);
+    cum_bot = cum_top;
+end
 exportgraphics(f, fullfile(FIG_DIR, 'q1_timeofday.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_timeofday.eps'), '-depsc');
 close(f);
@@ -207,7 +227,7 @@ for ci = 1:n_cat
         if cj == 1, ylabel(cat_names(ci), 'FontSize', 8); end
     end
 end
-sgtitle('图7 蔬菜品类日销量两两散点图 (** : |\rho|>0.6 且 p<0.01)');
+sgtitle('蔬菜品类日销量两两散点图 (** : |\rho|>0.6 且 p<0.01)');
 exportgraphics(f, fullfile(FIG_DIR, 'q1_category_scatter.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_category_scatter.eps'), '-depsc');
 close(f);
@@ -240,7 +260,7 @@ for ii = 1:n_sel
         if jj == 1, ylabel(sel_names(ii), 'FontSize', 6); end
     end
 end
-sgtitle('图8 各品类销量前2单品日销量散点矩阵');
+sgtitle('各品类销量前2单品日销量散点矩阵');
 print(f, fullfile(FIG_DIR, 'q1_item_scatter.png'), '-dpng', '-r150');   % 144子图降分辨率防内存不足
 print(f, fullfile(FIG_DIR, 'q1_item_scatter.eps'), '-depsc');
 close(f);
@@ -252,7 +272,7 @@ top10_names = prod_info.prod_name(top10_idx);
 f = figure('Position', [100 100 780 680], 'Color', 'w');
 h = heatmap(top10_rho, 'Colormap', parula, 'GridVisible', 'off');
 h.XDisplayLabels = top10_names;  h.YDisplayLabels = top10_names;
-h.Title = '图9 销量前10单品斯皮尔曼相关系数热图';
+h.Title = '销量前10单品斯皮尔曼相关系数热图';
 h.CellLabelFormat = '%.2f';
 exportgraphics(f, fullfile(FIG_DIR, 'q1_top10_heatmap.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_top10_heatmap.eps'), '-depsc');

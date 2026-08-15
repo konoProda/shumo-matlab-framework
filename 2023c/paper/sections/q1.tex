@@ -1,0 +1,182 @@
+% q1.tex — 四、问题一的模型建立与求解（2026-08-15, 素材见 PAPER_HANDOFF.md §5）
+
+\subsection{4.1 数据准备}
+
+问题一使用附件2 的销售流水。将三年共 878,503 条交易记录按"日期-单品"聚合为
+$251\times1085$ 的日销量矩阵（无销售记录的日期填 0），再按品类汇总为
+$6\times1085$ 的品类日销量矩阵。退货记录 461 条（占 0.05\%）予以剔除；全期无销售
+记录的 5 个单品不参与相关性计算。分布规律的观察对象为六品类与 251 个单品的日销量
+序列，相互关系分析的对象为品类别与单品间的销量时间序列。
+
+\subsection{4.2 销售量分布规律}
+
+\subsubsection{4.2.1 总量分布}
+
+三年销售总量为 471,276 kg。图1 给出六品类的销量占比：花叶类占 42.2\%，辣椒类占
+19.4\%，食用菌占 16.2\%，三者合计近八成；花菜类、水生根茎类与茄类分别占 8.9\%、
+8.6\% 与 4.8\%。叶菜类蔬菜是本地居民日常消费的主体，其需求量大且购买频次高，这一
+结构与常见家庭膳食结构相符。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{figures/q1_pie_share.png}
+\caption{六品类蔬菜三年总销量占比}
+\label{fig:q1_pie}
+\end{figure}
+
+\subsubsection{4.2.2 月度分布}
+
+图2 为各品类月销量的堆叠柱状图，图3 为对应的箱线图。花叶类在各月的销量均远高于
+其余品类，且波动幅度最大，三年中的月度峰值均出现在 8 月（月销量 7,262、7,113、
+10,141 kg），与夏季叶菜集中上市一致；茄类的月销量最低且分布最为集中（日均
+20.7 kg，标准差 13.5），需求最为平稳；辣椒类与食用菌的月销量量级相近。整体上
+各品类呈现以年为周期的季节波动，8 月为三年共同的销量高峰，对应应季叶菜上市、
+价格走低的供给因素，冬季月份受春节日期逐年漂移的影响波动较大。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/q1_monthly_stacked.png}
+\caption{六品类蔬菜各月销售量堆叠柱状图}
+\label{fig:q1_monthly}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/q1_monthly_boxplot.png}
+\caption{六品类蔬菜月销售量箱线图}
+\label{fig:q1_box}
+\end{figure}
+
+\subsubsection{4.2.3 单品销量分布}
+
+图4 以对数分箱展示各品类内部单品的三年总销量分布。六个品类均呈明显的长尾形态：
+多数单品销量集中在低量级区间，少数"明星单品"贡献了品类销量的主体。以花叶类为例，
+大多数单品三年总销量在 $10^1$--$10^3$ kg 区间，而头部单品达到 $10^4$ kg 量级。
+这一规律提示商超在补货决策上应区分对待头部单品与长尾单品，后者仅需维持基本陈列以
+保证品种丰富度，为问题三的选品建模提供依据。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/q1_item_hist.png}
+\caption{各品类单品三年总销量直方图（对数分箱）}
+\label{fig:q1_hist}
+\end{figure}
+
+\subsubsection{4.2.4 周内分布}
+
+图5 给出各品类一周七天的平均销量。六类蔬菜在周六、周日的销量均高于工作日，
+周末日均销量约 91 kg，比工作日的 65 kg 高出 39\%。周末聚餐与家宴增多带动了蔬菜
+消费，这一周内规律是问题二中以"同星期均值"预测未来一周销量的直接依据。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/q1_weekly_dist.png}
+\caption{六品类蔬菜周内销售量分布}
+\label{fig:q1_weekly}
+\end{figure}
+
+\subsubsection{4.2.5 日内时段分布}
+
+按扫码时间将一天划分为早上（8:00--13:00）、下午（13:00--17:00）与晚上（17:00--
+23:00）三个时段，图6 为各品类销量在三个时段的占比。花叶类、花菜类与水生根茎类的
+早晨销量占比最高（38\%--50\%），消费者倾向在早晨购买新鲜叶菜用于当日午晚餐；茄类、
+辣椒类与食用菌的晚间占比与早晨相当（35\%--40\%），这些品类多为晚餐配菜或火锅食材，
+晚间时段仍保持较高购买强度。时段差异说明蔬菜销售存在明显的日内节奏，商超可按品类
+调整上架与补货的时间安排。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/q1_timeofday.png}
+\caption{六品类蔬菜早中晚时段销量占比}
+\label{fig:q1_time}
+\end{figure}
+
+\subsection{4.3 品类间、单品间相互关系}
+
+\subsubsection{4.3.1 散点图检验}
+
+在计算相关系数前，先通过散点图观察变量间的关系形态。图7 为六品类日销量的两两散点
+矩阵，图8 为各品类销量前 2 名单品（共 12 个）的散点矩阵。散点图显示变量间的关系
+以松散的点云为主，部分组合呈现同增同减的趋势（如花叶类与花菜类），少数组合呈反向
+变化（如茄类与部分叶菜），整体上属于单调关联而非严格线性关系。这一观察决定了两点：
+相关系数选用对分布与线性性均无要求的斯皮尔曼秩相关；关联结果只作为补货与陈列的
+参考，不引入模型约束。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/q1_category_scatter.png}
+\caption{蔬菜品类日销量两两散点图（** 表示 $|\rho|>0.6$ 且 $p<0.01$）}
+\label{fig:q1_cat_scatter}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/q1_item_scatter.png}
+\caption{各品类销量前 2 名单品日销量散点矩阵}
+\label{fig:q1_item_scatter}
+\end{figure}
+
+\subsubsection{4.3.2 斯皮尔曼秩相关模型}
+
+对品类（或单品）$i$ 与 $j$ 的日销量序列分别赋予秩 $R_i(t)$、$R_j(t)$，斯皮尔曼
+秩相关系数定义为
+
+\begin{equation}
+\rho_{ij}=1-\frac{6\sum_{t=1}^{T}\left(R_i(t)-R_j(t)\right)^2}{T(T^2-1)},
+\label{eq:spr}
+\end{equation}
+
+其中 $T=1085$ 为观测天数。$\rho$ 取正值表示两序列同向变动，取负值表示反向变动。
+显著性检验采用 $t$ 近似：
+
+\begin{equation}
+t=\rho\sqrt{\frac{T-2}{1-\rho^2}},\qquad p=2\left(1-F_{t,T-2}(|t|)\right),
+\label{eq:spr_t}
+\end{equation}
+
+其中 $F_{t,T-2}$ 为自由度 $T-2$ 的 $t$ 分布函数。以 $|\rho|>0.6$ 且 $p<0.01$ 作为
+强关联的判定标准。
+
+\subsubsection{4.3.3 结果与分析}
+
+按上述标准筛选，品类间存在 2 对强关联，单品间存在 20 对强关联，表1 列出部分
+代表组合。图9 为销量前 10 名单品间的相关热图。
+
+\begin{table}[H]
+\centering
+\caption{部分显著相关组合（$|\rho|>0.6$ 且 $p<0.01$）}
+\label{tab:sig_pairs}
+\begin{tabular}{lll}
+\toprule
+变量 1 & 变量 2 & 斯皮尔曼相关系数 \\
+\midrule
+花叶类 & 花菜类 & 0.633 \\
+水生根茎类 & 食用菌 & 0.605 \\
+云南生菜(份) & 云南油麦菜(份) & 0.932 \\
+枝江红菜苔(份) & 小青菜(2) & 0.895 \\
+大白菜 & 金针菇(1) & 0.858 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/q1_top10_heatmap.png}
+\caption{销量前 10 单品斯皮尔曼相关系数热图}
+\label{fig:q1_heatmap}
+\end{figure}
+
+品类的两对强关联可从两个角度解释。花叶类与花菜类同为叶菜，上市季节一致，供给端
+的同节奏带来销量的同向波动；水生根茎类与食用菌则常见于同一类菜品（炖汤、火锅），
+需求端搭配带动了关联。单品层面，筛选出的 20 对强关联均为正相关，可归纳为三类：
+同产地同渠道的叶菜（云南生菜(份)与云南油麦菜(份)，相关系数 0.932）、同系列椒类
+（螺丝椒(份)与小米椒系列组合装）以及叶菜与菌菇的菜品搭配组合（大白菜与金针菇(1)，
+相关系数 0.858）。这些关联关系为商超的陈列组合与协同补货提供了参考。
+
+\subsection{4.4 本节小结}
+
+问题一从总量、月度、周内与日内四个尺度刻画了六品类与单品的销量分布：花叶类占据
+销量主体，各品类存在季节周期，周末销量显著高于工作日，日内呈"早高峰为主、晚高峰
+次之"的节奏，单品销量呈长尾分布。相互关系方面，通过散点检验与斯皮尔曼秩相关筛选
+出 2 对品类与 20 对单品的显著强关联，并给出供给与需求两方面的解释。周内规律将直接
+用于问题二的销量预测，长尾分布为问题三的选品模型提供依据。

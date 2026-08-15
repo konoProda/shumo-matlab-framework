@@ -1,0 +1,73 @@
+%!TEX program = xelatex
+% ============================================================
+% 2023c C题 蔬菜类商品的自动定价与补货决策 — 论文主文件
+% 结构: 摘要/问题重述与分析/假设/符号/问题一~四/检验/评价/参考文献/附录
+% 个人信息均为占位符, 提交前由编程手填充
+% ============================================================
+\documentclass[12pt,a4paper]{ctexart}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+\captionsetup{font=small,labelfont=bf}
+
+\title{\textbf{蔬菜类商品的自动定价与补货决策}}
+\author{【学校名称】 \\ 【队员1姓名】\quad 【队员2姓名】\quad 【队员3姓名】}
+\date{【提交日期】}
+
+\begin{document}
+
+\maketitle
+
+% ---------------- 摘要 ----------------
+\begin{abstract}
+\input{sections/abstract}
+\par\noindent\textbf{关键词：}成本加成定价\quad 斯皮尔曼秩相关\quad 三次多项式拟合\quad 线性规划与0-1混合整数规划\quad 熵权法-TOPSIS\quad 灵敏度分析
+\end{abstract}
+
+% ---------------- 正文 ----------------
+\section{一、问题重述与分析}
+\input{sections/restatement}
+
+\section{二、模型假设}
+\input{sections/assumption}
+
+\section{三、符号说明}
+\input{sections/symbol}
+
+\section{四、问题一的模型建立与求解}
+\input{sections/q1}
+
+\section{五、问题二的模型建立与求解}
+\input{sections/q2}
+
+\section{六、问题三的模型建立与求解}
+\input{sections/q3}
+
+\section{七、问题四的分析}
+\input{sections/q4}
+
+\section{八、模型的检验与灵敏度分析}
+\input{sections/verification}
+
+\section{九、模型的评价、改进与推广}
+\input{sections/evaluation}
+
+\section{十、参考文献}
+\input{sections/reference}
+
+% ---------------- 附录 ----------------
+\newpage
+\appendix
+\section{附录A\quad 关键代码节选}
+\input{sections/appendix}
+
+\end{document}

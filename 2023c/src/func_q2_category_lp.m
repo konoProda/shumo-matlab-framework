@@ -239,7 +239,7 @@ if save_figs
         xlabel('销售单价(元/kg)');  ylabel('销售量(kg)');
         title(sprintf('%s (R^2=%.2f)', cat_names_q2(c), r2_c(c)));
     end
-    sgtitle('图10 各品类销售量与成本加成定价三次多项式拟合');
+    sgtitle('各品类销售量与成本加成定价三次多项式拟合');
     exportgraphics(f, fullfile(FIG_DIR, 'q2_fit_cubic.png'), 'Resolution', 300);
     print(f, fullfile(FIG_DIR, 'q2_fit_cubic.eps'), '-depsc');
     close(f);
@@ -250,7 +250,7 @@ if save_figs
     b = bar(profit_day');
     xticks(1:HORIZON);  xticklabels(day_labels);
     legend({'方案A(主模型)', '方案B(对比)'}, 'Location', 'northwest');
-    xlabel('日期');  ylabel('日利润(元)');  title('图11 方案A/B 日利润对比');
+    xlabel('日期');  ylabel('日利润(元)');  title('方案A/B 日利润对比');
     ylim([0, max(profit_day, [], 'all') * 1.2]);
     for k = 1:numel(b)
         text(b(k).XEndPoints, b(k).YEndPoints, string(round(b(k).YData)), ...
@@ -262,11 +262,15 @@ if save_figs
 
     % A9 同比利润对比 (7天×4年 分组柱状图)
     f = figure('Position', [100 100 820 440], 'Color', 'w');
-    bar(yoy_profit);
+    b = bar(yoy_profit);
     xticks(1:7);  xticklabels(day_labels);
     legend({'2020年', '2021年', '2022年', '2023年(预测)'}, 'Location', 'northwest');
     xlabel('日期');  ylabel('日利润(元)');
-    title('图12 7月1-7日单日利润同比对比 (方案A口径)');
+    title('7月1-7日单日利润同比对比 (方案A口径)');
+    for k = 1:numel(b)                               % 每根柱数值标注
+        text(b(k).XEndPoints, b(k).YEndPoints, string(round(b(k).YData)), ...
+            'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', 'FontSize', 6);
+    end
     exportgraphics(f, fullfile(FIG_DIR, 'q2_yoy_profit.png'), 'Resolution', 300);
     print(f, fullfile(FIG_DIR, 'q2_yoy_profit.eps'), '-depsc');
     close(f);

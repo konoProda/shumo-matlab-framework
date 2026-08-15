@@ -248,10 +248,12 @@ if save_figs
     n_show = min(15, height(out_tbl));
     show = out_tbl(1:n_show, :);
     f = figure('Position', [100 100 860 440], 'Color', 'w');
-    bar(categorical(show.prod_name), show.unit_profit .* show.x_kg);
+    b = bar(categorical(show.prod_name), show.unit_profit .* show.x_kg);
     xtickangle(45);
     xlabel('单品(前15名)');  ylabel('单品利润(元)');
-    title(sprintf('问题3: 7月1日选品单品利润 (共%d个, 其余利润极小)', height(out_tbl)));
+    title(sprintf('7月1日选品单品利润分布 (共%d个上架, 前15名)', height(out_tbl)));
+    text(b(1).XEndPoints, b(1).YEndPoints, string(round(b(1).YData, 1)), ...
+        'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', 'FontSize', 7);
     exportgraphics(f, fullfile(FIG_DIR, 'q3_item_profit.png'), 'Resolution', 300);
     print(f, fullfile(FIG_DIR, 'q3_item_profit.eps'), '-depsc');
     close(f);
