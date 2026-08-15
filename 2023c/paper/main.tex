@@ -3,8 +3,15 @@
 % 2023c C题 蔬菜类商品的自动定价与补货决策 — 论文主文件
 % 结构: 摘要/问题重述与分析/假设/符号/问题一~四/检验/评价/参考文献/附录
 % 个人信息均为占位符, 提交前由编程手填充
+% 编译器: 必须使用 XeLaTeX (在线平台在编译菜单中选 XeLaTeX,
+%         或依赖根目录 latexmkrc 自动选择)
 % ============================================================
-\documentclass[12pt,a4paper]{ctexart}
+\documentclass[12pt,a4paper,fontset=none]{ctexart}
+
+\RequirePackage{iftex}
+\ifPDFTeX
+  \ClassError{ctexart}{本论文必须使用 XeLaTeX 编译, 请在编译器中切换为 XeLaTeX}{}
+\fi
 
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{amsmath,amssymb}
@@ -15,13 +22,63 @@
 \usepackage{caption}
 \usepackage{enumitem}
 \usepackage[hidelinks]{hyperref}
+\usepackage{fontspec}
+
+% 中文字体自适应(平台字体环境差异大: 依次尝试 Noto CJK/思源/Fandol)
+\IfFontExistsTF{Noto Serif CJK SC}{%
+  \setCJKmainfont{Noto Serif CJK SC}}{%
+  \IfFontExistsTF{Source Han Serif SC}{%
+  \setCJKmainfont{Source Han Serif SC}}{%
+  \IfFontExistsTF{FandolSong-Regular}{%
+  \setCJKmainfont{FandolSong-Regular}}{%
+  \PackageError{ctexart}{未找到可用中文字体, 请安装 Noto CJK/思源/Fandol 中任一字体}{}}}}
+\IfFontExistsTF{Noto Sans CJK SC}{%
+  \setCJKsansfont{Noto Sans CJK SC}}{%
+  \IfFontExistsTF{Source Han Sans SC}{%
+  \setCJKsansfont{Source Han Sans SC}}{%
+  \IfFontExistsTF{FandolSans-Regular}{%
+  \setCJKsansfont{FandolSans-Regular}}{}}}
+\IfFontExistsTF{FandolFang-Regular}{%
+  \setCJKmonofont{FandolFang-Regular}}{%
+  \IfFontExistsTF{Noto Sans Mono CJK SC}{%
+  \setCJKmonofont{Noto Sans Mono CJK SC}}{}}
+
+% 非中文字体: Times New Roman(依次回退: 系统Times → TeX Gyre Termes)
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{%
+  \IfFontExistsTF{TeX Gyre Termes}{\setmainfont{TeX Gyre Termes}}{}}
+
+% 代码块: 边框+行号+编辑器三色(关键字蓝/注释绿/字符串红), listings 通用方案
+\usepackage{xcolor}
+\usepackage{listings}
+\definecolor{kwblue}{RGB}{0,0,180}
+\definecolor{comgreen}{RGB}{0,128,0}
+\definecolor{strred}{RGB}{163,21,21}
+\lstdefinelanguage{mymatlab}{
+  keywords={function,end,for,if,else,elseif,while,switch,case,otherwise,...
+            return,break,continue,global,persistent,clear,clc,try,catch,save},
+  comment=[l]\%,
+  string=[b]",
+}
+\lstset{
+  language=mymatlab,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{kwblue}\bfseries,
+  commentstyle=\color{comgreen},
+  stringstyle=\color{strred},
+  numbers=left, numberstyle=\tiny\color{gray},
+  frame=single, rulecolor=\color{gray},
+  breaklines=true, columns=fullflexible,
+  showstringspaces=false, tabsize=4,
+}
 
 \graphicspath{{figures/}}
 \captionsetup{font=small,labelfont=bf}
 
 \title{\textbf{蔬菜类商品的自动定价与补货决策}}
-\author{【学校名称】 \\ 【队员1姓名】\quad 【队员2姓名】\quad 【队员3姓名】}
-\date{【提交日期】}
+\date{}          % 大标题下不显示日期
+
+% 页码统一底部居中, 无页眉
+\pagestyle{plain}
 
 \begin{document}
 
@@ -30,44 +87,45 @@
 % ---------------- 摘要 ----------------
 \begin{abstract}
 \input{sections/abstract}
+
+\vspace{1.5em}   % 关键词与摘要正文至少隔一行
 \par\noindent\textbf{关键词：}成本加成定价\quad 斯皮尔曼秩相关\quad 三次多项式拟合\quad 线性规划与0-1混合整数规划\quad 熵权法-TOPSIS\quad 灵敏度分析
 \end{abstract}
 
 % ---------------- 正文 ----------------
-\section{一、问题重述与分析}
+\section{问题重述与分析}
 \input{sections/restatement}
 
-\section{二、模型假设}
+\section{模型假设}
 \input{sections/assumption}
 
-\section{三、符号说明}
+\section{符号说明}
 \input{sections/symbol}
 
-\section{四、问题一的模型建立与求解}
+\section{问题一的模型建立与求解}
 \input{sections/q1}
 
-\section{五、问题二的模型建立与求解}
+\section{问题二的模型建立与求解}
 \input{sections/q2}
 
-\section{六、问题三的模型建立与求解}
+\section{问题三的模型建立与求解}
 \input{sections/q3}
 
-\section{七、问题四的分析}
+\section{问题四的分析}
 \input{sections/q4}
 
-\section{八、模型的检验与灵敏度分析}
+\section{模型的检验与灵敏度分析}
 \input{sections/verification}
 
-\section{九、模型的评价、改进与推广}
+\section{模型的评价、改进与推广}
 \input{sections/evaluation}
 
-\section{十、参考文献}
+\section{参考文献}
 \input{sections/reference}
 
 % ---------------- 附录 ----------------
 \newpage
-\appendix
-\section{附录A\quad 关键代码节选}
+\section*{附录\quad 关键代码节选}
 \input{sections/appendix}
 
 \end{document}

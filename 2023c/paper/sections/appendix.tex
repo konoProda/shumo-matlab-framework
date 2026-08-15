@@ -1,6 +1,6 @@
 % appendix.tex — 附录（2026-08-15: A 支撑材料目录, B 核心代码）
 
-\subsection{附录A 支撑材料目录}
+\subsection*{附录A 支撑材料目录}
 
 \begin{description}
 \item[代码] \texttt{src/} 目录：\texttt{main\_vegetable.m}（主程序）、
@@ -16,14 +16,13 @@
       品类相关热图与单品聚类树状图等补充分析图随支撑材料提交。
 \end{description}
 
-\subsection{附录B 核心代码}
+\subsection*{附录B 核心代码}
 
 以下代码与支撑材料中的实现一致，注释按论文展示需要精简。完整代码见支撑材料。
 
-\subsubsection{B.1 主程序（流水线总览）}
+\subsubsection*{B.1 主程序（流水线总览）}
 
-{\footnotesize
-\begin{verbatim}
+\begin{lstlisting}
 % 主程序: 数据预处理 → 问题一 → 问题二 → 问题三 → 结果存档
 clear; close all; clc;
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
@@ -42,13 +41,11 @@ result_q2 = func_q2_category_lp(stats_q1, prod_info, PROJ_ROOT);  % 问题二
 result_q3 = func_q3_item_milp(stats_q1, prod_info, PROJ_ROOT, true, Q3_SAT_LB);
 save(fullfile(OUT_DIR, 'final_results.mat'), ...
      'prod_info', 'stats_q1', 'result_q2', 'result_q3');
-\end{verbatim}
-}
+\end{lstlisting}
 
-\subsubsection{B.2 熵权 TOPSIS 评价（问题三选品）}
+\subsubsection*{B.2 熵权 TOPSIS 评价（问题三选品）}
 
-{\footnotesize
-\begin{verbatim}
+\begin{lstlisting}
 % 熵权法+TOPSIS: 熵权(公式8), 距离与贴近度(公式10)(11)
 function [scores, weights] = func_topsis(X, is_benefit)
 n = size(X, 1);
@@ -67,13 +64,11 @@ v_pos = max(v, [], 1);  v_neg = min(v, [], 1);
 D_pos = sqrt(sum((v - v_pos).^2, 2));           % 到正理想解距离
 D_neg = sqrt(sum((v - v_neg).^2, 2));           % 到负理想解距离
 scores = D_neg ./ (D_pos + D_neg);              % 相对贴近度
-\end{verbatim}
-}
+\end{lstlisting}
 
-\subsubsection{B.3 问题二：方案A 线性规划与方案B 混合整数规划}
+\subsubsection*{B.3 问题二：方案A 线性规划与方案B 混合整数规划}
 
-{\footnotesize
-\begin{verbatim}
+\begin{lstlisting}
 % 方案A: 成本加成定价(公式6) + 线性规划, 目标含打折回收(公式5)
 w_eff_ct = w_ct .* (1 + loss_bar_c);
 p_ct_A = min(max((1 + markup_c) .* w_ct, p_min_c), p_max_c);
@@ -110,13 +105,11 @@ z = reshape(sol(1:nz), K, nC);
 x_day = sum(reshape(sol(nz + 1:end), K, nC), 1);    % x_c = sum_k x_k
 p_day = sum(z .* p_grid', 1);                       % p_c = sum_k p_k * z_k
 profit_day = margin_B(:)' * sol(nz + 1:end);
-\end{verbatim}
-}
+\end{lstlisting}
 
-\subsubsection{B.4 问题三：单品 0-1 规划的约束构建}
+\subsubsection*{B.4 问题三：单品 0-1 规划的约束构建}
 
-{\footnotesize
-\begin{verbatim}
+\begin{lstlisting}
 % 问题三 MILP: 变量排布 [y; z; x; xk], 目标(公式13), 约束(6.3.2节)
 n_var = n_y + n_z + n_x + n_xk;
 c = [zeros(n_y, 1); zeros(n_z, 1); zeros(n_x, 1); -reshape(margin_k', [], 1)];
@@ -148,5 +141,4 @@ if sat_lb > 0                                       % 满足率下限(方案b)
     end
 end
 [sol, ~, flag] = intlinprog(c, intcon, Aineq, bineq, Aeq, beq, lb, ub, opts);
-\end{verbatim}
-}
+\end{lstlisting}
