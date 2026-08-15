@@ -1,11 +1,11 @@
 function result_q2 = func_q2_category_lp(stats_q1, prod_info, PROJ_ROOT, save_figs)
 % =========================================================================
-% func_q2_category_lp.m — 问题2: 品类层面补货与定价优化（建模文档第4节 + 二次优化裁定）
-% B1(2026-08-14): 品类销量-定价关系用三次多项式拟合 S = f(P)（替代线性回归）
-% B2(2026-08-14): 未来一周销售量 = 往年6-7月同星期均值预测
-% B3(2026-08-14): 目标函数含打折回收项 max Σ x·(P·[(1-ℓ)+ℓ·d] - ŵ)
-% B4(2026-08-14): 灵敏度分析 = 定价 ±5%/±10%
-% A9(2026-08-14): 同比2020-2023年7月1-7日利润对比图
+% func_q2_category_lp.m — 问题2: 品类层面补货与定价优化（建模文档第4节）
+% B1: 品类销量-定价关系用三次多项式拟合 S = f(P)（替代线性回归）
+% B2: 未来一周销售量 = 往年6-7月同星期均值预测
+% B3: 目标函数含打折回收项 max Σ x·(P·[(1-ℓ)+ℓ·d] - ŵ)
+% B4: 灵敏度分析 = 定价 ±5%/±10%
+% A9: 同比2020-2023年7月1-7日利润对比图
 % 方案A(主模型): 成本加成定价 P=(1+η)w + LP(linprog) 分配补货量
 % 方案B(对比):   价格离散K档 + MILP(intlinprog) 联合寻优
 % 公式(4.2): ŵ = w(1+ℓ); 公式(4.4)含打折项见 B3
@@ -13,7 +13,7 @@ function result_q2 = func_q2_category_lp(stats_q1, prod_info, PROJ_ROOT, save_fi
 
 OUT_DIR = fullfile(PROJ_ROOT, 'outputs');
 FIG_DIR = fullfile(PROJ_ROOT, 'figures');
-if nargin < 4, save_figs = true; end               % 稳定性测试循环传 false 跳过绘图
+if nargin < 4, save_figs = true; end               % 测试循环传 false 跳过绘图
 
 %% 0. 参数 (与主程序保持一致)
 FORECAST_START = datetime(2023, 7, 1);
@@ -25,7 +25,7 @@ V_SENS_RATIOS = [0.8 0.9 1.0 1.1 1.2];
 
 %% 1. 品类批发价日序列 + 打折日均价 (建模文档4.2)
 ws_cache = fullfile(OUT_DIR, 'wholesale_price.mat');
-if exist(ws_cache, 'file')                        % 缓存加载(约1s, 见 func_preprocess)
+if exist(ws_cache, 'file')                        % 缓存加载
     S = load(ws_cache, 'ws_tbl');
     ws = S.ws_tbl;
 else
@@ -83,7 +83,7 @@ for t = 1:HORIZON
     B_ct(:, t) = mean(stats_q1.cat_qty(:, wd_mask), 2);
 end
 
-%% 4. 未来一周批发价 (Q2②同星期对齐) + 打折数 d_c (B3)
+%% 4. 未来一周批发价 (Q2同星期对齐) + 打折数 d_c (B3)
 w_ct = zeros(n_cat, HORIZON);
 for t = 1:HORIZON
     wd_mask = weekday(dates) == weekday(fcast_dates(t));

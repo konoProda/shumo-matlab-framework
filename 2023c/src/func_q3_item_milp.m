@@ -1,9 +1,9 @@
 function result_q3 = func_q3_item_milp(stats_q1, prod_info, PROJ_ROOT, save_figs, sat_lb)
 % =========================================================================
 % func_q3_item_milp.m — 问题3: 单品层面选品/补货/定价 MILP（建模文档第5节）
-% C2(2026-08-14): 熵权法+TOPSIS 预筛选: 利润额/销售量/销售次数/打折次数/损耗率
+% C2: 熵权法+TOPSIS 预筛选: 利润额/销售量/销售次数/打折次数/损耗率
 %                 5指标评价, 取前33进入MILP; C1裁定: 保留价格离散寻优
-% 方案b(2026-08-14 编程手裁定): sat_lb 为各品类需求满足率下限(基准A口径),
+% 方案b: sat_lb 为各品类需求满足率下限(基准A口径),
 %                默认0=不加; >0 时加入约束 Σ_{i∈c} x_i ≥ sat_lb·D̄_c
 % 决策变量(5.1): y_i 是否上架(binary); x_i 补货量(kg); p_i 售价(元/kg)
 % 参数(5.2): w_i,ℓ_i,a_i,b_i,p^min/max,V,L=27,U=33,M
@@ -16,8 +16,8 @@ function result_q3 = func_q3_item_milp(stats_q1, prod_info, PROJ_ROOT, save_figs
 
 OUT_DIR = fullfile(PROJ_ROOT, 'outputs');
 FIG_DIR = fullfile(PROJ_ROOT, 'figures');
-if nargin < 4, save_figs = true; end               % 稳定性测试循环传 false 跳过绘图
-if nargin < 5, sat_lb = 0.5; end                   % 方案b(2026-08-14裁定): 品类满足率下限=50%
+if nargin < 4, save_figs = true; end               % 测试循环传 false 跳过绘图
+if nargin < 5, sat_lb = 0.5; end                   % 方案b: 品类满足率下限=50%
 
 %% 0. 参数 (与主程序一致)
 CAND_START = datetime(2023, 6, 24);   CAND_END = datetime(2023, 6, 30);
@@ -41,13 +41,13 @@ prod_codes = prod_info.prod_code(cand_idx);
 %% 2. 单品参数 (公式5.2)
 % 批发价 w_i: 2023-06-24~30 均值
 ws_cache = fullfile(OUT_DIR, 'wholesale_price.mat');
-if exist(ws_cache, 'file')                        % 缓存加载(约1s, 见 func_preprocess)
+if exist(ws_cache, 'file')                        % 缓存加载
     S = load(ws_cache, 'ws_tbl');
     ws = S.ws_tbl;
 else
     opts_w = detectImportOptions(fullfile(OUT_DIR, 'wholesale_price.csv'), 'TextType', 'string');
     opts_w.VariableNames = {'prod_code', 'w_date', 'w_price'};
-    opts_w.VariableTypes = {'string', 'string', 'double'};   % 强制字符串防15位编码失真
+    opts_w.VariableTypes = {'string', 'string', 'double'};   % 
     ws = readtable(fullfile(OUT_DIR, 'wholesale_price.csv'), opts_w);
     ws.w_date = datetime(ws.w_date);
 end
@@ -102,7 +102,7 @@ ds_cache = fullfile(OUT_DIR, 'daily_sales.mat');
 if exist(ds_cache, 'file')                                             % 缓存加载
     S = load(ds_cache, 'long_daily');
     ds = S.long_daily;
-    ds.sale_date = datetime(ds.sale_date);                            % 缓存中为文本, 需转换
+    ds.sale_date = datetime(ds.sale_date);                            % 缓存为文本, 需转换
 else
     opts_d = detectImportOptions(fullfile(OUT_DIR, 'daily_sales.csv'), 'TextType', 'string');
     opts_d.VariableNames = {'prod_code', 'sale_date', 'qty', 'revenue', 'avg_price', ...
@@ -141,7 +141,7 @@ P = stats_q1.item_price(cand_idx, jun_mask);
 Q = stats_q1.item_qty(cand_idx, jun_mask);
 p_bar = sum(P .* Q, 2, 'omitnan') ./ sum(Q, 2, 'omitnan');   % 销量加权均价 (n×1)
 demand_bar = max(a_vec + b_vec .* p_bar, 0);                 % 历史实际售价下的需求 D̄_i
-% F3(2026-08-14): 容量护栏 = 全期最大日销量×1.5 (市场容纳量思路)
+% F3: 容量护栏 = 全期最大日销量×1.5 (市场容纳量思路)
 cap_vec = max(item_qty(cand_idx, :), [], 2) * 1.5;
 
 %% 3. 展示空间 V (Q3: 与问题2同口径)
@@ -185,9 +185,9 @@ row = row + 1;  Aineq(row, 1:n_y) = 1;   bineq(row) = U_SHELF;   % Σy ≤ 33
 row = row + 1;  Aineq(row, 1:n_y) = -1;  bineq(row) = -L_SHELF;  % Σy ≥ 27
 row = row + 1;  Aineq(row, n_y + n_z + (1:n_x)) = 1;  bineq(row) = V;  % Σs_i*x_i ≤ V (s=1)
 idx_space = row;                                    % 空间约束行号(敏感性分析用)
-% 方案b(2026-08-14): 各品类需求满足率 ≥ sat_lb (基准A口径: Σ_{i∈c} x_i ≥ sat_lb·D̄_c)
+% 方案b: 各品类需求满足率 ≥ sat_lb (基准A口径: Σ_{i∈c} x_i ≥ sat_lb·D̄_c)
 if sat_lb > 0
-    for cc = 1:n_cat                     % 注意: 循环变量不得与目标向量 c 重名
+    for cc = 1:n_cat                     % 循环变量不与目标向量重名
         row = row + 1;
         idx_in_c = find(g_i == cc);
         Aineq(row, n_y + n_z + idx_in_c) = -1;

@@ -3,7 +3,7 @@
 % 运行方式: matlab -batch "run('src/main_vegetable.m')"（pwd 可为任意目录）
 %
 % 流水线: 数据预处理 → 问题1关联分析 → 问题2品类LP → 问题3单品MILP → 保存结果
-% 裁定记录: 见 outputs/math_to_code_mapping.md 第 6 节（Q1~Q9, 2026-08-14）
+% 裁定记录: 见 outputs/math_to_code_mapping.md 第 6 节（Q1~Q9）
 
 clear; close all; clc;
 
@@ -35,7 +35,7 @@ V_SENS_RATIOS = [0.8 0.9 1.0 1.1 1.2];     % V 敏感性五点
 N_PRICE_LEVELS = 10;            % 方案B价格离散档数 K
 % Q5: 问题3 两阶段策略 — 先纯利润目标(公式5.4); 若品类需求满足率极端则暂停询问编程手
 DEMAND_SAT_ALERT = 0.30;        % 品类需求满足率低于此值视为"极端", 触发暂停
-% 方案b(2026-08-14 编程手裁定): 各品类需求满足率下限 = 50% (扫描结果: 仅损失5.06%利润)
+% 方案b: 各品类需求满足率下限 = 50% (扫描结果: 仅损失5.06%利润)
 Q3_SAT_LB = 0.50;
 % Q6: 需求回归窗口: 近期30天为主, 全3年对比
 REGRESS_WINDOW_DAYS = 30;

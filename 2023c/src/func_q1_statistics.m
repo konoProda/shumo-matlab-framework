@@ -4,7 +4,7 @@ function stats_q1 = func_q1_statistics(prod_info, PROJ_ROOT, save_figs)
 % 公式(3.2): q_{i,t} = 第 i 类/单品第 t 天销量(kg), 未售出填 0
 % 公式(3.3): rho_ij = 1 - 6*Σ(R_i(t)-R_j(t))^2 / (T*(T^2-1))
 %            t  = rho*sqrt((T-2)/(1-rho^2));   p = 2*(1-F_{t,T-2}(|t|))
-% 图表(2026-08-14 二次优化裁定 A1~A8): 图1 品类销量占比扇形图 / 图2 月销量堆叠柱状图
+% 图表(A1~A8): 图1 品类销量占比扇形图 / 图2 月销量堆叠柱状图
 %       图3 月销量箱线图 / 图4 单品销量直方图 / 图5 周内分布 / 图6 时间段堆叠
 %       图7 品类散点矩阵 / 图8 单品散点矩阵 / 图9 top10单品相关热图
 % 输入: prod_info 商品信息表;  PROJ_ROOT 题目根目录
@@ -108,7 +108,7 @@ pie(sum(cat_qty, 2), strcat(string(cat_names), ' ', string(round(pct, 1)), '%'))
 title('六品类蔬菜三年总销量占比');
 exportgraphics(f, fullfile(FIG_DIR, 'q1_pie_share.png'), 'Resolution', 300);
 print(f, fullfile(FIG_DIR, 'q1_pie_share.eps'), '-depsc');
-close(f);                                          % 导出后立即关闭, 释放图形内存(3GB无GPU环境)
+close(f);                                          % 导出后关闭图形
 
 % ---- 图2 (A2): 月销量堆叠柱状图 (12月×6品类) ----
 monthly = zeros(n_cat, 12);
@@ -116,7 +116,7 @@ for mm = 1:12
     monthly(:, mm) = sum(cat_qty(:, month(dates) == mm), 2);
 end
 f = figure('Position', [100 100 760 440], 'Color', 'w');
-b = bar(monthly', 'stacked');                    % 本环境bar: 行=组 → 12月组×6品类
+b = bar(monthly', 'stacked');                    % 12月组×6品类
 legend(cat_names, 'Location', 'eastoutside');
 xlabel('月份');  ylabel('销售量(kg)');
 title('六品类蔬菜各月销售量堆叠柱状图');
