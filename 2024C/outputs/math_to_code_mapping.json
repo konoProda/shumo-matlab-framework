@@ -1,0 +1,167 @@
+{
+  "problem": "2024C",
+  "source_doc": "2024C/data/建模_改2.md",
+  "version": "v3",
+  "generated": "2026-08-19",
+  "status": "pending_final_confirmation",
+  "language": "MATLAB",
+  "solvers": {"q1": "intlinprog", "q2": "linprog (拓扑固定法主路径) / intlinprog (K=30尝试)", "q3": "linprog (拓扑固定后)"},
+  "corrections_applied": {
+    "B1": "轮作窗口改为 t in {2025..2030}（窗口自2023起，2023为常数）",
+    "B2": "价格口径B：q拆到(i,j,s)，逐地块按P_{j,k(i),s}计价（建模手已改）",
+    "B3": "φ折减big-M线性化：折减面积变量w",
+    "B4": "N_j^max数值：{1..15}->4, 16->3, {17..37}->8, {38..41}->6（建模手已给）",
+    "B5": "灾害减产率每地块独立抽样 theta_{i,t}(w) ~ U(0.30,0.40)",
+    "B6": "折减前茬按时间相邻上一季（跨季时序）",
+    "B7": "默认值 theta_{m,j}=|rho_{m,j}|, phi=0.90 (Delta_c=0.10)，Q3做phi敏感性"
+  },
+  "sets": {
+    "years": [2024, 2025, 2026, 2027, 2028, 2029, 2030],
+    "base_year": 2023,
+    "n_plots": 54,
+    "plot_index": {
+      "露天1-34": {"平旱地": [1,2,3,4,5,6], "梯田": [7,8,9,10,11,12,13,14,15,16,17,18,19,20], "山坡地": [21,22,23,24,25,26], "水浇地": [27,28,29,30,31,32,33,34]},
+      "普通大棚35-50": [35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50],
+      "智慧大棚51-54": [51,52,53,54]
+    },
+    "plot_names": ["A1","A2","A3","A4","A5","A6","B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2","C3","C4","C5","C6","D1","D2","D3","D4","D5","D6","D7","D8","E1","E2","E3","E4","E5","E6","E7","E8","E9","E10","E11","E12","E13","E14","E15","E16","F1","F2","F3","F4"],
+    "n_crops": 41,
+    "crop_groups": {
+      "grain_bean": [1,2,3,4,5],
+      "grain": [6,7,8,9,10,11,12,13,14,15,16],
+      "rice": 16,
+      "veg_bean": [17,18,19],
+      "veg": [17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34],
+      "veg_second_only": [35,36,37],
+      "fungi": [38,39,40,41],
+      "bean_all": [1,2,3,4,5,17,18,19],
+      "wheat": 6,
+      "corn": 7,
+      "morel": 41,
+      "edible_fungi_except_morel": [38,39,40]
+    },
+    "n_seasons": 2,
+    "season_label": {"1": "第一季", "2": "第二季", "single": "单季"},
+    "scenario": {"K_base": 50, "K_range": [30, 50, 100], "p": "1/K"}
+  },
+  "omega_rules": [
+    {"plot_types": ["平旱地","梯田","山坡地"], "seasons": [1], "crops": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},
+    {"plot_types": ["水浇地"], "seasons": [1], "crops": [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34]},
+    {"plot_types": ["水浇地"], "seasons": [2], "crops": [35,36,37]},
+    {"plot_types": ["普通大棚"], "seasons": [1], "crops": [17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34]},
+    {"plot_types": ["普通大棚"], "seasons": [2], "crops": [38,39,40,41]},
+    {"plot_types": ["智慧大棚"], "seasons": [1,2], "crops": [17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34]}
+  ],
+  "n_omega": 1062,
+  "q1": {
+    "variables": [
+      {"symbol": "x_{i,j,s,t}", "name": "x_plant", "type": "continuous>=0", "dim": "|Omega|x7 = 7434", "meaning": "种植面积(亩)"},
+      {"symbol": "u_{i,j,s,t}", "name": "u_plant", "type": "binary", "dim": "7434", "meaning": "是否种植"},
+      {"symbol": "q^{norm}_{i,j,s,t}", "name": "q_norm", "type": "continuous>=0", "dim": "7434", "meaning": "正常价销量(斤), 按地块产出"},
+      {"symbol": "q^{disc}_{i,j,s,t}", "name": "q_disc", "type": "continuous>=0", "dim": "7434", "meaning": "半价销量(斤)"}
+    ],
+    "parameters": [
+      {"symbol": "A_i", "name": "plot_area", "dim": "54x1", "source": "附件1"},
+      {"symbol": "Y_{i,j,s}", "name": "yield_i", "dim": "1062x1", "source": "附件2统计表, 按(j,type,s)查表", "note": "智慧大棚第一季用普通大棚第一季平补"},
+      {"symbol": "C_{i,j,s}", "name": "cost_i", "dim": "1062x1", "source": "附件2统计表", "note": "同上平补"},
+      {"symbol": "P_{j,k(i),s}", "name": "price_i", "dim": "1062x1", "source": "附件2统计表价格区间均值(min+max)/2", "note": "智慧大棚+20%自动体现"},
+      {"symbol": "D_{j,s}", "name": "demand_2023", "dim": "41x2", "source": "2023种植面积x亩产按(j,s)全村汇总"},
+      {"symbol": "delta", "name": "delta_min", "value": 0.10, "meaning": "单地块单作物最小种植比例"},
+      {"symbol": "N_j^max", "name": "n_plot_max", "value": {"crops_1_15": 4, "rice_16": 3, "veg_17_37": 8, "fungi_38_41": 6}},
+      {"symbol": "u_{i,j,s,2023}", "name": "planted_2023", "dim": "54x41x2 logical", "source": "附件2 2023种植情况", "note": "连作/轮作/前茬锚点"}
+    ],
+    "objective": {
+      "direction": "max",
+      "expression": "sum_t sum_s sum_Omega ( P_{j,k(i),s}*q_norm + gamma*P_{j,k(i),s}*q_disc - C_{i,j,s}*x )",
+      "case1_滞销": {"gamma": 0, "q_disc": "固定为0", "note": "超产无收入, 全额计成本"},
+      "case2_半价": {"gamma": 0.5}
+    },
+    "constraints": [
+      {"id": "C1-1", "name": "单地块产量定义", "form": "Q(i,j,s,t) = Y(i,j,s)*x(i,j,s,t)", "type": "eq"},
+      {"id": "C1-2", "name": "全村需求上限", "form": "sum_{i:(i,j,s)inOmega} q_norm(i,j,s,t) <= D(j,s)", "type": "ineq"},
+      {"id": "C1-3", "name": "单地块产销平衡", "form": "q_norm(i,j,s,t)+q_disc(i,j,s,t) <= Q(i,j,s,t)", "type": "ineq"},
+      {"id": "C1-4", "name": "面积上限", "form": "sum_j x(i,j,s,t) <= A_i, forall i,s,t", "type": "ineq"},
+      {"id": "C1-5", "name": "最小比例", "form": "delta*A_i*u <= x <= A_i*u", "type": "ineq"},
+      {"id": "C1-6a", "name": "连作跨年同季", "form": "u(i,j,s,t)+u(i,j,s,t-1) <= 1, t in T, 2023为常数", "type": "ineq"},
+      {"id": "C1-6b", "name": "连作年内跨季", "form": "u(i,j,1,t)+u(i,j,2,t) <= 1, i in {27..54}", "type": "ineq"},
+      {"id": "C1-6c", "name": "连作智慧大棚跨年跨季", "form": "u(i,j,2,t-1)+u(i,j,1,t) <= 1, i in {51..54}", "type": "ineq"},
+      {"id": "C1-7", "name": "豆类轮作", "form": "sum_{tau=t-2..t} sum_s sum_{j in bean_all} u(i,j,s,tau) >= 1, forall i, t in {2025..2030}", "type": "ineq", "note": "B1修正: 窗口自2023起, 2023为常数"},
+      {"id": "C1-8", "name": "集中度", "form": "sum_{i:(i,j,s)inOmega} u(i,j,s,t) <= N_j^max", "type": "ineq"}
+    ],
+    "solve": "intlinprog, 稀疏装配, 两种gamma分别求解, 回填result1_1.xlsx/result1_2.xlsx",
+    "scale": "29736变量(14868连续x/q + 7434二值u) + ~3.8万约束, 分钟级"
+  },
+  "q2": {
+    "stochastic_params": [
+      {"symbol": "D_{j,s,t}(w)", "name": "demand_w", "dist": "小麦(6)/玉米(7): g~U(0.05,0.10); 其他: g~U(-0.05,0.05)", "form": "D_t = D_2023 * prod_{tau=2024..t}(1+g_tau)", "dim": "41x2x7xK"},
+      {"symbol": "C_{i,j,s,t}(w)", "name": "cost_w", "dist": "g_c ~ N(0.05, 0.01^2)", "form": "C_t = C_2023 * prod(1+g_c,tau)", "dim": "1062x7xK"},
+      {"symbol": "P_{j,k(i),s,t}(w)", "name": "price_w", "dist": "粮食rate=0; 蔬菜g_p~N(0.05,0.01^2); 食用菌38-40 d_p~U(0.01,0.05)负向; 羊肚菌固定-5%", "form": "P_t = P_2023 * prod(1+rate), 智慧大棚+20%基准自动沿用", "dim": "1062x7xK"},
+      {"symbol": "Y_{i,j,s,t}(w)", "name": "yield_w", "dist": "xi_{j,t}~U(-0.10,0.10); 灾害: 露天i<=34每地块每年10%独立触发, theta_{i,t}(w)~U(0.30,0.40)每地块独立(B5); 大棚theta=0", "form": "Y = Y_2023*(1+xi)*(1-theta*I_disaster)", "dim": "1062x7xK"}
+    ],
+    "variables": [
+      {"symbol": "x,u", "name": "x_plant,u_plant", "stage": 1, "dim": "7434x2"},
+      {"symbol": "q_norm(w),q_disc(w)", "name": "q_norm_w,q_disc_w", "stage": 2, "dim": "1062x7xKx2"},
+      {"symbol": "eta_t, v_t(w)", "name": "eta, v_tail", "dim": "7, 7xK"}
+    ],
+    "cvar": {"alpha": 0.95, "lambda": 0.1, "lambda_sensitivity": [0, 0.1, 0.5],
+             "formula": "CVaR_t = eta_t + (1/(0.05*K))*sum_w v_t(w)",
+             "v_constraints": ["v_t(w) >= Loss_t(w) - eta_t", "v_t(w) >= 0"],
+             "loss": "Loss_t(w) = -Pi_t(w)"},
+    "objective": "max sum_t ( (1/K)sum_w Pi_t(w) - lambda*CVaR_t )",
+    "constraints": "第一阶段x,u满足C1-4~C1-8刚性约束; 每情景: sum_i q_norm(w)<=D_{j,s,t}(w); q_norm(w)+q_disc(w)<=Y_{i,j,s,t}(w)*x(i,j,s,t); 半价规则gamma=0.5",
+    "solve_strategy": {
+      "primary": "拓扑固定法: 固定Q1最优u* -> 纯连续LP (K=50~100) -> linprog内点法, 分钟~小时级",
+      "attempt": "全量SAA-MILP K=30 + 时间上限, intlinprog, 高风险仅作对比",
+      "verify": "K in {30,50,100} 目标均值/方差收敛曲线"
+    },
+    "output": "第一阶段x方案回填result2.xlsx",
+    "scale_note": "K=50拓扑固定LP: ~76万连续变量, ~60万约束"
+  },
+  "q3": {
+    "statistics": [
+      {"step": "正态性检验", "tool": "jbtest", "output": "各指标正态性判定"},
+      {"step": "Spearman相关", "tool": "corr(...,'Type','Spearman')", "output": "41x41矩阵+热力图"},
+      {"step": "K-means聚类", "tool": "kmeans, 4类, 特征[预期销量,均价,成本,价格波动区间]先标准化", "output": "功能分组"}
+    ],
+    "substitution": {
+      "Sub(j)": "rho_{j,m} <= -0.4 且同聚类",
+      "theta_{m,j}": "|rho_{m,j}| (B7默认值)",
+      "demand_update": "D_tilde_{j,s,t}(w) = D_{j,s,t}(w) + sum_{m in Sub(j)} theta_{m,j} * e_{m,s,t}(w)",
+      "linearize_e": ["e_{m,s,t}(w) >= D_{m,s,t}(w) - sum_i Y_{i,m,s,t}(w)*x_{i,m,s,t}", "e >= 0", "e dim: 41x2x7xK"]
+    },
+    "complementarity": {
+      "phi": 0.90, "Delta_c": 0.10, "phi_sensitivity": [0.85, 0.90, 0.95],
+      "prev_season_rule": "B6修正: t年第一季前茬=(t-1)年第二季; t年第二季前茬=t年第一季; 单季地块前茬=(t-1)年第一季; 2024年用2023常数",
+      "b_indicator": "b(i,s,t) in [0,1]连续: b>=u_{j_bean}(逐豆类), b<=sum_{j_bean}u; b dim: 54x2x7",
+      "bigM_linearization": "w(i,j,s,t): 0<=w<=x, w<=A_i*b, w>=x-A_i*(1-b); 成本项=C(w)*x - Delta_c*C(w)*w; w dim: 7434"
+    },
+    "solve": "将D_tilde与折减成本代入问题2 SAA-CVaR, 拓扑固定后纯LP(linprog)",
+    "compare": [
+      "经济: 7年总利润期望/总销售额/总成本",
+      "风险: 利润标准差/95%CVaR",
+      "结构: 粮食/蔬菜/食用菌面积占比演变"
+    ]
+  },
+  "sensitivity": [
+    {"id": "S1", "item": "lambda权衡曲线", "impl": "lambda in [0,0.5]扫描, 期望收益-CVaR Pareto前沿"},
+    {"id": "S2", "item": "灾害概率敏感性", "impl": "p_dis in {0.05,0.10,0.15,0.20}, 观察露天->大棚转移"},
+    {"id": "S3", "item": "delta扰动", "impl": "delta in {0.05,0.10,0.15}, 耕地利用率与总利润"},
+    {"id": "S4", "item": "phi敏感性", "impl": "phi in {0.85,0.90,0.95}"}
+  ],
+  "data_io": {
+    "inputs": [
+      {"file": "附件1.xlsx", "sheet": "乡村的现有耕地", "clean": "跳过说明列文本"},
+      {"file": "附件1.xlsx", "sheet": "乡村种植的农作物", "clean": "取前41行前3列"},
+      {"file": "附件2.xlsx", "sheet": "2023年的农作物种植情况", "clean": "地块名前向填充; 单季->s=1; 生成planted_2023"},
+      {"file": "附件2.xlsx", "sheet": "2023年统计的相关数据", "clean": "删末3空行; 价格区间(min+max)/2; 建yield/cost/price_map; 智慧大棚第一季平补=普通大棚第一季"},
+      {"file": "附件3/result1_1.xlsx,result1_2.xlsx,result2.xlsx", "structure": "7sheets x 87行x43列, A季次(合并) B地块名 C..43=41作物, 82数据行(第一季54+第二季28)", "fill": "种植亩数, 单季作物填第一季行, 不改形式"}
+    ],
+    "outputs": "result1_1.xlsx(情况1), result1_2.xlsx(情况2), result2.xlsx(问题2)"
+  },
+  "implementation": {
+    "components": ["loadData", "buildOmega", "buildParams", "buildAnchor", "solveQ1", "writeResultTpl", "genScenarios", "buildSAA", "buildCVaR", "solveQ2", "analyzeCorr", "clusterCrops", "buildQ3", "runSensitivity", "compareQuestions"],
+    "toolbox": ["Optimization_Toolbox", "Statistics_Toolbox"],
+    "naming": {"variables": "下划线", "functions": "驼峰", "comments": "标注公式编号C1-x/C3-x等"}
+  },
+  "remaining": "无未决歧义; 轮作-连作-分散度组合可行性由/test求解器验证, 不可行则回传调整N或delta"
+}

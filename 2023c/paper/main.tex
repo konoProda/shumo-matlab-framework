@@ -79,18 +79,32 @@
 
 % 页码统一底部居中, 无页眉
 \pagestyle{plain}
+\setlength{\textheight}{22cm}      % 正文高度，可调大以减少底部空白
+\setlength{\footskip}{1cm}         % 页脚到正文底部的距离，适当减小
+\setlength{\voffset}{0cm}          % 垂直偏移归零
+\setlength{\topmargin}{-0.5cm}     % 调整上边距
+\setlength{\headheight}{0.5cm}     % 页眉高度
+\setlength{\headsep}{0.5cm}        % 页眉与正文间距
+\raggedbottom
+
+
 
 \begin{document}
 
-\maketitle
-
+% 自定义紧凑标题(弃用 \maketitle, 其上下留白过大)
+\begin{center}
+{\LARGE\heiti 蔬菜类商品的自动定价与补货决策}
+\end{center}
+\vspace{0.8em}
 % ---------------- 摘要 ----------------
-\begin{abstract}
+\begin{center}{\heiti\bfseries\large 摘\quad 要}\end{center}
+\vspace{-0.4em}
 \input{sections/abstract}
 
-\vspace{1.5em}   % 关键词与摘要正文至少隔一行
+\vspace{0.4cm}   % 关键词与摘要正文间隔一行
 \par\noindent\textbf{关键词：}成本加成定价\quad 斯皮尔曼秩相关\quad 三次多项式拟合\quad 线性规划与0-1混合整数规划\quad 熵权法-TOPSIS\quad 灵敏度分析
-\end{abstract}
+
+\newpage   % 摘要独占第一页, 正文从第二页开始
 
 % ---------------- 正文 ----------------
 \section{问题重述与分析}
