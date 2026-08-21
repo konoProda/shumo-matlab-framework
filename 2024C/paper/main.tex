@@ -1,0 +1,63 @@
+\documentclass[12pt,a4paper]{ctexart}
+
+\usepackage{iftex}
+\ifXeTeX
+  \usepackage{fontspec}
+  \IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{TeX Gyre Termes}}
+\fi
+\usepackage{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\geometry{left=2.7cm,right=2.7cm,top=2.6cm,bottom=2.6cm}
+\pagestyle{plain}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\linespread{1.28}
+\setlist[enumerate]{leftmargin=3em,itemsep=0.2em,topsep=0.2em}
+\captionsetup{font=small,labelsep=quad}
+\graphicspath{{figures/}}
+
+\lstdefinestyle{matlabstyle}{
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{blue!60!black},
+  commentstyle=\color{green!45!black},
+  stringstyle=\color{red!55!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  frame=single,
+  breaklines=true,
+  tabsize=4,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\begin{center}
+  {\zihao{2}\heiti 农作物的种植策略优化模型}\\[1.2em]
+  {\zihao{4}【学校名称】\quad 【队员1姓名】\quad 【队员2姓名】\quad 【队员3姓名】}
+\end{center}
+
+\input{sections/abstract}
+\input{sections/restatement}
+\input{sections/assumptions_symbols}
+\input{sections/data_preprocess}
+\input{sections/q1_model}
+\input{sections/q2_model}
+\input{sections/q3_model}
+\input{sections/validation}
+\input{sections/evaluation}
+\input{sections/references}
+\input{sections/appendix}
+
+\end{document}

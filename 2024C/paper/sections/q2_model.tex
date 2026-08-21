@@ -1,0 +1,77 @@
+\section{问题二模型建立与求解}
+
+\subsection{从确定性模型到随机模型}
+
+问题一把未来看作2023年的延续，这适合作为基准，但农业经营中需求、价格、成本和亩产都存在变化。若仍只最大化固定参数下的利润，得到的方案可能在平均情况下表现较好，却对灾害或价格波动较敏感。问题二因此需要把“不确定性”显式纳入模型。
+
+本文采用两阶段随机规划。第一阶段是在规划期开始时确定种植面积和种植拓扑；第二阶段是在不同随机情景下，根据当年的产量和需求决定正常销售量与折价销售量。这样处理符合实际决策顺序：种植安排需要提前确定，销售分配则会随市场和产量实现情况调整。
+
+\subsection{随机情景生成}
+
+本文根据题目给定规则生成 $K=50$ 个随机情景。对小麦和玉米，需求增长率在 $[5\%,10\%]$ 内抽样；对其他作物，需求增长率在 $[-5\%,5\%]$ 内波动。成本按年增长，蔬菜价格整体增长，食用菌价格下降。亩产量存在 $\pm 10\%$ 的随机波动，露天耕地还会以10\%概率受到灾害影响，大棚不计入灾害减产范围。
+
+以需求为例，若 $g_{j,t}(\omega)$ 表示作物 $j$ 在年份 $t$、情景 $\omega$ 下的需求增长率，则
+\begin{equation}
+D_{j,s,t}(\omega)=D_{j,s}\prod_{\tau=2024}^{t}\left(1+g_{j,\tau}(\omega)\right).
+\end{equation}
+成本、价格和亩产也采用类似的逐年累积或扰动方式。采用情景生成而非单一预测值，是为了在模型中同时保留多种可能的未来状态。
+
+\subsection{SAA-CVaR两阶段模型}
+
+在情景 $\omega$ 下，年份 $t$ 的利润为
+\begin{equation}
+\Pi_t(\omega)=\sum_{(i,j,s)\in\Omega}
+\left(P_{i,j,s,t}(\omega)q^n_{i,j,s,t}(\omega)
+ +0.5P_{i,j,s,t}(\omega)q^d_{i,j,s,t}(\omega)
+ -C_{i,j,s,t}(\omega)x_{i,j,s,t}\right).
+\end{equation}
+其中，超产部分按半价销售，这是问题二延续题目第二问的销售口径。
+
+仅最大化情景平均利润会忽略尾部风险。本文引入 CVaR 描述最差一部分情景下的平均损失。令 $\mathrm{Loss}_t(\omega)=-\Pi_t(\omega)$，CVaR 可线性化为
+\begin{equation}
+\mathrm{CVaR}_t=\eta_t+\frac{1}{(1-\alpha)K}\sum_{\omega=1}^{K}v_t(\omega),
+\end{equation}
+\begin{equation}
+v_t(\omega)\ge \mathrm{Loss}_t(\omega)-\eta_t,\quad v_t(\omega)\ge 0.
+\end{equation}
+本文取 $\alpha=0.95$，表示关注最差5\%情景的平均表现。于是问题二目标为
+\begin{equation}
+\max \sum_{t\in T}\left[\frac{1}{K}\sum_{\omega=1}^{K}\Pi_t(\omega)-\lambda \mathrm{CVaR}_t\right],
+\end{equation}
+其中 $\lambda=0.10$ 为风险厌恶系数。该目标的含义是，在提高平均利润的同时，对尾部损失较大的方案施加惩罚。
+
+每个情景下仍需满足销售量和产量关系：
+\begin{equation}
+\sum_{i:(i,j,s)\in\Omega}q^n_{i,j,s,t}(\omega)\le D_{j,s,t}(\omega),
+\end{equation}
+\begin{equation}
+q^n_{i,j,s,t}(\omega)+q^d_{i,j,s,t}(\omega)\le
+Y_{i,j,s,t}(\omega)x_{i,j,s,t}.
+\end{equation}
+面积、最小比例、连作、轮作和集中度约束沿用问题一，保证随机模型不会破坏农作制度。
+
+\subsection{工程求解策略}
+
+若在50个情景下同时保留全部0-1变量，模型规模会很大，求解时间和内存压力显著增加。考虑到问题一半价情形已给出稳定的可行种植拓扑，本文采用拓扑固定法：固定问题一半价方案中的 $u_{i,j,s,t}$，在此基础上优化种植面积和各情景下销售分配。固定拓扑后，模型转化为纯线性规划，能够使用 \texttt{linprog} 获得该拓扑下的全局最优解。该处理既保持了农艺结构，又使随机规划在可用计算资源内完成。
+
+\subsection{求解结果与分析}
+
+问题二求得七年期望利润为6429.27万元，总收入7335.30万元，总成本906.02万元，情景总利润标准差为112.03万元。与问题一半价情形相比，期望利润提高约318.31万元，说明在考虑未来需求和价格变化后，允许各情景下灵活分配销售量能够提升方案收益。
+
+图\ref{fig:q2-hist}展示了问题二情景总利润分布。利润主要集中在均值附近，尾部情景未出现亏损，这与CVaR结果相一致。本文得到的95\% CVaR合计为 $-5910.96$ 万元；由于本文将损失定义为利润的相反数，负值表示最差5\%情景下平均仍保持盈利。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\textwidth]{q2_profit_hist.png}
+  \caption{问题二情景总利润分布}
+  \label{fig:q2-hist}
+\end{figure}
+
+为检验样本平均逼近的稳定性，本文比较不同情景数下的目标值，并绘制累计均值曲线，如图\ref{fig:saa}所示。$K=30$ 与 $K=50$ 的目标相对差小于5\%，说明当前情景规模能够较稳定地反映随机因素影响。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\textwidth]{saa_cumulative.png}
+  \caption{SAA累计均值收敛情况}
+  \label{fig:saa}
+\end{figure}

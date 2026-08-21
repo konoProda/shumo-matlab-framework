@@ -1,0 +1,116 @@
+\section{问题三模型建立与求解}
+
+\subsection{作物关系的引入}
+
+问题二仍默认每种作物的需求相互独立，但在实际市场中，作物之间可能存在替代或互补关系。例如，两种用途相近的蔬菜可能在销售端相互替代；豆类作物作为前茬时，又可能改善土壤条件，降低后茬作物的种植成本。问题三的核心是把这种作物关联性转化为可计算的约束或参数修正。
+
+本文先从数据中识别关系，再把关系嵌入优化模型。这样做比直接主观指定替代作物更稳妥：相关性分析提供了作物市场表现之间的证据，聚类则保证替代关系主要发生在功能相近的作物之间。
+
+\subsection{统计相关性与聚类}
+
+对每种作物，本文提取基准需求、均价、成本和价格波动等特征，并进行标准化处理。作物 $j$ 与作物 $m$ 的关联程度采用 Spearman 秩相关系数 $\rho_{j,m}$ 表示。选择 Spearman 相关的原因是，它不要求变量满足线性关系或正态分布，更适合农业价格和需求这类可能存在偏态与等级关系的数据。
+
+在相关性基础上，本文采用 K-means 将41种作物分为4类，分别对应大宗粮食、普通蔬果、高价值菌类和特种敏感作物等功能分组。图\ref{fig:q3-stats}给出了相关热力图和聚类散点图。相关热力图用于观察作物之间的正负相关结构，聚类图用于保证替代关系只在同类作物内识别，避免把差异过大的作物错误地设为替代品。
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{q3_corr_heatmap.png}
+    \caption{Spearman相关热力图}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{q3_clusters.png}
+    \caption{K-means聚类结果}
+  \end{subfigure}
+  \caption{作物统计关系识别}
+  \label{fig:q3-stats}
+\end{figure}
+
+\subsection{替代关系建模}
+
+若两个作物属于同一聚类，且 Spearman 相关系数满足 $\rho_{j,m}\le -0.4$，本文认为它们具有较强替代倾向。作物 $j$ 的替代集合记为
+\begin{equation}
+\mathrm{Sub}(j)=\{m:\rho_{j,m}\le -0.4,\ m\text{ 与 }j\text{ 属于同一聚类}\}.
+\end{equation}
+负相关表示两者在市场表现上存在相反变化，且同簇约束保证替代关系发生在相近作物之间。
+
+当替代作物 $m$ 的供给不足时，其未满足需求可部分转移给作物 $j$。本文令需求转移系数为
+\begin{equation}
+\theta_{m,j}=|\rho_{m,j}|,
+\end{equation}
+并将需求上限修正为
+\begin{equation}
+\sum_i q^n_{i,j,s,t}(\omega)+
+\sum_{m\in\mathrm{Sub}(j)}\theta_{m,j}\sum_i q^n_{i,m,s,t}(\omega)
+\le D_{j,s,t}(\omega)+
+\sum_{m\in\mathrm{Sub}(j)}\theta_{m,j}D_{m,s,t}(\omega).
+\end{equation}
+该式的直观含义是：若替代品具有需求空间，部分市场消化能力可以在同类作物之间转移，但转移强度由相关程度限制。
+
+\subsection{互补关系建模}
+
+豆类作物具有固氮作用，作为前茬时可能降低后茬作物种植成本。本文用 $b_{i,s,t}$ 表示地块 $i$ 在季次 $s$、年份 $t$ 的前茬是否为豆类，并设置成本折减系数 $\phi=0.90$。于是有效种植成本可写为
+\begin{equation}
+C^{\rm eff}_{i,j,s,t}(\omega)=C_{i,j,s,t}(\omega)\left[1-(1-\phi)b_{i,s,t}\right].
+\end{equation}
+其中 $1-\phi=0.10$ 表示豆类前茬带来的成本折减比例。前茬按时间相邻关系判定：第一季参考上一年第二季，第二季参考同年第一季；对于单季地块，参考上一年第一季。2024年的前茬由2023年实际种植锚点确定。
+
+由于问题三沿用问题二的固定拓扑，$b_{i,s,t}$ 可由已知种植结构确定，因此互补折减不会引入新的非线性困难。将上述有效成本代入问题二的SAA-CVaR模型，即得到包含替代与互补机制的扩展随机规划模型。
+
+\subsection{求解结果与对比}
+
+问题三求得七年期望利润为6443.76万元，总收入7335.36万元，总成本891.60万元。与问题二相比，收入几乎不变，但成本下降14.43万元，期望利润提高14.49万元，说明互补成本折减是利润改善的主要来源，替代机制主要起到微调需求分配和稳定销售结构的作用。
+
+四类方案的总体对比如表\ref{tab:compare-all}和图\ref{fig:compare-profit}所示。问题一滞销方案利润最低，表明超产不能销售时，模型会主动压缩部分种植以避免无效成本；问题一半价方案明显提高土地利用程度；问题二在随机环境下进一步提升期望收益；问题三在考虑作物关系后取得最高利润。
+
+\begin{table}[H]
+\centering
+\caption{四类方案经济指标对比}
+\label{tab:compare-all}
+\begin{tabular}{lccccc}
+\toprule
+方案 & 七年总利润/万元 & 总收入/万元 & 总成本/万元 & 标准差/万元 & CVaR/万元 \\
+\midrule
+Q1滞销 & 3552.16 & 4018.88 & 466.72 & -- & -- \\
+Q1半价 & 6110.96 & 6858.95 & 747.99 & -- & -- \\
+Q2期望 & 6429.27 & 7335.30 & 906.02 & 112.03 & -5910.96 \\
+Q3期望 & 6443.76 & 7335.36 & 891.60 & 111.95 & -5925.51 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{compare_profit.png}
+    \caption{总利润对比}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{compare_profit_year.png}
+    \caption{逐年利润对比}
+  \end{subfigure}
+  \caption{四类方案利润对比}
+  \label{fig:compare-profit}
+\end{figure}
+
+图\ref{fig:area-share}展示了问题三中主要作物类别的面积结构变化。种植结构并未随利润目标向单一高价作物极端集中，而是在粮食、蔬菜和食用菌之间保持约束下的平衡，这说明轮作、适宜性和分散度约束对方案结构起到了稳定作用。
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.58\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{area_share_evol.png}
+    \caption{面积占比逐年演变}
+  \end{subfigure}
+  \begin{subfigure}{0.36\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{q3_area_share_pie.png}
+    \caption{七年累计面积占比}
+  \end{subfigure}
+  \caption{问题三种植面积结构}
+  \label{fig:area-share}
+\end{figure}

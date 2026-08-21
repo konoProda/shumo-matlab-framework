@@ -1,0 +1,347 @@
+\appendix
+
+\section{支撑材料清单}
+
+为保证正文模型、程序实现与结果文件之间能够相互追溯，本文附录列出支撑材料及核心程序节选。完整工程文件位于本文同级支撑目录中，主要包括：
+\begin{enumerate}
+  \item 原始数据：\texttt{data/C题.pdf}、\texttt{data/附件1.xlsx}、\texttt{data/附件2.xlsx}、\texttt{data/附件3/}；
+  \item 代码文件：\texttt{src/main\_planting.m} 及 \texttt{src/func\_*.m}，分别对应主控程序、数据预处理、三问建模求解、结果回填与灵敏度分析；
+  \item 结果文件：\texttt{outputs/result1\_1.xlsx}、\texttt{outputs/result1\_2.xlsx}、\texttt{outputs/result2.xlsx}、\texttt{outputs/compare\_q.csv}、\texttt{outputs/sensitivity.csv}；
+  \item 检验文件：\texttt{tests/test\_planting.m}、\texttt{outputs/test\_log.txt}、\texttt{outputs/test\_results.mat}；
+  \item 图件文件：\texttt{figures/} 目录下的收益对比、结构分布、收敛性与灵敏度分析图；
+  \item 模型--代码映射：\texttt{outputs/math\_to\_code\_mapping.md} 与 \texttt{outputs/math\_to\_code\_mapping.json}。
+\end{enumerate}
+
+附录代码仅保留能够体现模型构建思想和约束实现方式的关键片段，完整可运行代码以 \texttt{src/} 与 \texttt{tests/} 目录为准。
+
+\section{核心代码节选}
+
+\subsection{主程序参数与三问调度}
+
+主程序首先集中设置随机情景数、最小种植比例、CVaR 置信水平、风险厌恶系数、互补折减系数等参数。随后完成数据加载、适宜种植集合构造和 2023 年种植锚点建立，最后通过 \texttt{QUESTION} 控制三问及灵敏度分析的运行流程。这样处理可以保证三问使用同一套数据口径和参数口径。
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% main_planting.m：参数集中定义
+QUESTION = 1;       % 1/2/3/4 分别对应问题一、二、三和灵敏度分析
+RNG_SEED = 2024;    % 随机数种子，保证 SAA 情景可复现
+
+K_SCEN      = 50;   % 样本平均近似的情景数
+DELTA_MIN   = 0.10; % 最小种植比例
+ALPHA_CVAR  = 0.95; % CVaR 置信水平
+LAMBDA_RISK = 0.1;  % 风险厌恶系数
+PHI_COMP    = 0.90; % 豆类前茬互补折减系数
+P_DISASTER  = 0.10; % 露天耕地灾害触发概率
+
+[plot_area, plot_type, crop_type, plant_raw, stat_raw] = ...
+    func_load_data(DATA_DIR);
+[omega_list, omega_map] = func_build_omega(plot_type, crop_type);
+param = func_build_params(plot_area, plot_type, crop_type, ...
+                          stat_raw, plant_raw, omega_list);
+param.delta_min = DELTA_MIN;
+param.p_disaster = P_DISASTER;
+
+planted_2023 = func_build_anchor(plant_raw, omega_map);
+param.planted_2023 = planted_2023;
+param.bean_2023 = squeeze(sum(planted_2023(:, [1 2 3 4 5 17 18 19], :), [2 3]));
+\end{lstlisting}
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% main_planting.m：三问调度
+switch QUESTION
+    case 1
+        sol_case1 = func_q1_milp(param, planted_2023, '滞销');
+        sol_case2 = func_q1_milp(param, planted_2023, '半价');
+        func_write_result(OUT_DIR, 'result1_1.xlsx', sol_case1);
+        func_write_result(OUT_DIR, 'result1_2.xlsx', sol_case2);
+
+    case 2
+        scen = func_gen_scenarios(param, K_SCEN, RNG_SEED);
+        S1 = load(fullfile(OUT_DIR, 'q1_solution.mat'));
+        sol_q2 = func_q2_saa(param, scen, S1.sol_case2.u, ...
+                             ALPHA_CVAR, LAMBDA_RISK, 'lp_fixed');
+        func_write_result(OUT_DIR, 'result2.xlsx', sol_q2);
+
+    case 3
+        S2 = load(fullfile(OUT_DIR, 'q2_solution.mat'));
+        [rho_sp, clusters] = func_q3_stats(param, S2.sol_q2);
+        sol_q3 = func_q3_extend(param, S2.scen, S2.sol_q2.u, ...
+                                rho_sp, clusters, PHI_COMP, 'abs_rho');
+end
+\end{lstlisting}
+
+\subsection{问题一混合整数规划约束装配}
+
+问题一将每个“地块--作物--季次”可行组合整理为集合 $\Omega$，并在 2024--2030 年上建立面积变量 $x$、种植指示变量 $u$、正常销售量 $q^{n}$ 与折价销售量 $q^{d}$。由于约束数量较多，程序采用稀疏矩阵方式逐块装配 \texttt{A,b,f,lb,ub,intcon}，再调用 \texttt{intlinprog} 求解。
+
+面积变量和 0--1 变量之间通过上下界联动：若 $u=0$，则 $x=0$；若 $u=1$，则面积至少为地块面积的 $\delta$ 倍，避免出现零散不可操作方案。
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q1_milp.m：变量分块与目标函数
+N7 = N * n_t;
+off_u = N7;  off_qn = 2 * N7;  off_qd = 3 * N7;
+n_var = 4 * N7;
+xidx  = @(idx, t) (t - 1) * N + idx;
+uidx  = @(idx, t) off_u  + (t - 1) * N + idx;
+qnidx = @(idx, t) off_qn + (t - 1) * N + idx;
+qdidx = @(idx, t) off_qd + (t - 1) * N + idx;
+
+gamma = 0.5;                         % 半价情形；滞销情形取 0
+f = zeros(n_var, 1);                 % 最大收益转化为最小化 -收益
+for t = 1:n_t
+    f(xidx(allidx, t))  = param.cost_i;
+    f(qnidx(allidx, t)) = -param.price_i;
+    f(qdidx(allidx, t)) = -gamma * param.price_i;
+end
+\end{lstlisting}
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q1_milp.m：产销平衡与面积约束
+% q_norm + q_disc <= yield * x
+for t = 1:n_t
+    Ic{end+1, 1} = [qnidx(allidx, t); qdidx(allidx, t); xidx(allidx, t)];
+    Jc{end+1, 1} = n_row + [allidx; allidx; allidx];
+    Vc{end+1, 1} = [ones(N, 1); ones(N, 1); -param.yield_i];
+    bc{end+1, 1} = zeros(N, 1);
+    n_row = n_row + N;
+end
+
+% delta * A_i * u <= x <= A_i * u
+for t = 1:n_t
+    Ic{end+1, 1} = [xidx(allidx, t); uidx(allidx, t)];
+    Jc{end+1, 1} = n_row + [allidx; allidx];
+    Vc{end+1, 1} = [-ones(N, 1); delta * Ai];
+    bc{end+1, 1} = zeros(N, 1);
+    n_row = n_row + N;
+
+    Ic{end+1, 1} = [xidx(allidx, t); uidx(allidx, t)];
+    Jc{end+1, 1} = n_row + [allidx; allidx];
+    Vc{end+1, 1} = [ones(N, 1); -Ai];
+    bc{end+1, 1} = zeros(N, 1);
+    n_row = n_row + N;
+end
+\end{lstlisting}
+
+连作约束和豆类轮作约束是种植策略中最容易出错的部分。程序将 2023 年真实种植作为锚点纳入约束右端项，从而保证 2024 年第一期方案不会脱离已知前茬条件；豆类轮作则使用三年滑动窗口，确保每块地在连续三年内至少安排一次豆类作物。
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q1_milp.m：跨年同季连作约束
+for idx = 1:N
+    rhs = 1 - planted_2023(oi(idx), oj(idx), os(idx));
+    n_row = n_row + 1;
+    Ic{end+1, 1} = uidx(idx, 1);
+    Jc{end+1, 1} = n_row;
+    Vc{end+1, 1} = 1;
+    bc{end+1, 1} = rhs;
+end
+for t = 2:n_t
+    Ic{end+1, 1} = [uidx(allidx, t); uidx(allidx, t - 1)];
+    Jc{end+1, 1} = n_row + [allidx; allidx];
+    Vc{end+1, 1} = ones(2 * N, 1);
+    bc{end+1, 1} = ones(N, 1);
+    n_row = n_row + N;
+end
+
+% func_q1_milp.m：豆类三年轮作窗口
+bean = [1 2 3 4 5 17 18 19];
+for i = 1:54
+    ids_i = find(oi == i & ismember(oj, bean));
+    bean_2023 = sum(planted_2023(i, bean, :), 'all');
+    for tt = 2:n_t
+        rhs = 1 - (tt == 2) * bean_2023;
+        if rhs <= 0, continue; end
+        tau_all = max(1, tt - 2):tt;
+        n_row = n_row + 1;
+        Ic{end+1, 1} = reshape(uidx(ids_i, tau_all), [], 1);
+        Jc{end+1, 1} = n_row + zeros(numel(ids_i) * numel(tau_all), 1);
+        Vc{end+1, 1} = ones(numel(ids_i) * numel(tau_all), 1);
+        bc{end+1, 1} = rhs;
+    end
+end
+\end{lstlisting}
+
+\subsection{问题二 SAA-CVaR 目标与风险线性化}
+
+问题二考虑产量、价格、成本和需求随年份变化的不确定性。程序先根据题意生成 $K$ 个情景，再采用样本平均近似方法，以情景平均利润近似期望利润。同时，为避免方案只追求平均收益而忽视尾部亏损风险，引入 CVaR 风险项，将目标写成“期望收益--风险惩罚”的形式。
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q2_saa.m：SAA-CVaR 目标函数
+off_u = N7;  off_qn = 2 * N7;  off_qd = 2 * N7 + N7K;
+off_eta = 2 * N7 + 2 * N7K;
+off_v = off_eta + 7;
+
+f = zeros(n_var, 1);
+f(1:N7) = reshape(sum(cost_eff, 3) / K, [], 1);
+f(off_qn + 1:off_qd) = -scen.price_w(:) / K;
+f(off_qd + 1:off_eta) = -0.5 * scen.price_w(:) / K;
+f(off_eta + 1:off_v) = lambda;
+f(off_v + 1:end) = lambda * (1 / ((1 - alpha) * K));
+\end{lstlisting}
+
+由于 CVaR 原始表达含有尾部最大函数，不能直接放入线性规划。程序引入辅助变量 $\eta_t$ 与 $v_{t,w}$，用线性不等式表示 $v_{t,w}\geq \mathrm{Loss}_{t,w}-\eta_t$，从而保持模型可由 \texttt{linprog} 求解。
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q2_saa.m：情景产销约束
+for w = 1:K
+    for t = 1:n_t
+        Ic{end+1, 1} = [qnidx(allidx, t, w); ...
+                        qdidx(allidx, t, w); ...
+                        xidx(allidx, t)];
+        Jc{end+1, 1} = n_row + [allidx; allidx; allidx];
+        Vc{end+1, 1} = [ones(N, 1); ones(N, 1); ...
+                        -scen.yield_w(:, t, w)];
+        bc{end+1, 1} = zeros(N, 1);
+        n_row = n_row + N;
+    end
+end
+
+% func_q2_saa.m：CVaR 线性化
+for w = 1:K
+    for t = 1:n_t
+        Ic{end+1, 1} = [vidx(t, w); etaidx(t); ...
+                        qnidx(allidx, t, w); ...
+                        qdidx(allidx, t, w); xidx(allidx, t)];
+        Jc{end+1, 1} = n_row + 1 + ones(3 * N + 2, 1);
+        Vc{end+1, 1} = [-1; -1; -scen.price_w(:, t, w); ...
+                        -0.5 * scen.price_w(:, t, w); ...
+                        cost_eff(:, t, w)];
+        bc{end+1, 1} = 0;
+        n_row = n_row + 1;
+    end
+end
+\end{lstlisting}
+
+在求解策略上，本文采用“问题一半价情形给出种植拓扑，问题二在该拓扑下优化面积与销售量”的主路径。这样既保留了问题一对轮作、连作、集中度等离散结构的刻画，又能将问题二转化为纯线性规划，提高多情景求解的稳定性。
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q2_saa.m：拓扑固定后的线性规划求解
+lb = zeros(n_var, 1);
+ub = inf(n_var, 1);
+lb(off_eta + 1:off_v) = -inf;
+
+lb(off_u + 1:off_qn) = u_q1(:);
+ub(off_u + 1:off_qn) = u_q1(:);
+opts = optimoptions('linprog', 'Display', 'off');
+[v, ~, exit_flag] = linprog(f, A, b, [], [], lb, ub, opts);
+\end{lstlisting}
+
+\subsection{问题三替代与互补机制调用}
+
+问题三在问题二基础上加入作物间关系。首先由历史统计关系得到 Spearman 相关矩阵和作物聚类结果；然后将同簇且相关系数显著为负的作物视为替代作物，把替代需求转移写入需求上限；同时将豆类前茬带来的养地作用转化为下一茬成本折减。
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q3_extend.m：将统计关系传入随机规划模型
+assert(strcmp(theta_rule, 'abs_rho'), ...
+       'theta_rule 仅支持 abs_rho');
+
+ext.rho_sp = rho_sp;       % Spearman 相关系数
+ext.clusters = clusters;   % 作物聚类标签
+ext.phi = phi;             % 互补折减系数
+
+sol = func_q2_saa(param, scen, u_q1, 0.95, 0.1, ...
+                  'lp_fixed', ext);
+\end{lstlisting}
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q2_saa.m：豆类前茬互补折减
+omega_lin = zeros(54, 41, 2);
+omega_lin(sub2ind([54 41 2], oi, oj, os)) = 1:N;
+p23 = param.planted_2023;
+b_prev = zeros(N, n_t);
+
+for idx = 1:N
+    for t = 1:n_t
+        if os(idx) == 2
+            sp = 1;  tp = t;       % 第二季前茬为同年第一季
+        elseif has_s2(idx)
+            sp = 2;  tp = t - 1;   % 双季地第一季前茬为上年第二季
+        else
+            sp = 1;  tp = t - 1;   % 单季地前茬为上年同季
+        end
+
+        if tp == 0
+            b_prev(idx, t) = any(p23(oi(idx), [1 2 3 4 5 17 18 19], sp), 'all');
+        else
+            rows = omega_lin(oi(idx), [1 2 3 4 5 17 18 19], sp);
+            rows = rows(rows > 0);
+            b_prev(idx, t) = any(u_q1(rows, tp) > 0.5);
+        end
+    end
+end
+
+cost_eff = scen.cost_w .* (1 - (1 - ext.phi) * b_prev);
+\end{lstlisting}
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% func_q2_saa.m：替代作物需求转移约束
+rho_col = ext.rho_sp(j, :)';
+sub_list = find(ext.clusters == ext.clusters(j) & has_rows ...
+                & rho_col <= -0.4 & isfinite(rho_col) ...
+                & (1:41)' ~= j);
+
+Ic{end+1, 1} = qnidx(ids, t, w);
+Jc{end+1, 1} = n_row + 1 + zeros(numel(ids), 1);
+Vc{end+1, 1} = ones(numel(ids), 1);
+rhs_val = scen.demand_w(j, s, t, w);
+
+if ~isempty(sub_list)
+    sub_cells = idx_js(sub_list, s);
+    lens = cellfun(@numel, sub_cells);
+    all_ids = cell2mat(sub_cells);
+    theta_vec = abs(ext.rho_sp(j, sub_list));
+    all_theta = repelem(theta_vec, lens);
+
+    Ic{end+1, 1} = [Ic{end, 1}; qnidx(all_ids, t, w)];
+    Jc{end+1, 1} = [Jc{end, 1}; n_row + 1 + zeros(numel(all_ids), 1)];
+    Vc{end+1, 1} = [Vc{end, 1}; all_theta(:)];
+    rhs_val = rhs_val + ...
+        sum(theta_vec .* reshape(scen.demand_w(sub_list, s, t, w), [], 1));
+end
+bc{end+1, 1} = rhs_val;
+\end{lstlisting}
+
+\subsection{一致性测试入口}
+
+为检验程序实现是否与数学模型一致，测试脚本从数据维度、特殊值手算、随机情景稳定性、求解器收敛性和结果文件回填五个方面进行检查。最终测试记录显示 35 项检查全部通过，说明本文模型实现、结果输出和论文使用的数据口径保持一致。
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% tests/test_planting.m：测试入口与检查函数
+clear; close all; clc;
+PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
+addpath(fullfile(PROJ_ROOT, 'src'));
+DATA_DIR = fullfile(PROJ_ROOT, 'data');
+OUT_DIR  = fullfile(PROJ_ROOT, 'outputs');
+FIG_DIR  = fullfile(PROJ_ROOT, 'figures');
+
+diary(fullfile(OUT_DIR, 'test_log.txt'));
+fprintf('=== 2024C 一致性测试开始 %s ===\n', datestr(now));
+
+results = {};
+function results = check(results, name, cond, detail)
+    if cond
+        fprintf('[PASS] %s\n', name);
+    else
+        fprintf('[FAIL] %s -- %s\n', name, detail);
+    end
+    results{end+1, 1} = struct('name', name, ...
+                               'pass', cond, ...
+                               'detail', detail);
+end
+\end{lstlisting}
+
+\begin{lstlisting}[style=matlabstyle,language=Matlab]
+% tests/test_planting.m：代表性测试项目
+results = check(results, 'Ω 三元组总数=1062', ...
+    size(omega_list, 1) == 1062, '适宜种植集合规模不一致');
+
+results = check(results, 'Q1 解满足 delta*A*u<=x<=A*u 边界', ...
+    ok_lb && ok_up, '面积变量与0-1变量联动失败');
+
+results = check(results, '情景生成同种子10次一致', ...
+    ok_scen, '随机情景不可复现');
+
+results = check(results, 'Q2 主解求解器收敛(exit=1)', ...
+    S2.sol_q2.exit_flag == 1, '线性规划未正常收敛');
+
+results = check(results, '模板回填与解一致', ...
+    md_read < 1e-9, '结果表读回后与模型解不一致');
+\end{lstlisting}

@@ -1,0 +1,80 @@
+\section{模型检验与灵敏度分析}
+
+\subsection{一致性检验}
+
+为了确认程序实现与数学模型一致，本文从五个层面进行检验：维度检查、特殊值手算、稳定性检验、收敛性检验和交叉验证。检验结果见表\ref{tab:test-summary}。全部35项测试通过，说明数据读取、参数构造、约束装配、情景生成、求解结果和模板回填均与模型设定一致。
+
+\begin{table}[H]
+\centering
+\caption{一致性测试结果}
+\label{tab:test-summary}
+\begin{tabular}{lcl}
+\toprule
+测试类别 & 项数 & 结论 \\
+\midrule
+维度检查 & 9 & 地块、作物、参数和可行集合维度均正确 \\
+特殊值检验 & 10 & 露天面积、价格均值、基准需求等手算用例通过 \\
+稳定性检验 & 6 & 数据层、情景层和SAA结果稳定 \\
+收敛性检验 & 2 & Q1拓扑固定LP和Q2主解均收敛 \\
+交叉验证 & 8 & 约束残差、利润分解和模板回填一致 \\
+\midrule
+合计 & 35 & 全部通过 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+在约束验证中，问题一两种情形的最大约束违反量不超过 $4.6\times 10^{-13}$，可视为数值精度范围内的零违反。模板回填后重新读取得到的 Excel 数据与模型解一致，说明结果文件可直接用于题目要求的提交表。
+
+\subsection{求解稳定性说明}
+
+混合整数规划受启发式搜索和时间限制影响，可能出现同一模型在不同设置下得到不同可行解的情况。本文对问题一两种情形进行稳定性检验。半价销售情形跨配置相对标准差为0.031\%，结果稳定；滞销情形在900秒限制下利润区间为3552--4008万元，相对标准差为6.3\%。因此，本文对滞销情形采用“时限内可行解+拓扑固定线性规划精化”的谨慎表述，不声称其为全局最优。
+
+问题二和问题三采用拓扑固定线性规划，求解器均返回收敛状态。由于线性规划在固定拓扑下是凸优化问题，收敛解即为该拓扑下的全局最优解。
+
+\subsection{灵敏度分析}
+
+本文选取风险厌恶系数 $\lambda$、灾害概率、最小种植比例 $\delta$ 和互补折减系数 $\phi$ 进行灵敏度分析，结果见表\ref{tab:sensitivity}。
+
+\begin{table}[H]
+\centering
+\caption{灵敏度分析结果}
+\label{tab:sensitivity}
+\begin{tabular}{llc}
+\toprule
+项目 & 参数取值 & 指标/万元 \\
+\midrule
+$\lambda$ & 0 / 0.1 / 0.5 & 6429.29 / 6429.27 / 6428.98 \\
+灾害概率 & 5\% / 10\% / 15\% / 20\% & 6519.74 / 6429.27 / 6335.64 / 6221.96 \\
+$\delta$ & 0.05 / 0.10 / 0.15 & 6111.77 / 6110.96 / 6108.48 \\
+$\phi$ & 0.85 / 0.90 / 0.95 & 6451.01 / 6443.76 / 6436.52 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+图\ref{fig:sensitivity}进一步展示了四类参数变化。风险厌恶系数和最小种植比例对利润影响较小，说明基准方案对这两个设定不敏感；灾害概率升高会显著降低利润，是未来经营风险的主要来源；$\phi$ 取值变化会引起问题三利润单调变化，但在0.85--0.95范围内不改变“考虑互补关系后利润高于问题二”的主要结论。
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{sens_lambda.png}
+    \caption{风险厌恶系数}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{sens_disaster.png}
+    \caption{灾害概率}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{sens_delta.png}
+    \caption{最小种植比例}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{sens_phi.png}
+    \caption{互补折减系数}
+  \end{subfigure}
+  \caption{关键参数灵敏度分析}
+  \label{fig:sensitivity}
+\end{figure}

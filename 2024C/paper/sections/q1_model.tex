@@ -1,0 +1,92 @@
+\section{问题一模型建立与求解}
+
+\subsection{建模思路}
+
+问题一假定未来七年各项参数保持2023年水平，因此首先需要回答的是：在所有农作制度都必须满足的情况下，怎样分配每块地、每个季次和每种作物的种植面积，才能使七年总利润最大。这个问题既有连续决策，也有离散决策。连续部分是种多少亩，离散部分是某作物是否在某地块某季次被种植。若只设置面积变量，模型无法表达“只要种就至少达到一定比例”“同一地块不能连续种同一作物”“三年内必须种过豆类”等要求。因此，本文同时设置面积变量 $x_{i,j,s,t}$ 和种植指示变量 $u_{i,j,s,t}$，建立混合整数线性规划模型。
+
+超产处理方式是问题一的另一个关键。正常销售部分受到预期销售量 $D_{j,s}$ 限制，超出部分在情形一中没有收入，在情形二中按半价销售。为了统一表达两种情形，本文引入正常销售量 $q^n_{i,j,s,t}$ 和折价销售量 $q^d_{i,j,s,t}$，用折扣系数 $\gamma$ 区分情形：滞销时 $\gamma=0$ 且 $q^d=0$，半价销售时 $\gamma=0.5$。
+
+\subsection{目标函数}
+
+七年总利润由正常销售收入、折价销售收入和种植成本组成。问题一的目标函数为
+\begin{equation}
+\max W=\sum_{t\in T}\sum_{(i,j,s)\in\Omega}
+\left(P_{i,j,s}q^n_{i,j,s,t}+\gamma P_{i,j,s}q^d_{i,j,s,t}
+-C_{i,j,s}x_{i,j,s,t}\right).
+\end{equation}
+该目标写成线性形式的好处是能够直接使用混合整数线性规划求解器。正常销售量和折价销售量被分开后，销售收入不需要通过 $\min$ 函数表达，避免了非线性形式。
+
+\subsection{约束条件}
+
+首先，某作物在某地块某季次的销量不能超过该地块产量：
+\begin{equation}
+q^n_{i,j,s,t}+q^d_{i,j,s,t}\le Y_{i,j,s}x_{i,j,s,t},\quad (i,j,s)\in\Omega.
+\end{equation}
+同时，全村某作物某季次按正常价格销售的总量不能超过预期销售量：
+\begin{equation}
+\sum_{i:(i,j,s)\in\Omega}q^n_{i,j,s,t}\le D_{j,s}.
+\end{equation}
+这样，模型会优先把产量分配到正常价销售部分；超过需求的产量只能进入折价销售或在滞销情形下不产生收入。
+
+每块地每季的种植面积不能超过其可用面积：
+\begin{equation}
+\sum_{j:(i,j,s)\in\Omega}x_{i,j,s,t}\le A_i.
+\end{equation}
+种植面积与是否种植之间通过上下界联系：
+\begin{equation}
+\delta A_i u_{i,j,s,t}\le x_{i,j,s,t}\le A_i u_{i,j,s,t}.
+\end{equation}
+当 $u=0$ 时面积被迫为0；当 $u=1$ 时面积至少为地块面积的 $\delta$ 倍。该约束避免模型给某作物分配极小面积，从而保证种植方案具有可执行性。
+
+连作限制分三类处理。跨年同季不能连续种植同一作物：
+\begin{equation}
+u_{i,j,s,t}+u_{i,j,s,t-1}\le 1.
+\end{equation}
+对于可两季种植的水浇地和大棚，同一年内前后季也不能种同一作物：
+\begin{equation}
+u_{i,j,1,t}+u_{i,j,2,t}\le 1.
+\end{equation}
+智慧大棚还需要考虑上一年第二季与下一年第一季的衔接：
+\begin{equation}
+u_{i,j,2,t-1}+u_{i,j,1,t}\le 1.
+\end{equation}
+这些约束的作用是把题目中的农艺规则转化为相邻时间段的0-1变量关系。
+
+豆类轮作要求每块地三年内至少种植一次豆类。由于2023年是已知基准年，本文从2025年开始检查三年窗口：
+\begin{equation}
+\sum_{\tau=t-2}^{t}\sum_{s\in S}\sum_{j\in J_{\rm bean}}u_{i,j,s,\tau}\ge 1,\quad t=2025,\ldots,2030.
+\end{equation}
+最后，为避免某一作物被分散到过多地块，设置集中度上限：
+\begin{equation}
+\sum_{i:(i,j,s)\in\Omega}u_{i,j,s,t}\le N_j^{\max}.
+\end{equation}
+本文按作物类型取 $N_j^{\max}$：粮食类为4，水稻为3，蔬菜瓜果为8，食用菌为6。
+
+\subsection{求解结果}
+
+模型使用 MATLAB 中的 \texttt{intlinprog} 求解，并将2024--2030年方案回填至附件3模板。两种超产处理方式的结果见表\ref{tab:q1-result}。
+
+\begin{table}[H]
+\centering
+\caption{问题一两种超产处理方式结果}
+\label{tab:q1-result}
+\begin{tabular}{lccc}
+\toprule
+情形 & 七年总利润/万元 & 总收入/万元 & 总成本/万元 \\
+\midrule
+超产滞销 & 3552.16 & 4018.88 & 466.72 \\
+超产半价销售 & 6110.96 & 6858.95 & 747.99 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+半价销售情形的利润显著高于滞销情形，原因在于超出预期销售量的产量仍能形成部分收入，使得部分高产作物和大棚资源的边际价值提高。图\ref{fig:q1-matrix}展示了半价销售情形下2024年的种植矩阵。可以看到，模型并非简单集中种植少数高价作物，而是在作物适宜性、轮作和分散度约束下形成多作物组合。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{q1_plant_matrix.png}
+  \caption{问题一半价情形2024年种植方案矩阵}
+  \label{fig:q1-matrix}
+\end{figure}
+
+需要说明的是，滞销情形在混合整数求解中受900秒时间限制，得到的是时限内可行方案；随后固定其0-1种植拓扑并进行线性规划精化，证明该拓扑下连续变量已达到最优。半价情形在多种求解配置下相对标准差为0.031\%，稳定性较好。
