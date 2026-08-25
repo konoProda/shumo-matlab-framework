@@ -1,0 +1,13 @@
+[警告: 找不到 $documents/MATLAB 的个人文件夹。] 
+[警告: Graphics acceleration hardware is unavailable. Graphics quality and
+performance might be diminished. See <a
+href="https://www.mathworks.com/support/requirements/matlab-system-requirements.html">MATLAB
+System Requirements</a>.] 
+[> 位置：alternatePrintPath
+位置: print (第 56 行)
+位置: fig_export (第 4 行)
+位置: q1_correlation_regression>plot_q1_figures (第 121 行)
+位置: q1_correlation_regression (第 62 行)
+位置: main_2025C (第 45 行)
+位置: run (第 100 行)] 
+主程序运行完成，结果已保存至 /home/sck/scktest/claude_test/shumo/2025C/src/../outputs/final_results.mat

@@ -1,0 +1,93 @@
+{
+  "problem": "2023c",
+  "title": "C题：蔬菜类商品自动定价与补货决策",
+  "generated_at": "2026-08-14",
+  "phase": "Phase0",
+  "problems": {
+    "q1": {"type": "statistics", "method": "spearman_rank_correlation", "output": "分布规律与关联结构"},
+    "q2": {"type": "LP_or_MILP", "method": "品类层面补货与定价优化", "horizon": "2023-07-01~07 (7天)", "output": "x_ct, p_ct"},
+    "q3": {"type": "MILP", "method": "单品层面选品+补货+定价", "date": "2023-07-01", "output": "y_vec, x_vec, p_vec"},
+    "q4": {"type": "qualitative", "output": "数据采集建议清单"}
+  },
+  "variables": [
+    {"formula": "(3.2)", "symbol": "q_{i,t}", "meaning": "第 i 类/单品第 t 天销量(kg)，未售出填 0", "type_dim": "double 矩阵 (N_item x T)", "code_name": "qty_mat", "scope": "q1"},
+    {"formula": "(3.3)", "symbol": "R_i(t)", "meaning": "q_{i,t} 在其序列中的秩", "type_dim": "double 矩阵 (N_item x T)", "code_name": "rank_mat", "scope": "q1"},
+    {"formula": "(3.3)", "symbol": "rho_ij", "meaning": "斯皮尔曼秩相关系数", "type_dim": "double 对称矩阵 (N_item x N_item)", "code_name": "rho_mat", "scope": "q1"},
+    {"formula": "(3.3)", "symbol": "T", "meaning": "序列长度（天数）", "type_dim": "double 标量", "code_name": "n_days", "scope": "q1"},
+    {"formula": "(3.3)", "symbol": "t", "meaning": "显著性检验 t 统计量", "type_dim": "double 矩阵", "code_name": "t_stat_mat", "scope": "q1"},
+    {"formula": "(3.3)", "symbol": "p", "meaning": "p 值", "type_dim": "double 矩阵", "code_name": "p_val_mat", "scope": "q1"},
+    {"formula": "(4.1)", "symbol": "x_{c,t}", "meaning": "第 t 天品类 c 补货量(kg)", "type_dim": "连续>=0 矩阵 (6x7)", "code_name": "x_ct", "scope": "q2"},
+    {"formula": "(4.1)", "symbol": "p_{c,t}", "meaning": "第 t 天品类 c 零售单价(元/kg)", "type_dim": "连续 矩阵 (6x7)", "code_name": "p_ct", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "w_{c,t}", "meaning": "品类 c 第 t 天批发价(元/kg)按销量加权", "type_dim": "矩阵 (6x7)", "code_name": "w_ct", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "lbar_c", "meaning": "品类平均损耗率(小数)", "type_dim": "向量 (6x1)", "code_name": "loss_bar_c", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "w_hat_{c,t}", "meaning": "有效成本 = w(1+lbar)", "type_dim": "矩阵 (6x7)", "code_name": "w_eff_ct", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "a_c", "meaning": "需求-价格回归截距", "type_dim": "向量 (6x1)", "code_name": "a_c", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "b_c", "meaning": "需求-价格回归斜率(<0)", "type_dim": "向量 (6x1)", "code_name": "b_c", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "p_c^min", "meaning": "品类历史最低售价", "type_dim": "向量 (6x1)", "code_name": "p_min_c", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "p_c^max", "meaning": "品类历史最高售价", "type_dim": "向量 (6x1)", "code_name": "p_max_c", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "V_t", "meaning": "第 t 天展示空间上限(数据源待定)", "type_dim": "标量或向量 (7x1)", "code_name": "V_t", "scope": "q2"},
+    {"formula": "(4.2)", "symbol": "s_c", "meaning": "每 kg 展示面积系数(默认1)", "type_dim": "向量 (6x1)", "code_name": "s_c", "scope": "q2"},
+    {"formula": "(4.4)", "symbol": "Z", "meaning": "7 天总利润(目标)", "type_dim": "double 标量", "code_name": "profit_q2", "scope": "q2"},
+    {"formula": "(4.5)", "symbol": "eta_c", "meaning": "历史平均加成率(方案A)", "type_dim": "向量 (6x1)", "code_name": "markup_c", "scope": "q2"},
+    {"formula": "(4.5)", "symbol": "K", "meaning": "离散价格档数(方案B)", "type_dim": "标量", "code_name": "n_price_levels", "scope": "q2"},
+    {"formula": "(4.5)", "symbol": "p_c^{(k)}", "meaning": "第 k 档候选售价(方案B)", "type_dim": "矩阵 (6xK)", "code_name": "p_grid_c", "scope": "q2"},
+    {"formula": "(4.5)", "symbol": "z_{c,t}^{(k)}", "meaning": "选价二元变量(方案B)", "type_dim": "binary (6x7xK)", "code_name": "z_ctk", "scope": "q2"},
+    {"formula": "(5.1)", "symbol": "y_i", "meaning": "单品 i 是否上架", "type_dim": "binary (Nx1)", "code_name": "y_vec", "scope": "q3"},
+    {"formula": "(5.1)", "symbol": "x_i", "meaning": "单品 i 补货量(kg)", "type_dim": "连续>=0 (Nx1)", "code_name": "x_vec", "scope": "q3"},
+    {"formula": "(5.1)", "symbol": "p_i", "meaning": "单品 i 零售单价(元/kg)", "type_dim": "连续 (Nx1)", "code_name": "p_vec", "scope": "q3"},
+    {"formula": "(5.1)", "symbol": "z_i^{(k)}", "meaning": "价格离散二元变量(可选)", "type_dim": "binary (NxK)", "code_name": "z_mat", "scope": "q3"},
+    {"formula": "(5.2)", "symbol": "w_i", "meaning": "单品批发价近期均值(元/kg)", "type_dim": "向量 (Nx1)", "code_name": "w_vec", "scope": "q3"},
+    {"formula": "(5.2)", "symbol": "l_i", "meaning": "单品损耗率(小数)", "type_dim": "向量 (Nx1)", "code_name": "loss_vec", "scope": "q3"},
+    {"formula": "(5.2)", "symbol": "a_i, b_i", "meaning": "单品需求-价格回归系数", "type_dim": "向量 (Nx1)", "code_name": "a_vec, b_vec", "scope": "q3"},
+    {"formula": "(5.2)", "symbol": "p_i^min, p_i^max", "meaning": "单品历史价格区间", "type_dim": "向量 (Nx1)", "code_name": "p_min_vec, p_max_vec", "scope": "q3"},
+    {"formula": "(5.2)", "symbol": "s_i", "meaning": "展示面积系数(默认1)", "type_dim": "向量 (Nx1)", "code_name": "s_vec", "scope": "q3"},
+    {"formula": "(5.2)", "symbol": "V", "meaning": "总展示空间上限(数据源待定)", "type_dim": "标量", "code_name": "V_total", "scope": "q3"},
+    {"formula": "(5.2)", "symbol": "L, U", "meaning": "上架数下限27/上限33", "type_dim": "标量", "code_name": "L_shelf, U_shelf", "scope": "q3"},
+    {"formula": "(5.2)", "symbol": "M", "meaning": "大 M 常数", "type_dim": "标量", "code_name": "BIG_M", "scope": "q3"},
+    {"formula": "(5.4)", "symbol": "Z", "meaning": "单日总利润(目标)", "type_dim": "double 标量", "code_name": "profit_q3", "scope": "q3"}
+  ],
+  "objectives": [
+    {"problem": "q2", "formula": "(4.4)", "expr": "max Z = sum_{t=1..7} sum_c (p_{c,t} - w_hat_{c,t}) * x_{c,t}", "code": "func_objective_q2"},
+    {"problem": "q3", "formula": "(5.4)", "expr": "max Z = sum_i (p_i - w_i*(1+l_i)) * x_i", "code": "func_objective_q3"}
+  ],
+  "constraints": {
+    "q2": [
+      {"id": 1, "formula": "(4.3.1)", "expr": "x_{c,t} <= a_c + b_c*p_{c,t}"},
+      {"id": 2, "formula": "(4.3.2)", "expr": "p_c^min <= p_{c,t} <= p_c^max"},
+      {"id": 3, "formula": "(4.3.3)", "expr": "sum_c s_c*x_{c,t} <= V_t (若有)"},
+      {"id": 4, "formula": "(4.3.4)", "expr": "x_{c,t} >= 0"}
+    ],
+    "q3": [
+      {"id": 1, "formula": "(5.3.1)", "expr": "L <= sum_i y_i <= U"},
+      {"id": 2, "formula": "(5.3.2)", "expr": "x_i >= 2.5*y_i"},
+      {"id": 3, "formula": "(5.3.3)", "expr": "x_i <= a_i + b_i*p_i"},
+      {"id": 4, "formula": "(5.3.4)", "expr": "p_i^min*y_i <= p_i <= p_i^max*y_i"},
+      {"id": 5, "formula": "(5.3.5)", "expr": "sum_i s_i*x_i <= V"},
+      {"id": 6, "formula": "(5.3.6)", "expr": "离散化关联: sum_k z_i^(k)=y_i; p_i=sum_k p_i^(k) z_i^(k); x_i <= sum_k (a_i+b_i p_i^(k)) z_i^(k); x_i <= M*y_i; x_i >= 0"}
+    ]
+  },
+  "data_io": [
+    {"file": "附件1.xlsx", "rows": 251, "cols": ["单品编码", "单品名称", "分类编码", "分类名称"], "output": "product_info.csv"},
+    {"file": "附件2.xlsx", "rows": 878503, "cols": ["销售日期(Excel序列号)", "扫码销售时间", "单品编码", "销量(千克)", "销售单价(元/千克)", "销售类型", "是否打折销售"], "notes": "销售878042行/退货461行; 2020-07-01~2023-06-30 共1085天", "output": "daily_sales.csv"},
+    {"file": "附件3.xlsx", "rows": 55982, "cols": ["日期(Excel序列号)", "单品编码", "批发价格(元/千克)"], "output": "wholesale_price.csv"},
+    {"file": "附件4.xlsx", "rows": "sheet1:6 / sheet2:251", "cols": ["sheet1: 小分类编码/小分类名称/平均损耗率(%)", "sheet2: 单品编码/单品名称/损耗率(%)"], "notes": "损耗率以%存储需÷100", "output": "并入 product_info.csv"},
+    {"file": "衍生", "rows": null, "cols": ["weekday/is_weekend/品类映射/品类日聚合/品类平均损耗"], "output": "category_daily.csv"}
+  ],
+  "ambiguities": [
+    {"id": "Q1", "topic": "求解器策略", "status": "已裁定", "decision": "MATLAB 原生求解器: linprog(问题2方案A) + intlinprog(问题2方案B/问题3 MILP, HiGHS 1.11.0), 工具箱已安装并冒烟测试通过"},
+    {"id": "Q2", "topic": "未来一周批发价", "status": "已裁定", "decision": "主模型: 2023-06-24~30 销量加权品类均价外推(7天同常数); 敏感性: 批发价整体 ±5%/±10% 重跑"},
+    {"id": "Q3", "topic": "展示空间 V", "status": "已裁定", "decision": "数据驱动方案(编程手提出): V = max(67.5, 历史6-7月日总销量95%分位), s_i=1; 敏感性 0.8~1.2V 五点; 数据通道走预处理 CSV; 约束松弛则报告空间利用率"},
+    {"id": "Q4", "topic": "问题2方案", "status": "已裁定", "decision": "主模型 A(固定加成), B 作对比脚本; 报告与总结指明主模型为 A"},
+    {"id": "Q5", "topic": "问题3需求满足", "status": "已裁定", "decision": "两阶段: 先纯利润目标求解并检查结果; 若结果过于极端则暂停询问编程手, 改用需求下限约束或目标惩罚项方案"},
+    {"id": "Q6", "topic": "需求回归窗口", "status": "已裁定", "decision": "近期30天(2023-06-01~30)为主, 全3年回归作对比"},
+    {"id": "Q7", "topic": "退货/打折行处理", "status": "已裁定", "decision": "退货行剔除; 打折行剔除出需求回归, 统计保留"},
+    {"id": "Q8", "topic": "附件3缺失填补", "status": "已裁定", "decision": "单日缺失线性插值, 连续缺失前向填充"},
+    {"id": "Q9", "topic": "品类聚合口径", "status": "已裁定", "decision": "日销量求和; 批发价/售价按销量加权平均"}
+  ],
+  "environment": {
+    "matlab": "R2026a Update 4, Optimization Toolbox 已安装(2026-08-14 via mpm), linprog/intlinprog 可用且冒烟测试通过(intlinprog 底层 HiGHS 1.11.0)",
+    "license": "在线许可证(MathWorks 账号), 已含 Optimization Toolbox 授权",
+    "python": "3.10 + pip 26.1.2 联网可用(求解已不需要 Python)",
+    "notes": "MATLAB readtable 读大 xlsx 极慢; 建议数据读取用 Python 标准库或 MATLAB 分段读入"
+  }
+}

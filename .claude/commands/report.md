@@ -8,10 +8,19 @@ description: 生成该题目的实现验证报告
 - 支持显式指定题目：`/report <题目名>`（如 `/report A题`）；未指定时读取 `shumo/.active_problem.txt` 中的当前题目。
 - 状态文件为空且未指定题目名时，先询问题目名，不得默认猜测。
 
+## 图件清单前置对齐（2026-08-24 迭代新增）
+正式出图前，先向编程手提交**图件清单表**（图名 | 数据来源文件 | 论文位置建议 | 四条设计规范核对：少数据点不画连线 / 饼图补充占比表达 / 低饱和可区分配色 / 标注防重叠），经编程手确认后批量生成；禁止先出图后返工。图件与结果表清单最终写入 PAPER_HANDOFF.md。
+
 ## 正式运行
 1. 清空内存，读取 `<题目名>/data/` 下的完整原始数据。
 2. 运行 `<题目名>/src/main_*.m`，记录总耗时。
 3. 结果存至 `<题目名>/outputs/final_results.mat`（save 使用 fullfile 绝对路径，避免默认路径依赖），图表存至 `<题目名>/figures/`。
+
+## 交付打包（2026-08-24 新增，国赛语境）
+收尾时生成 `<题目名>/deliver/` 作为**唯一交付面**：
+- **必含**：result1_1/result1_2/result2.xlsx（题目要求结果，官方模板）、`code/`（main_*.m + 全部 func_*.m + 核心可复现脚本）、论文.pdf（如有）；
+- **可选**：data/（附件）、figures/（图件）、README_运行说明.md；
+- **不交付**：tests/、outputs/ 日志与中间记录、映射表/风险预判、IMPLEMENTATION_REPORT、PAPER_HANDOFF、RETROSPECTIVE（组内文档）。
 
 ## 实现验证报告 (`<题目名>/IMPLEMENTATION_REPORT.md`)
 结构如下：
