@@ -12,3 +12,6 @@ mpm
 *.swp
 *.swo
 Thumbs.db
+
+# 根级 outputs/ 不保留（产物一律在题目子目录内）
+/outputs/
