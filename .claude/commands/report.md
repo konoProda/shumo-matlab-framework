@@ -3,6 +3,11 @@ description: 生成该题目的实现验证报告
 ---
 # /report - 验证报告生成
 
+> **逐问模式（2026-09-11）**：本次只出**当前一个问题**的结果——问题号取自 `.active_problem.txt` 第三字段，
+> 或由 `/report <题目名> Qn` 显式指定。`final_results_qX.mat`、`figures/` 按问命名；
+> `PAPER_HANDOFF.md` 与 `IMPLEMENTATION_REPORT.md` **保持单文件、按问追加章节**；
+> 图件配额按全论文累计核算；状态文件写为 `<题目名>|Phase3|QX`。详见 CLAUDE.md §逐问求解模式。
+
 ## 触发条件
 测试通过后自动触发，或用户手动输入。
 - 支持显式指定题目：`/report <题目名>`（如 `/report A题`）；未指定时读取 `shumo/.active_problem.txt` 中的当前题目。

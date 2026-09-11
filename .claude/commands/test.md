@@ -3,6 +3,10 @@ description: 验证代码实现与数学模型的一致性，生成测试报告
 ---
 # /test - 一致性测试与验证
 
+> **逐问模式（2026-09-11）**：本次只测试**当前一个问题**——问题号取自 `.active_problem.txt` 第三字段，
+> 或由 `/test <题目名> Qn` 显式指定。结果写 `outputs/test_results_qX.mat`、`test_log_qX.txt`、
+> `failure_notes_qX.md`，状态文件写为 `<题目名>|Phase2|QX`。详见 CLAUDE.md §逐问求解模式。
+
 ## 触发条件
 Phase 1 代码生成完成后自动触发，或用户手动输入。
 - 支持显式指定题目：`/test <题目名>`（如 `/test A题`）；未指定时读取 `shumo/.active_problem.txt` 中的当前题目。

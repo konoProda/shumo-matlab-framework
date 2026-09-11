@@ -3,6 +3,10 @@ description: 基于确认的数学映射生成MATLAB代码，存于题目子目�
 ---
 # /code - 代码生成
 
+> **逐问模式（2026-09-11）**：本次只生成**当前一个问题**的代码——问题号取自 `.active_problem.txt`
+> 第三字段，或由 `/code <题目名> Qn` 显式指定；只读该问的 `decisions_qX.md` 与 `math_to_code_mapping_qX.md`，
+> 状态文件写为 `<题目名>|Phase1|QX`。详见 CLAUDE.md §逐问求解模式。
+
 ## 触发条件
 仅在用户通过 /prep 确认后，或手动输入 /code 时触发。
 - 支持显式指定题目：`/code <题目名>`（如 `/code A题`）；未指定时读取 `shumo/.active_problem.txt` 中的当前题目。

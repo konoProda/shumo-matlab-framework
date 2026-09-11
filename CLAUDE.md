@@ -42,6 +42,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 当用户（编程手）提出与"编写建模代码"相关的请求时，必须遵循以下分步流水线：
 
+## 逐问求解模式（2026-09-11 立，适配建模手逐问交付）
+
+自 2026C 起，流水线按**逐问**推进：`Qn 建模文档 → /prep → /code → /test → /report → Q(n+1) …`。
+本模式**只改动以下五处**，其余规范（角色分离、交付结构、图件规范、代码风格）一律不变。
+
+1. **状态文件**：`.active_problem.txt` 扩展为 `<题目名>|<Phase>|<当前问题>`
+   （例：`2026C_formal|Phase0|Q1`）。命令支持显式指定：`/prep <题目名> Q2`、`/code <题目名> Q2` 等。
+2. **逐问产物加 `_qX` 后缀**，避免四问互相覆盖：
+   - `outputs/decisions_qX.md`、`solve_strategy_qX.md`、`math_to_code_mapping_qX.md`、`preprocess_log_qX.txt`
+   - `outputs/test_results_qX.mat`、`test_log_qX.txt`、`failure_notes_qX.md`、`final_results_qX.mat`
+   - `src/main_qX.m`、`src/func_<短词>_qX.m`、`src/plot_qX_*.m`（既有命名，不变）
+3. **/prep 每次只解析当前一问的建模文档**，对应确认点 #1 只核该问的裁决清单；
+   已完成问题**不重跑、不合并**，其产物原样保留。
+4. **确认点 #1 / #2 逐问重复**（每问各停一次）；**确认点 #3 仍在论文初稿后一次性执行**
+   （论文是全局的）。图件清单前置确认逐问进行，但配额按**全论文累计**核算（总数 12–16、任一问 ≤40%）。
+5. **`PAPER_HANDOFF.md` 与 `IMPLEMENTATION_REPORT.md` 保持单文件、按问追加章节**
+   （最终交接需要全局视图），不拆成四份。
+
 ## Phase 0 - 题目环境初始化与数学建模解析（/prep）
 
 - 创建题目子目录（询问题目名，不可默认猜测）及标准子文件夹：data/、src/、outputs/、figures/。
