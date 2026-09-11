@@ -1,12 +1,12 @@
 function tab = func_write_q1(sol, prm, tpl_path, out_path)
 
 % 依附件5 的 result1 模板写出结果文件，同时回带论文表1/表2 所需的数值
-% sol 字段：G / C / D / E 均为 T×1（kW 或 kWh），price_v 为 T×1
+% sol 字段：GL / GC / C / D / E 均为 T×1（kW 或 kWh），price_v 为 T×1
 
 T  = prm.T;
 dt = prm.dt;
 
-buy_kwh = sol.G * dt;                 % (15) 购电量
+buy_kwh = (sol.GL + sol.GC) * dt;     % 购电量 = 外网供负载 + 外网充电
 chg_kwh = sol.C * dt;
 dis_kwh = sol.D * dt;
 
@@ -38,7 +38,7 @@ tab.t1_slot  = slot_of_hour(:);
 tab.t1_label = arrayfun(@(h) sprintf('%d:00-%d:10', h, h), [10 12 14 16 18 20], 'UniformOutput', false).';
 tab.t1_buy   = buy_kwh(slot_of_hour);
 tab.t1_total = sum(buy_kwh);
-tab.t1_cost  = sum(sol.price_v(:) .* sol.G) * dt;
+tab.t1_cost  = sum(sol.price_v(:) .* (sol.GL + sol.GC)) * dt;
 
 % ---- 论文表2 ----
 tab.t2_label = {'0:00-4:00';'4:00-8:00';'8:00-12:00';'12:00-16:00';'16:00-20:00';'20:00-24:00'};

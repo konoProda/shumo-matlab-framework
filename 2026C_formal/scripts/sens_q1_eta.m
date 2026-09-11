@@ -23,9 +23,9 @@ fprintf('%s\n', repmat('-', 1, 72));
 Zs = zeros(numel(eta_list), 1);
 for k = 1:numel(eta_list)
     P.eta_ch = eta_list(k);  P.eta_dis = eta_list(k);
-    [f, ic, A, b, Aeq, beq, lb, ub] = func_build_q1(price_v, load_p, pv_p, P);
+    [f, ic, A, b, Aeq, beq, lb, ub, aux] = func_build_q1(price_v, load_p, pv_p, P);
     [x, Z] = intlinprog(f, ic, A, b, Aeq, beq, lb, ub, opt);
-    G = x(1:144); C = x(145:288); D = x(289:432);
+    G = x(1:144) + x(145:288); C = x(433:576); D = x(577:720);
     Zs(k) = Z;
     fprintf('%-8.4f %-20s %14.2f %12.2f %12.2f\n', eta_list(k), note{k}, ...
             Z, sum(G)*P.dt, (sum(C)+sum(D))*P.dt);
