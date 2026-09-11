@@ -63,6 +63,10 @@ description: 生成该题目的实现验证报告
 IMPLEMENTATION_REPORT.md 生成后**停止**，等待编程手确认风险清单（10-15 分钟）：
 风险是否完整、每条是否标注论文对应位置、口径是否诚实。模板见 `_CHECK_TEMPLATES.md` 模板2。
 
+同时生成 `<题目名>/建模手交接/交付建模手/致建模手_确认点2_qX.md`（2026-09-11 新增，见 CLAUDE.md §确认点交付单）：
+列出需建模手回复的少数项（如口径确认、结果是否与建模预期相符）+ 仅告知项 + 填写式回复区，
+**不出现代码与求解器细节**；编号须与 `IMPLEMENTATION_REPORT.md` 的风险清单一一对应。
+
 ## 收尾
 交付后核对六件套：状态置 Done、PAPER_HANDOFF、IMPLEMENTATION_REPORT、**RETROSPECTIVE.md**、
 deliver/ 已打包、三确认点记录留档。RETROSPECTIVE 不可省——它是下次工作流优化的唯一流程依据。
