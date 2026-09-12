@@ -1,0 +1,10 @@
+[警告: 找不到 $documents/MATLAB 的个人文件夹。] 
+已写入 outputs/q2c_handback_tables.md
+REPORT_DONE
+单位自检A 储能年度递推残差 1.870e-08 kWh（应≈0）
+单位自检B 紧急购电隐含单价 6.1574 元/kWh（允许 1.8565~6.9760）
+交付件已写出：outputs/result2_q2c.xlsx（L2，R=7, K=4）
+  报送窗口 334 天：计划购电费 13149064.98 + 紧急购电费 1657825.30 = 14806890.28 元
+  窗口计划购电量 21303028.1 kWh，紧急购电量 269240.9 kWh（175 天出现）
+  （上一轮的 outputs/result2.xlsx 未被改动）
+指定日期明细已写出：outputs/q2c_指定日期表.md（4 个日期）

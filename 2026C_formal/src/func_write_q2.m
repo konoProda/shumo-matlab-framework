@@ -28,8 +28,12 @@ day_cost = sum(res.price_v(:).' .* res.buy_m(ri,:), 2) ...
 if exist(out_path, 'file'); delete(out_path); end
 
 % ---- 表 1：计划购电量 ----
+% 模板列标签是显式区间 0:10-0:20 … 23:50-0:00+1, 0:00+1-0:10+1，与模型槽错开一格：
+% 第 2..144 列按标签逐列对应模型第 2..144 槽；末列（0:00+1-0:10+1）按日周期归位，
+% 填本日第 1 槽 [0:00,0:10)。整行恰为本日 144 槽，"全天合计"即本日合计。（2026-09-12 裁定）
+ord = [(2:T), 1];
 sh1 = blank_missing(readcell(tpl_path, 'Sheet', '计划购电量', 'Range', 'A1:EQ335'));
-sh1(2:1+D, 2:1+T) = num2cell(res.buy_m(ri,:));
+sh1(2:1+D, 2:1+T) = num2cell(res.buy_m(ri, ord));
 sh1(2:1+D, 2+T)   = num2cell(day_buy);
 sh1(2:1+D, 3+T)   = num2cell(day_cost);
 writecell(sh1, out_path, 'Sheet', '计划购电量');

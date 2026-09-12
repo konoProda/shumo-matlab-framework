@@ -1,4 +1,4 @@
-function [Lhat, PVhat, used_max] = func_forecast_q2(load_m, pv_m, L1, PV1, K, d0)
+function [Lhat, PVhat, used_max, fb] = func_forecast_q2(load_m, pv_m, L1, PV1, K, d0)
 %FUNC_FORECAST_Q2  问题二：同星期滚动均值预测（因果，严格只用历史实际数据）
 %
 %   两种用法：
@@ -22,6 +22,7 @@ function [Lhat, PVhat, used_max] = func_forecast_q2(load_m, pv_m, L1, PV1, K, d0
 %         d0              （可选）决策日索引；省略或给 [] 为逐日模式
 %   输出  Lhat / PVhat    逐日模式 D×T；地平线模式 (D-d0+1)×T，行 j 对应第 d0+j-1 天
 %         used_max       各行实际引用的最晚历史日（信息泄漏自检用）
+%         fb             各行是否走了冷启动/扩展均值回退（诊断用，逻辑向量）
 
 [D, T] = size(load_m);
 assert(size(pv_m,1) == D && size(pv_m,2) == T, '负荷与光伏维度不一致');
@@ -36,6 +37,7 @@ end
 tau_list = (d0 == 0) * 1 + (d0 > 0) * d0;    % 起始目标日
 n   = D - tau_list + 1;
 Lhat = zeros(n, T);  PVhat = zeros(n, T);  used_max = zeros(n, 1);
+fb   = false(n, 1);
 cut  = zeros(n, 1);
 
 for j = 1:n
@@ -48,6 +50,7 @@ for j = 1:n
 
     if dcut == 1
         Lhat(j,:) = L1(:).';  PVhat(j,:) = PV1(:).';  used_max(j) = 0;
+        fb(j) = true;
         continue;
     end
 
@@ -60,6 +63,7 @@ for j = 1:n
         Lhat(j,:) = mean(load_m(1:dcut-1,:), 1);
         PVhat(j,:) = mean(pv_m(1:dcut-1,:), 1);
         used_max(j) = dcut - 1;
+        fb(j) = true;
     else
         Lhat(j,:) = mean(load_m(S,:), 1);
         PVhat(j,:) = mean(pv_m(S,:), 1);

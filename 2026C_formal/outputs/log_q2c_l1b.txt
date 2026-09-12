@@ -1,0 +1,48 @@
+[警告: 找不到 $documents/MATLAB 的个人文件夹。] 
+=== L1b 全年联合完美信息基准（LP 松弛）===
+  全年 365 天（2025-01-01 ~ 2025-12-31），起点 SOC = 6000 kWh
+  装配耗时 0.2 s：列 578160，等式行 262800，不等式行 105120，Aeq 非零元 840959
+  互斥约束在松弛下为空，已按空矩阵传入
+Running HiGHS 1.11.0: Copyright (c) 2025 HiGHS under MIT licence terms
+LP   has 262800 rows; 578160 cols; 840959 nonzeros
+Coefficient ranges:
+  Matrix [1e-01, 1e+00]
+  Cost   [6e-02, 1e+00]
+  Bound  [1e-01, 1e+05]
+  RHS    [1e-01, 7e+03]
+Presolving model
+200110 rows, 400076 cols, 642615 nonzeros  0s
+142765 rows, 290074 cols, 475268 nonzeros  0s
+Dependent equations search running on 137575 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.01s (limit = 1000.00s)
+137575 rows, 284677 cols, 464681 nonzeros  1s
+Presolve : Reductions: rows 137575(-125225); columns 284677(-293483); elements 464681(-376278)
+Solving the presolved LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     1.3404354761e+02 Pr: 42431(5.48305e+07) 1s
+     171808     1.3746913941e+07 Pr: 1683(168903); Du: 0(8.02891e-06) 6s
+     173633     1.3751229705e+07 Pr: 0(0); Du: 0(1.11022e-15) 6s
+Solving the original LP from the solution after postsolve
+Model status        : Optimal
+Simplex   iterations: 173633
+Objective value     :  1.3751229705e+07
+P-D objective error :  3.7249570285e-15
+HiGHS run time      :          6.53
+
+找到最优解。
+
+
+  linprog 返回 exitflag=1，耗时 7.0 s，迭代 173633
+
+  全年联合最优费用（LP 松弛）= 13751229.71 元
+  报送窗口（2025-02-01 起）段费用     = 12227142.86 元
+  linprog 目标函数值         = 13751229.71 元（应与全年费用一致）
+
+=== 逐槽互斥审计（LP 松弛，非整数解）===
+  存在同槽同时充放的日数 = 0 / 365
+  最大同时充放量 min(C,D) = 0.0000 kW（出现在 2025-01-01），占功率上限 0.00%
+
+已写入 outputs/final_results_q2c_L1b.mat 与 outputs/q2c_l1b_audit.txt
+L1B_DONE
+L1B_EXIT=0
