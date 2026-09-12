@@ -5,10 +5,7 @@ clear; clc;
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
 addpath(fullfile(PROJ_ROOT, 'src'));
 
-raw = readcell(fullfile(PROJ_ROOT, 'data', '附件', '附件1.xlsx'), 'Sheet', 'Sheet1');
-price_v = cell2mat(raw(2:145, 2));
-load_p  = cell2mat(raw(2:145, 3));
-pv_p    = cell2mat(raw(2:145, 4));
+[price_v, load_p, pv_p] = func_read_q1(PROJ_ROOT);
 
 P = struct('T',144,'dt',1/6,'eta_ch',0.90,'eta_dis',0.90, ...
            'E_init',6000,'E_min',1200,'E_max',10800,'P_max',5000);

@@ -3,11 +3,9 @@
 
 clear; clc;
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
+addpath(fullfile(PROJ_ROOT, 'src'));
 
-raw = readcell(fullfile(PROJ_ROOT, 'data', '附件', '附件1.xlsx'), 'Sheet', 'Sheet1');
-price_v = cell2mat(raw(2:145, 2));
-load_p  = cell2mat(raw(2:145, 3));
-pv_p    = cell2mat(raw(2:145, 4));
+[price_v, load_p, pv_p] = func_read_q1(PROJ_ROOT);
 dt = 1/6;
 
 % 基准：储能不动作

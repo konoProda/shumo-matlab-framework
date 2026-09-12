@@ -21,10 +21,7 @@ fprintf('===== 问题一 一致性测试 =====\n');
 fprintf('时间：%s\n\n', datestr(now, 'yyyy-mm-dd HH:MM:SS'));
 
 %% T1 维度检查
-raw = readcell(fullfile(PROJ_ROOT, 'data', '附件', '附件1.xlsx'), 'Sheet', 'Sheet1');
-price_v = cell2mat(raw(2:1+P.T, 2));
-load_p  = cell2mat(raw(2:1+P.T, 3));
-pv_p    = cell2mat(raw(2:1+P.T, 4));
+[price_v, load_p, pv_p] = func_read_q1(PROJ_ROOT);   % 时间轴口径见该函数
 [f, intcon, A, b, Aeq, beq, lb, ub, aux] = func_build_q1(price_v, load_p, pv_p, P);
 
 d_ok = isequal(size(price_v), [144 1]) && numel(f) == 1152 && numel(intcon) == 144 ...

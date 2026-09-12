@@ -33,10 +33,7 @@ fprintf('  G^L = [%.2f %.2f]   G^ch = [%.4f %.4f]   PV^ch = [%.1f %.1f]\n', ...
 fprintf('  E_0=%.1f  E_T=%.4f  (须相等)\n\n', prm.E_init, E(end));
 
 %% case B —— 真实数据 T=12 缩样
-raw = readcell(fullfile(PROJ_ROOT, 'data', '附件', '附件1.xlsx'), 'Sheet', 'Sheet1');
-price_all = cell2mat(raw(2:145, 2));
-load_all  = cell2mat(raw(2:145, 3));
-pv_all    = cell2mat(raw(2:145, 4));
+[price_all, load_all, pv_all] = func_read_q1(PROJ_ROOT);
 
 idx = (55:66).';
 prm.T = numel(idx);

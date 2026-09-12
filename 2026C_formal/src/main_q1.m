@@ -18,11 +18,8 @@ prm = struct( ...
     'E_max',   10800, ...    % (P-7) 储电量上限
     'P_max',   5000);        % (P-8) 最大充放电功率 kW
 
-%% 读取附件1（时间列存储类型混合，故不读该列，按序号建时间轴）
-raw = readcell(fullfile(PROJ_ROOT, 'data', '附件', '附件1.xlsx'), 'Sheet', 'Sheet1');
-price_v = cell2mat(raw(2:1+prm.T, 2));      % 电价 元/kWh
-load_p  = cell2mat(raw(2:1+prm.T, 3));      % 小区负载 kW
-pv_p    = cell2mat(raw(2:1+prm.T, 4));      % 光伏预测 kW
+%% 读取附件1（时间轴口径见 func_read_q1）
+[price_v, load_p, pv_p] = func_read_q1(PROJ_ROOT);
 
 %% 装配并求解
 [f, intcon, A, b, Aeq, beq, lb, ub, aux] = func_build_q1(price_v, load_p, pv_p, prm);
@@ -83,18 +80,18 @@ writetable(out_tbl, fullfile(PROJ_ROOT, 'outputs', 'q1_solution.csv'));
 
 save(fullfile(PROJ_ROOT, 'outputs', 'q1_solution.mat'), 'sol', 'prm', 'aux', 'Z', 'rep', 'output', 'exitflag');
 
-%% 绘图数据落盘（figures/data/，plot 脚本只读不算）
-fig_data_dir = fullfile(PROJ_ROOT, 'figures', 'data');
-if ~exist(fig_data_dir, 'dir'); mkdir(fig_data_dir); end
+%% 绘图数据落盘（写入各图件文件夹，与绘图脚本同目录；plot 脚本只读不算）
+fig1 = fullfile(PROJ_ROOT, 'figures', '问题一', '01 典型日计划购电策略');
+fig2 = fullfile(PROJ_ROOT, 'figures', '问题一', '02 储能充放电与储电量');
 
 writetable(table((1:T).', lab, price_v, (sol.GL+sol.GC)*prm.dt, ...
     'VariableNames', {'slot','period','price','buy_kwh'}), ...
-    fullfile(fig_data_dir, 'q1_price_buy.csv'));
+    fullfile(fig1, 'data.csv'));
 
 E_start = [prm.E_init; sol.E(1:end-1)];     % 各槽起始储电量，首槽即 0:00 的初值
 writetable(table((1:T).', lab, sol.C*prm.dt, sol.D*prm.dt, E_start, sol.E, ...
     'VariableNames', {'slot','period','chg_kwh','dis_kwh','E_start_kwh','E_kwh'}), ...
-    fullfile(fig_data_dir, 'q1_soc.csv'));
+    fullfile(fig2, 'data.csv'));
 
 %% 写结果文件 result1.xlsx
 tab = func_write_q1(sol, prm, ...
