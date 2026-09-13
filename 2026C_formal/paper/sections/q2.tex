@@ -41,11 +41,12 @@ E^{act}_{d+1,0}=E^{act}_{d,T}.
 均与问题一相同，只是负荷平衡中增加 \(H_{d,t}\)：
 
 \begin{equation}
+\begin{gathered}
 G^L_{d,t}+D_{d,t}+H_{d,t}=\overline L_{d,t},
 \qquad
-PV^{ch}_{d,t}+G^{ch}_{d,t}=C_{d,t},
-\qquad
+PV^{ch}_{d,t}+G^{ch}_{d,t}=C_{d,t},\\
 PV^{ch}_{d,t}+V_{d,t}=\overline{PV}_{d,t}.
+\end{gathered}
 \end{equation}
 
 该基准在已知真实数据的条件下求全天费用最小，构成预测不确定性成本的下界。
@@ -126,11 +127,11 @@ R=7.
 三类能量流向平衡相应写为
 
 \begin{equation}
-G^{L,(\omega)}_{\tau,t}+D^{(\omega)}_{\tau,t}+H^{(\omega)}_{\tau,t}=\overline L^{(\omega)}_{\tau,t},
-\qquad
-PV^{ch,(\omega)}_{\tau,t}+G^{ch,(\omega)}_{\tau,t}=C^{(\omega)}_{\tau,t},
-\qquad
-PV^{ch,(\omega)}_{\tau,t}+V^{(\omega)}_{\tau,t}=\overline{PV}^{(\omega)}_{\tau,t},
+\begin{gathered}
+G^{L,(\omega)}_{\tau,t}+D^{(\omega)}_{\tau,t}+H^{(\omega)}_{\tau,t}=\overline L^{(\omega)}_{\tau,t},\\
+PV^{ch,(\omega)}_{\tau,t}+G^{ch,(\omega)}_{\tau,t}=C^{(\omega)}_{\tau,t},\\
+PV^{ch,(\omega)}_{\tau,t}+V^{(\omega)}_{\tau,t}=\overline{PV}^{(\omega)}_{\tau,t}.
+\end{gathered}
 \end{equation}
 
 其中紧急购电 \(H\) 只用于补足负荷，不用于储能充电。储能递推、储电量上下限、充放电功率限制

@@ -70,15 +70,9 @@ e^\pi_{r,t}
 
 正式情景数取 \(K=4\)， 稳定性分析取 \(K=8\)， 随机种子为 2026。
 
-价格情景为
-
-\begin{equation}
-\pi^{(\omega)}
+价格情景为 \(\pi^{(\omega)}
 =
-\hat\pi+e^\pi.
-\end{equation}
-
-历史残差叠加后可能出现负价格，因此模型保留负价格情景，不将其人工截断为 0。
+\hat\pi+e^\pi\)。 历史残差叠加后可能出现负价格，因此模型保留负价格情景，不将其人工截断为 0。
 
 \subsection{Q4-2：考虑负荷、光伏与电价联合不确定性的 7 日滚动模型}
 
@@ -273,11 +267,12 @@ A-P
 正常购电的实际用途只有补负荷与给储能充电，因此取当前日的计划购电物理上界为
 
 \begin{equation}
+\begin{gathered}
 U_{d,t}=\max_{\omega}\overline L_{d,t}^{(\omega)}+P_{\max},
 \qquad
-0\le P_{d,t}\le U_{d,t},
-\qquad
+0\le P_{d,t}\le U_{d,t},\\
 0\le G_{\tau,t}^{plan,(\omega)}\le\overline L_{\tau,t}^{(\omega)}+5000,
+\end{gathered}
 \end{equation}
 
 即最多补足最大情景的负荷缺口并按最大功率充电。这样 \(W\) 只表示预测误差造成的已购未用电，
@@ -307,32 +302,21 @@ M_t=U_{d,t},
 紧急购电按 5 倍结算，因此 0:00 与各调整阶段的目标函数统一写为
 
 \begin{equation}
-\min Z_{d,s}^{4-3}
-=
-\frac1K\sum_\omega\left[
-C^{settle,s,(\omega)}+C^{em,s,(\omega)}+C^{future,s,(\omega)}
-\right],
-\qquad
-C^{settle,s,(\omega)}
-=
-\left[\pi^{(\omega,s)}P+1.5\pi^{(\omega,s)}\Delta^+-0.5\pi^{(\omega,s)}\Delta^-\right]\Delta t,
+\begin{gathered}
+\min Z_{d,s}^{4-3}=\frac1K\sum_\omega\left[C^{settle,s,(\omega)}+C^{em,s,(\omega)}+C^{future,s,(\omega)}\right],\\
+C^{settle,s,(\omega)}=\left[\pi^{(\omega,s)}P+1.5\pi^{(\omega,s)}\Delta^+-0.5\pi^{(\omega,s)}\Delta^-\right]\Delta t,
+\end{gathered}
 \end{equation}
 
 其中 0:00 阶段的结算基准为原始计划 \(P\)，调整阶段为各阶段的调整计划。
 最终报送时全部替换为真实电价 \(\pi^{act}\)：
 
 \begin{equation}
-C_d^{4-3,act}
-=
-C_d^{normal,act}+C_d^{em,act},
-\qquad
-C_d^{normal,act}
-=
-\sum_t\left[\pi^{act}_{d,t}P_{d,t}+1.5\pi^{act}_{d,t}\Delta^+_{d,t}-0.5\pi^{act}_{d,t}\Delta^-_{d,t}\right]\Delta t,
-\qquad
-C_d^{em,act}
-=
-\sum_t 5\pi^{act}_{d,t}H^{act}_{d,t}\Delta t.
+\begin{gathered}
+C_d^{4-3,act}=C_d^{normal,act}+C_d^{em,act},\\
+C_d^{normal,act}=\sum_t\left[\pi^{act}_{d,t}P_{d,t}+1.5\pi^{act}_{d,t}\Delta^+_{d,t}-0.5\pi^{act}_{d,t}\Delta^-_{d,t}\right]\Delta t,\\
+C_d^{em,act}=\sum_t 5\pi^{act}_{d,t}H^{act}_{d,t}\Delta t.
+\end{gathered}
 \end{equation}
 
 \subsection{模型求解}

@@ -7,7 +7,7 @@
 约 2 行版面；回填进句子后语义不变、版面省下一半。
 
 判定为"短式"的条件：
-  · 渲染宽度 ≤ 44 列（\\left \\right 等不占宽）；
+  · 渲染宽度 ≤ 56 列（行内公式可在二元运算符处自动换行，稍宽也不会溢出）（\\left \\right 等不占宽）；
   · 公式体 ≤ 3 行；
   · 该 \\[…\\] 块前后各是一个完整段落（不为空、不以句末标点结尾、后段不是标题）。
 
@@ -25,6 +25,7 @@ PAPER = os.path.join(os.path.dirname(os.path.dirname(
 SECT = os.path.join(PAPER, 'sections')
 
 BLOCK = re.compile(r'(?<!\\)\\\[(.*?)(?<!\\)\\\]', re.S)
+EQ = re.compile(r'\\begin\{equation\}(.*?)\\end\{equation\}', re.S)
 STRIP = re.compile(r'\\(left|right|,|;|!|quad|qquad|displaystyle|mathrm|textbf|text|begin|end)\b')
 
 
@@ -35,7 +36,7 @@ def cols(b):
 
 
 def is_short(b):
-    return r'\boxed' not in b and cols(b) <= 44 and len(b.strip().split('\n')) <= 3
+    return r'\boxed' not in b and cols(b) <= 56 and len(b.strip().split('\n')) <= 3
 
 
 def inline_math(b):
@@ -75,6 +76,31 @@ def one(text):
             continue
         merged = '%s %s %s' % (pre.rstrip(), inline_math(b), post.strip())
         return text[:ps] + merged + text[qe:], (pre.strip()[-20:], b.strip()[:40])
+    # 再试编号公式（equation 环境）里的短式：正文没有任何 \ref{eq:…}，去掉编号不影响引用
+    for m in EQ.finditer(text):
+        b = m.group(1)
+        if not is_short(b) or r'\begin{' in b:
+            continue
+        pe = text.rfind('\n\n', 0, m.start())
+        if pe <= 0:
+            continue
+        ps = text.rfind('\n\n', 0, pe - 1) + 2
+        qs = text.find('\n\n', m.end())
+        if qs == -1:
+            continue
+        nx = text.find('\n\n', qs + 2)
+        qe = nx if nx != -1 else len(text)
+        pre, post = text[ps:pe], text[qs + 2:qe]
+        if not pre.strip() or not post.strip():
+            continue
+        if re.search(r'[。！？：]$', pre.strip()):
+            continue
+        if re.match(r'^\\(sub)*section|^\\begin|^\\end|^\\input', post.strip()):
+            continue
+        if '\n' in pre.strip() or '\n' in post.strip():
+            continue
+        merged = '%s %s %s' % (pre.rstrip(), inline_math(b), post.strip())
+        return text[:ps] + merged + text[qe:], ('[编号式] ' + pre.strip()[-16:], b.strip()[:36])
     return text, None
 
 

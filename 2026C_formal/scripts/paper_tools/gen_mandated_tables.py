@@ -127,7 +127,7 @@ def table1(rec, date=None, cap=''):
     L.append('全天购电量 & %s & & & 全天购电费 & %s \\\\' % (bold(use['total']), bold(use['cost'])))
     L += [r'\hline', r'\end{tabular}']
     if cap:
-        L.append(r'\par\vspace{1pt}{\zihao{6}%s}' % cap)
+        L.append(r'\par{\zihao{6}%s}' % cap)
     return '\n'.join(L) + '\n'
 
 
@@ -147,7 +147,7 @@ def table2(rec, date=None, cap=''):
         bold(soc.get('00:00') or soc.get('0:00')), bold(soc.get('24:00'))))
     L += [r'\hline', r'\end{tabular}']
     if cap:
-        L.append(r'\par\vspace{1pt}{\zihao{6}%s}' % cap)
+        L.append(r'\par{\zihao{6}%s}' % cap)
     return '\n'.join(L) + '\n'
 
 
@@ -165,7 +165,7 @@ def table3(rec, cap=''):
         L += [' & '.join(cells) + r' \\', r'\hline']
     L.append(r'\end{tabular}')
     if cap:
-        L.append(r'\par\vspace{1pt}{\zihao{6}%s}' % cap)
+        L.append(r'\par{\zihao{6}%s}' % cap)
     return '\n'.join(L) + '\n'
 
 
@@ -188,7 +188,7 @@ def main():
     pages = {}
     pages['t_q1'] = block('', [
         table1(r1, cap='表 1　微网在指定时间段的购电量及全天的购电量和购电费'),
-        r'\vspace{0.3\baselineskip}',
+        r'\vspace{0.15\baselineskip}',
         table2(r1, cap='表 2　储能设备在指定时间段的充放电量及 0:00 和 24:00 的储电量')])
 
     for path, tag, name in [('result2_q2c.xlsx', 'q2', '问题二'),
@@ -197,9 +197,9 @@ def main():
         b = []
         for i, d in enumerate(DATES):
             b += [table1(rec, d, cap='表 1（%s）　%s' % (DTAG[i], name)),
-                  r'\vspace{0.3\baselineskip}']
+                  r'\vspace{0.15\baselineskip}']
             b += [table2(rec, d, cap='表 2（%s）　%s' % (DTAG[i], name)),
-                  r'\vspace{0.3\baselineskip}']
+                  r'\vspace{0.15\baselineskip}']
         b.append(table3(rec, cap='表 3　微网在指定日期的紧急购电量（%s）' % name))
         pages['t_%s' % tag] = block('', b)
 

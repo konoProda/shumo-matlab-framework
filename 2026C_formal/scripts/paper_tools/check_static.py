@@ -23,9 +23,9 @@ TAB = os.path.join(PAPER, 'tables')
 CODE = os.path.join(PAPER, 'code')
 
 # 计数不变式（改稿后应同步更新这里的期望值）
-N_EQUATION = 58
+N_EQUATION = 52
 N_FIG = 11                     # 10 张结果图 + 1 张总体流程图
-N_TAB = 31                     # tabular + longtable（含横版页内 15 张）
+N_TAB = 31
 N_SUB = 2                     # 附录 B/C 的 \subsection 数（不计 code_manifest 内的）
 
 R = []                        # (层, 项, 结果, 说明)
