@@ -8,16 +8,16 @@ function [f, intcon, A, b, Aeq, beq, lb, ub, aux] = func_build_q3b( ...
 %   第一阶段（情景无关）——只决定当天尚未执行时段的正常购电承诺：
 %       s = 0 ：A_{d,t}（即当天原始计划 P），目标里按 π^(ω)·A·Δt 计入计划成本
 %       s > 0 ：A_{d,t} 与调整辅助量 Δ⁺/Δ⁻，结算按 π^(ω)·(P + 1.5Δ⁺ − 0.5Δ⁻)·Δt
-%               其中 A − P = Δ⁺ − Δ⁻（裁决 B5），P 为当天 0:00 原计划（常数）
+%               其中 A − P = Δ⁺ − Δ⁻，P 为当天 0:00 原计划（常数）
 %   第二阶段（逐情景 ω）：当天的 G^L/G^ch/PV^ch/C/D/E/V/H/W 与未来日的同名变量 + 临时计划 GPF，
 %       以及充放电互斥二元 U。
 %
-%   三项加固（建模侧订对批复，见 decisions_q4.md F8/F9）：
+%   三项加固：
 %     H-1 正常购电物理上界：A ≤ U_cur = max_ω L̄^{(ω)}_cur + P_max（当天四阶段冻结同一 U）；
 %         未来日情景内计划 GPF ≤ L̄^{(ω)}_fut + P_max。替代原人工上界 1e5。
 %         含义：正常购电最多用于"补负荷 + 最大充电功率"；W 仍保留以表示预测误差造成的已购未用。
 %         价格为正时该上界恒不起作用（正价下 W 无利可图 ⇒ 最优解 W=0）。
-%     H-2 调增/调减显式互斥：0 ≤ Δ⁺ ≤ M·z，0 ≤ Δ⁻ ≤ M·(1−z)，z∈{0,1}，**M = U_cur（不用人工 Big-M）**。
+%     H-2 调增/调减显式互斥：0 ≤ Δ⁺ ≤ M·z，0 ≤ Δ⁻ ≤ M·(1−z)，z∈{0,1}，M = U_cur（不用人工 Big-M）。
 %         正价下原最优解本就取单边 ⇒ 不收紧最优值；负价下它使结算式严格等于 §19.3 的语义。
 %         （问题三价格恒正，此项恒不起作用；问题四含负价情景，必须显式化。）
 %
@@ -27,7 +27,7 @@ function [f, intcon, A, b, Aeq, beq, lb, ub, aux] = func_build_q3b( ...
 %         Lfut/PVfut     T×nFut×K 未来日情景负荷 / 光伏
 %         Pfix   T×1       当天 0:00 原计划（已锁定；s=0 时不参与）
 %         sl     标量      当天已执行槽数（= 6×阶段小时数）
-%         E_start 标量     阶段起点的**真实**储电量 kWh（裁决 C8）
+%         E_start 标量     阶段起点的真实储电量 kWh
 %         prm    参数结构体
 %         use_bin 逻辑     true = 含互斥二元（MILP）；false = 连续松弛（LP）
 %   输出  intlinprog / linprog 标准型；aux 含分段索引与分流辅助量
@@ -46,17 +46,17 @@ assert(size(Pfut,1) == T && size(Pfut,2) == nFut && size(Pfut,3) == K, '未来�
 nDay = 10;                                  % 当天块：GL GC PVC C D E V H W U
 nFt  = 11;                                  % 未来日块：… + GPF（U 仍在末位）
 % 偏移沿用问题二已验证的约定：GPF=9、U=10（服务 11 组的未来日块）。
-% 当天块只有 10 组且没有 GPF，故其中 U 落在 offB.U−1 = 9——**两块的 U 偏移不同**，
+% 当天块只有 10 组且没有 GPF，故其中 U 落在 offB.U−1 = 9——两块的 U 偏移不同，
 % 分别用 offU_day 与 offB.U 取值，不可混用（混用会让 GPF 与 U 互换而静默出错）。
 offB = struct('GL',0,'GC',1,'PVC',2,'C',3,'D',4,'E',5,'V',6,'H',7,'W',8,'GPF',9,'U',10);
 offU_day = offB.U - 1;
 
-hasAdj = sl > 0;                            % s=0 阶段没有调整（裁决：不设 Δ±，不留空变量）
+hasAdj = sl > 0;                            % s=0 阶段没有调整（s=0 无需调整变量）
 
 %% 索引
 aux = struct('T',T, 'Tcur',Tcur, 'K',K, 'nFut',nFut, 'sl',sl, ...
              'nDay',nDay, 'nFt',nFt, 'offB',offB, 'offU_day',offU_day, 'hasAdj',hasAdj);
-% s=0 阶段没有调整，**既不生成也不保留** Δ± 与 z（不留"占位但不用"的空变量：
+% s=0 阶段没有调整，既不生成也不保留 Δ± 与 z（不留"占位但不用"的空变量：
 % 空变量会白白增加 432 列与 144 个二元变量，拖慢最贵的 0:00 阶段）
 aux.iA  = (1:Tcur).';
 if hasAdj
@@ -173,7 +173,7 @@ for w = 1:K
     r  = r0 + (1:Tcur).';   r0 = r0 + Tcur;                        % (4) SOC 递推
     r2 = r(2:end);
     % −E_{t−1} 用"第 2..Tcur 槽的列号减 1"取到第 1..Tcur−1 槽。
-    % 写成 gE(2:end) 长度同样对得上，但方程会退化成 E_t−E_t=0，**静默作废储能递推**。
+    % 写成 gE(2:end) 长度同样对得上，但方程会退化成 E_t−E_t=0，静默作废储能递推。
     gE = g('E');
     I=[I;r;r2;r;r];  J=[J;gE;gE(2:end)-1;g('C');g('D')];
     S=[S;ones(Tcur,1);-ones(Tcur-1,1);-prm.eta_ch*dt*ones(Tcur,1);(dt/prm.eta_dis)*ones(Tcur,1)];

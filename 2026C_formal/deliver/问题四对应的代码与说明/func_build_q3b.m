@@ -8,11 +8,11 @@ function [f, intcon, A, b, Aeq, beq, lb, ub, aux] = func_build_q3b( ...
 %   第一阶段（情景无关）——只决定当天尚未执行时段的正常购电承诺：
 %       s = 0 ：A_{d,t}（即当天原始计划 P），目标里按 π^(ω)·A·Δt 计入计划成本
 %       s > 0 ：A_{d,t} 与调整辅助量 Δ⁺/Δ⁻，结算按 π^(ω)·(P + 1.5Δ⁺ − 0.5Δ⁻)·Δt
-%               其中 A − P = Δ⁺ − Δ⁻（裁决 B5），P 为当天 0:00 原计划（常数）
+%               其中 A − P = Δ⁺ − Δ⁻，P 为当天 0:00 原计划（常数）
 %   第二阶段（逐情景 ω）：当天的 G^L/G^ch/PV^ch/C/D/E/V/H/W 与未来日的同名变量 + 临时计划 GPF，
 %       以及充放电互斥二元 U。
 %
-%   三项加固（建模侧订对批复，见 decisions_q4.md F8/F9）：
+%   三项加固：
 %     H-1 正常购电物理上界：A ≤ U_cur = max_ω L̄^{(ω)}_cur + P_max（当天四阶段冻结同一 U）；
 %         未来日情景内计划 GPF ≤ L̄^{(ω)}_fut + P_max。替代原人工上界 1e5。
 %         含义：正常购电最多用于"补负荷 + 最大充电功率"；W 仍保留以表示预测误差造成的已购未用。
@@ -27,7 +27,7 @@ function [f, intcon, A, b, Aeq, beq, lb, ub, aux] = func_build_q3b( ...
 %         Lfut/PVfut     T×nFut×K 未来日情景负荷 / 光伏
 %         Pfix   T×1       当天 0:00 原计划（已锁定；s=0 时不参与）
 %         sl     标量      当天已执行槽数（= 6×阶段小时数）
-%         E_start 标量     阶段起点的真实储电量 kWh（裁决 C8）
+%         E_start 标量     阶段起点的真实储电量 kWh
 %         prm    参数结构体
 %         use_bin 逻辑     true = 含互斥二元（MILP）；false = 连续松弛（LP）
 %   输出  intlinprog / linprog 标准型；aux 含分段索引与分流辅助量
@@ -51,7 +51,7 @@ nFt  = 11;                                  % 未来日块：… + GPF（U 仍�
 offB = struct('GL',0,'GC',1,'PVC',2,'C',3,'D',4,'E',5,'V',6,'H',7,'W',8,'GPF',9,'U',10);
 offU_day = offB.U - 1;
 
-hasAdj = sl > 0;                            % s=0 阶段没有调整（裁决：不设 Δ±，不留空变量）
+hasAdj = sl > 0;                            % s=0 阶段没有调整（s=0 无需调整变量）
 
 %% 索引
 aux = struct('T',T, 'Tcur',Tcur, 'K',K, 'nFut',nFut, 'sl',sl, ...

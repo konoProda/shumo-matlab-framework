@@ -2,7 +2,7 @@ function [Lc, PVc, Lf, PVf, info] = func_scen_q3b(arch3, d, sl, K, ...
         Lhat_c, PVhat_c, Lhat_f, PVhat_f, lead_f, cfg)
 %FUNC_SCEN_Q3B  生成阶段 s 的 K 个联合情景（负荷 / 光伏，来源同一历史日）
 %
-%   抽样：从决策日前"最近 libW 个有效残差日"中随机无放回抽 K 天（裁决 C12/D4）。
+%   抽样：从决策日前"最近 libW 个有效残差日"中随机无放回抽 K 天。
 %   情景：负荷   L^(ω) = max(0, L̂ + e^L_{r_ω})；
 %         光伏   PV^(ω) = max(0, PV̂ + ε)，其中
 %                 近端（自发布时刻起提前量 ℓ ≤ 144）：ε = e^{PV,s}_{r_ω,ℓ}（附件3 分阶段库）
@@ -10,7 +10,7 @@ function [Lc, PVc, Lf, PVf, info] = func_scen_q3b(arch3, d, sl, K, ...
 %         三处中心预测同属一条视野，故同一情景的负荷与光伏误差来自同一历史日。
 %   退化：有效残差日不足 max(K,5) 时退化为 K=1（情景 = 中心预测），置退化标记。
 %   随机性：按 (d,sl) 构造独立固定子流 rng(seed + 4(d−1) + sl/6)：
-%           同日同阶段完全可复现；不同日、不同阶段相互独立（裁决 C12/D6）。
+%           同日同阶段完全可复现；不同日、不同阶段相互独立。
 %
 %   输入  arch3   func_resid_q3b 的档案（含 eL / ePV / ePV3 / ok）
 %         d       决策日索引；sl 当天已执行槽数；K 情景数

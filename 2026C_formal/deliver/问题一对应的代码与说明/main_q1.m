@@ -77,7 +77,7 @@ out_tbl = table((1:T).', lab, price_v, (sol.GL+sol.GC)*prm.dt, sol.GL*prm.dt, so
     aux.PVL*prm.dt, sol.PVC*prm.dt, sol.C*prm.dt, sol.D*prm.dt, sol.V*prm.dt, sol.E, ...
     'VariableNames', {'slot','period','price','buy_kwh','g_load_kwh','g_chg_kwh', ...
                       'pv_load_kwh','pv_chg_kwh','chg_kwh','dis_kwh','curt_kwh','E_kwh'});
-% 逐槽结果算"统计中间件"（与其它问的逐日统计同类；见 outputs/README.md 的分类口径）
+% 逐槽结果算"统计中间件"（逐槽明细，供绘图与核对）
 SUB = fullfile(PROJ_ROOT, 'outputs', '统计中间件');
 if exist(SUB, 'dir') ~= 7; mkdir(SUB); end
 writetable(out_tbl, fullfile(SUB, 'q1_solution.csv'));

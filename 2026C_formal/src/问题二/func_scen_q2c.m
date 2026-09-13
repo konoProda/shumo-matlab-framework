@@ -1,5 +1,5 @@
 function [Lsc, PVsc, info] = func_scen_q2c(eL, ePV, okv, d, K, R, Lc, PVc, libW, seed)
-%FUNC_SCEN_Q2C  生成决策日 d 的 K 个 SAA 情景（问题二第三轮，建模手 C1/C2）
+%FUNC_SCEN_Q2C  生成决策日 d 的 K 个 SAA 情景（问题二第三轮， C1/C2）
 %
 %   抽样：从"决策日前最近 libW 个有效预测残差日"中随机无放回抽取 K 天；
 %         负荷与光伏误差成对（同一天）、144 槽作为整体抽取、不逐槽打乱。
