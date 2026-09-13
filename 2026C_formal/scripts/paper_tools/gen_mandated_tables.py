@@ -127,7 +127,7 @@ def table1(rec, date=None, cap=''):
     L.append('全天购电量 & %s & & & 全天购电费 & %s \\\\' % (bold(use['total']), bold(use['cost'])))
     L += [r'\hline', r'\end{tabular}']
     if cap:
-        L.append(r'\par{\zihao{6}%s}' % cap)
+        L.append(r'\par\noindent{\zihao{6}%s}' % cap)
     return '\n'.join(L) + '\n'
 
 
@@ -147,7 +147,7 @@ def table2(rec, date=None, cap=''):
         bold(soc.get('00:00') or soc.get('0:00')), bold(soc.get('24:00'))))
     L += [r'\hline', r'\end{tabular}']
     if cap:
-        L.append(r'\par{\zihao{6}%s}' % cap)
+        L.append(r'\par\noindent{\zihao{6}%s}' % cap)
     return '\n'.join(L) + '\n'
 
 
@@ -165,7 +165,7 @@ def table3(rec, cap=''):
         L += [' & '.join(cells) + r' \\', r'\hline']
     L.append(r'\end{tabular}')
     if cap:
-        L.append(r'\par{\zihao{6}%s}' % cap)
+        L.append(r'\par\noindent{\zihao{6}%s}' % cap)
     return '\n'.join(L) + '\n'
 
 
@@ -214,7 +214,11 @@ def main():
         for i, d in enumerate(DATES):
             pairs.append((table1(rec, d, cap='表 1（%s）' % DTAG[i]),
                           table2(rec, d, cap='表 2（%s）' % DTAG[i])))
-        b = two_col(pairs)
+        # 注：曾把表 1/表 2 左右并排放，但题目版式的 6 列表在 0.485\linewidth
+        # 里放不下，会与右栏重叠；已改回纵向叠放（可靠优先）。
+        b = []
+        for a, bb in pairs:
+            b += [a, r'\vspace{0.15\baselineskip}', bb, r'\vspace{0.15\baselineskip}']
         b.append(table3(rec, cap='表 3　微网在指定日期的紧急购电量（%s）' % name))
         pages['t_%s' % tag] = block('', b)
 

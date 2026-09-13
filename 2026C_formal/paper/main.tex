@@ -61,14 +61,17 @@
 % ============================================================
 % 标题格式
 % ============================================================
+% 注意：这里必须用 \titlespacing 的**不带星**形式。
+% titlesec 的带星形式 \titlespacing* 会取消标题后首段的缩进，
+% 于是每个标题下的第一段都顶格——不符合中文排版惯例（每段都应缩进两字）。
 \titleformat{\section}{\centering\heiti\zihao{3}}{\thesection、}{0pt}{}
-\titlespacing*{\section}{0pt}{0.8\baselineskip}{0.5\baselineskip}
+\titlespacing{\section}{0pt}{0.8\baselineskip}{0.5\baselineskip}
 
 \titleformat{\subsection}{\heiti\zihao{4}}{\thesubsection}{0.8em}{}
-\titlespacing*{\subsection}{0pt}{0.5\baselineskip}{0.3\baselineskip}
+\titlespacing{\subsection}{0pt}{0.5\baselineskip}{0.3\baselineskip}
 
 \titleformat{\subsubsection}{\heiti\zihao{-4}}{\thesubsubsection}{0.6em}{}
-\titlespacing*{\subsubsection}{0pt}{0.4\baselineskip}{0.2\baselineskip}
+\titlespacing{\subsubsection}{0pt}{0.4\baselineskip}{0.2\baselineskip}
 
 % ============================================================
 % 版式细节
