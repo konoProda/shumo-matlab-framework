@@ -79,5 +79,5 @@ set(lg, 'FontName', FN, 'FontSize', 14, 'Box', 'off');
 % ---------- 导出 ----------
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');
 print(f, fullfile(THIS_DIR, [NAME '.pdf']), '-dpdf');
-close(f);
+
 fprintf('已出图：%s\n', fullfile(THIS_DIR, [NAME '.png']));

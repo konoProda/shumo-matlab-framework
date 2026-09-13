@@ -58,4 +58,4 @@ set(lg, 'FontName', FN, 'FontSize', 14, 'Box', 'off');
 fig_dir = THIS_DIR;
 print(f, fullfile(fig_dir, [NAME '.png']), '-dpng', '-r300');
 print(f, fullfile(fig_dir, [NAME '.pdf']), '-dpdf');
-close(f);
+

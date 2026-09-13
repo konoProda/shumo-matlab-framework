@@ -71,5 +71,5 @@ xlim(ax, [D.date(1), D.date(end)]);     % 图例会重置日期轴，冻结一�
 % ---------- 导出 ----------
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');
 print(f, fullfile(THIS_DIR, [NAME '.pdf']), '-dpdf');
-close(f);
+
 fprintf('已出图：%s\n', fullfile(THIS_DIR, [NAME '.png']));
