@@ -177,6 +177,22 @@ def block(title, blocks):
     return '\n'.join(L) + '\n'
 
 
+def two_col(pairs):
+    """把「表 1 / 表 2」成对并排成左右两栏（版心 15.8cm，每栏约 7.6cm）。
+
+    题目表 1/2 各 6 列、六号字，单栏放得下；并排后每题 4 个日期的 8 张表
+    从"竖着摞 8 张"变成"横着排 4 组"，版面省约一半。
+    """
+    L = []
+    for a, b in pairs:
+        L += [r'\noindent',
+              r'\begin{minipage}[t]{0.485\linewidth}', a, r'\end{minipage}'
+              r'\hfill',
+              r'\begin{minipage}[t]{0.485\linewidth}', b, r'\end{minipage}',
+              r'\vspace{0.15\baselineskip}']
+    return L
+
+
 def main():
     import scipy.io as sio
     r1 = read_all('result1.xlsx')
@@ -194,12 +210,11 @@ def main():
     for path, tag, name in [('result2_q2c.xlsx', 'q2', '问题二'),
                             ('result3.xlsx', 'q3', '问题三')]:
         rec = read_all(path)
-        b = []
+        pairs = []
         for i, d in enumerate(DATES):
-            b += [table1(rec, d, cap='表 1（%s）　%s' % (DTAG[i], name)),
-                  r'\vspace{0.15\baselineskip}']
-            b += [table2(rec, d, cap='表 2（%s）　%s' % (DTAG[i], name)),
-                  r'\vspace{0.15\baselineskip}']
+            pairs.append((table1(rec, d, cap='表 1（%s）' % DTAG[i]),
+                          table2(rec, d, cap='表 2（%s）' % DTAG[i])))
+        b = two_col(pairs)
         b.append(table3(rec, cap='表 3　微网在指定日期的紧急购电量（%s）' % name))
         pages['t_%s' % tag] = block('', b)
 
