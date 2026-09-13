@@ -93,7 +93,8 @@ def check_figures():
             for pat, desc in [(r'^plot_.*\.m$', '绘图脚本'), (r'^data\.csv$', 'data.csv')]:
                 if not any(re.match(pat, f) for f in files):
                     fail('%s 缺 %s' % (p, desc))
-            pngs = [f for f in files if f.endswith('.png')]
+            # 排除人工改图（内部对照件，不属交付图，也不进 deliver）
+            pngs = [f for f in files if f.endswith('.png') and f != '改.png']
             pdfs = [f for f in files if f.endswith('.pdf')]
             if not pngs:
                 fail('%s 缺 PNG' % p)

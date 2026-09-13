@@ -1,9 +1,5 @@
-%% plot_q2c_soc —— 问题二：日末储电量轨迹与日内波动范围
-% 图名:     问题二 日末储电量轨迹
-% 对应问题: 问题二（Q2c 现行口径：7 日滚动 SAA + 两阶段 MILP）
-% 数据来源: 本目录 data.csv（逐日 E_end 与日内最小 / 最大储电量，单位 kWh）
-% 论文位置: 问题二·结果分析
-% 支撑结论: 日末在窗口内均值 7,046 kWh，最低触到下限 1,200 kWh
+% 日末储电量轨迹与日内波动范围
+% 数据：同目录 data.csv。
 
 clear; close all; clc;
 THIS_DIR  = fileparts(mfilename('fullpath'));
@@ -11,18 +7,18 @@ PROJ_ROOT = fullfile(THIS_DIR, '..', '..', '..');
 addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 D = readtable(fullfile(THIS_DIR, 'data.csv'), 'Encoding', 'UTF-8');
 
-% ---------- 绘图参数 ----------
-FIG_W = 24.5;  FIG_H = 12;
+%% 绘图参数
+FIG_W = 20;  FIG_H = 10;
 NAME  = '问题二 日末储电量轨迹';
 TITLE = '日末储电量轨迹与日内波动范围';
 AXPOS = [0.112 0.290 0.838 0.560];      % 左边界右移，右边界不动，给“储电量（kWh）”腾出位置
-XTIT  = 0.026;
+XTIT  = 0.008;
 E_MIN = 1200;                           % 储电量下限（kWh），模型参数
 E_MAX = 10800;                          % 储电量上限（kWh），模型参数
 E_AVE = 7046;                           % 报送窗口日末均值（kWh），与总览文档表 2 一致
 W0    = datetime(2025, 2, 1);           % 报送窗口起点（1 月不在窗口内）
 
-% ---------- 出图 ----------
+%% 出图
 f  = figure('Units', 'centimeters', 'Position', [5 5 FIG_W FIG_H]);
 ax = axes(f, 'Units', 'normalized', 'Position', AXPOS);
 hold(ax, 'on');
@@ -57,10 +53,10 @@ lg = legend(ax, [hband, hline, g1, g2, g3, g4], ...
             {'日内波动范围（最小—最大）', '日末储电量', '上限 10,800', '下限 1,200', ...
              '窗口日末均值 7,046', '报送窗口起点 02-01'}, ...
             'Orientation', 'horizontal', 'Location', 'northoutside');
-set(lg, 'FontName', FN, 'FontSize', 14, 'Box', 'off');
+set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off');
 xlim(ax, [D.date(1), D.date(end)]);     % 图例会重置日期轴，冻结一次
 
-% ---------- 导出 ----------
+%% 导出
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');
 print(f, fullfile(THIS_DIR, [NAME '.pdf']), '-dpdf');
 

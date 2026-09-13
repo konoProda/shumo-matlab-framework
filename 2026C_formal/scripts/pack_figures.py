@@ -47,7 +47,8 @@ def main():
             if not any(f.endswith('.png') for f in files):
                 continue
             dst = os.path.join(DST_BASE, q, name)
-            shutil.copytree(src, dst, dirs_exist_ok=True)
+            shutil.copytree(src, dst, dirs_exist_ok=True,
+                            ignore=shutil.ignore_patterns('改.png'))   # 人工改图是内部对照件，不进交付
             n_fig += 1
             miss = [e for e in ('.png', '.pdf', 'data.csv') if not any(f.endswith(e) for f in files)]
             if not any(f.startswith('plot_') for f in files):

@@ -1,26 +1,23 @@
-%% plot_q4_price —— 问题四：电价预测的逐时误差画像
-% 图名:     问题四 电价预测画像
-% 对应问题: 问题四
-% 数据来源: 本目录 data.csv（逐小时的原始预测误差、校正后误差与偏差）
-% 论文位置: 问题四·模型检验
-% 支撑结论: 偏差校正后各小时误差普遍下降；清晨与傍晚的误差相对更大
+% 电价预测的逐时平均绝对误差
+% 数据：同目录 data.csv。
+% 改图只需改本文件顶部的参数区。
 
 clear; close all; clc;
 THIS_DIR  = fileparts(mfilename('fullpath'));
 addpath(genpath(fullfile(THIS_DIR, '..', '..', '..', 'src')));
 D = readtable(fullfile(THIS_DIR, 'data.csv'), 'Encoding', 'UTF-8');
 
-% ---------- 绘图参数 ----------
-FIG_W = 26;  FIG_H = 12.5;
+%% 画图参数
+FIG_W = 20;  FIG_H = 10.1;
 NAME  = '问题四 电价预测画像';
 TITLE = '电价预测的逐时平均绝对误差';
 AX    = [0.092 0.280 0.884 0.560];
-XTIT  = 0.028;
+XTIT  = 0.008;
 x     = D.hour(:);
 XT    = 1:2:24;
 XTL   = cellstr(compose('%d:00', XT - 1));
 
-% ---------- 出图 ----------
+%% 绘制
 f = figure('Units','centimeters','Position',[3 5 FIG_W FIG_H]);
 ax = axes(f,'Units','normalized','Position',AX);
 hold(ax,'on');
@@ -38,8 +35,7 @@ xlabel(ax, '时段起点（时）');
 ylabel(ax, '误差（元/kWh）');
 func_fig_style(ax);
 legend(ax, {'校正前 MAE','校正后 MAE','校正后偏差'}, 'Location','northoutside', ...
-       'Orientation','horizontal', 'Box','off');
-set(ax, 'FontName', get(get(ax,'XLabel'),'FontName'));
+       'Orientation','horizontal', 'Box','off', 'FontSize', 22);
 func_fig_style(ax, 'Title', TITLE, 'TitleFigY', XTIT);
 
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');
