@@ -21,8 +21,8 @@ CODE = os.path.join(HERE, 'code')
 
 # 计数不变式（改稿后应同步更新这里的期望值）
 N_EQUATION = 85
-N_FIG = 10
-N_TAB = 24
+N_FIG = 11                     # 10 张结果图 + 1 张总体流程图
+N_TAB = 19                     # 18 张 table + 1 张 longtable（符号说明）
 N_SUB = 2                     # 附录 B/C 的 \subsection 数（不计 code_manifest 内的）
 
 R = []                        # (层, 项, 结果, 说明)
@@ -125,13 +125,13 @@ def main():
     # ---------------- L2 计数不变式 ----------------
     j = '\n'.join(body.values())
     n_eq = j.count(r'\begin{equation}')
-    n_tab_env = j.count(r'\begin{table}')
-    n_tabular = j.count(r'\begin{tabular}')
+    n_tab_env = j.count(r'\begin{table}') + j.count(r'\begin{longtable}')
+    n_tabular = j.count(r'\begin{tabular}') + j.count(r'\begin{longtable}')
     n_fig = j.count(r'\includegraphics')
     n_inc = n_eq and None
     checks = [
         ('equation == %d' % N_EQUATION, n_eq == N_EQUATION, '实际 %d' % n_eq),
-        ('table == tabular', n_tab_env == n_tabular, '%d / %d' % (n_tab_env, n_tabular)),
+        ('table 环境 == 表格体（含 longtable）', n_tab_env == n_tabular, '%d / %d' % (n_tab_env, n_tabular)),
         ('table == %d' % N_TAB, n_tab_env == N_TAB, '实际 %d' % n_tab_env),
         ('includegraphics == %d' % N_FIG, n_fig == N_FIG, '实际 %d' % n_fig),
         ('\\tag 残留 == 0', j.count(r'\tag{') == 0, '实际 %d' % j.count(r'\tag{')),
@@ -219,8 +219,14 @@ def main():
     # 判据：% 前面是数字、中文或右括号 => 是"百分之"，不是注释（注释前一般是空白或行首）。
     for name, t in body.items():
         for ln_no, ln in enumerate(t.split('\n'), 1):
-            for m in re.finditer(r'(?<!\\)%', ln):
-                k = m.start()
+            # 一行里只有**第一个**未转义的 % 可能是"百分之"；
+            # 它之后的 % 都落在注释里（注释中写 "45%" 是正常的）。
+            first = next((m for m in re.finditer(r'(?<!\\)%', ln)), None)
+            if first is not None:
+                k = first.start()
+                prev = ln[k - 1] if k > 0 else ''
+                if prev and (prev.isdigit() or ord(prev) > 0x2e80 or prev in ')]'):
+                    dangers.append('%s:%d 裸 %% （会吞掉该行剩余内容）' % (name, ln_no))
                 prev = ln[k - 1] if k > 0 else ''
                 if prev and (prev.isdigit() or ord(prev) > 0x2e80 or prev in ')]'):
                     dangers.append('%s:%d 裸 %% （会吞掉该行剩余内容）' % (name, ln_no))
@@ -344,10 +350,11 @@ def main():
         is7.append('main.tex 的 \\fvset 未开软折行（超宽行会溢出）')
     if 'frame=none' not in mt:
         is7.append('main.tex 的 \\fvset 未关边框')
+    # 附录代码要求**完整**（2026-09-13 编程手要求），不再按 6 页预算截断；
+    # 这里只报行数供参考，不作为失败项。正文 30 页另由 L8 约束。
     n_code = sum(len(open(p, encoding='utf-8').read().split('\n')) for p in files('*.m', CODE))
-    if n_code > 426:
-        is7.append('附录 B 代码 %d 行，超 6 页预算 426 行' % n_code)
-    rec('L7', '附录代码（制表符 / 排版开关 / 页数预算）', not is7, '; '.join(is7[:4]))
+    rec('L7', '附录代码（制表符 / 排版开关；%d 行，要求完整不截断）' % n_code,
+        not is7, '; '.join(is7[:4]))
 
     # ---------------- 汇总 ----------------
     print('%-4s %-56s %-5s %s' % ('层', '检查项', '结果', '说明'))

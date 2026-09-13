@@ -102,5 +102,30 @@ tab = func_write_q1(sol, prm, ...
     fullfile(PROJ_ROOT, 'outputs', 'result1.xlsx'));
 fprintf('\n结果已写入 outputs/result1.xlsx 与 outputs/统计中间件/q1_solution.csv\n');
 
+%% 论文表 1 / 表 2 数值
+fprintf('\n=== 论文表1 指定时段购电量 ===\n');
+for k = 1:numel(tab.t1_slot)
+    fprintf('  %-12s  槽%3d  %10.4f kWh\n', tab.t1_label{k}, tab.t1_slot(k), tab.t1_buy(k));
+end
+fprintf('  全天购电量 %.4f kWh    全天购电费 %.4f 元\n', tab.t1_total, tab.t1_cost);
 
-% ……（本段为控制台结果打印，不含求解逻辑，附录从略；完整代码见支撑材料）
+fprintf('\n=== 论文表2 储能充放电量 ===\n');
+for b = 1:6
+    fprintf('  %-12s  充电 %10.4f   放电 %10.4f kWh\n', tab.t2_label{b}, tab.t2_chg(b), tab.t2_dis(b));
+end
+fprintf('  0:00 储电量 %.2f kWh    24:00 储电量 %.2f kWh\n', tab.t2_E0, tab.t2_ET);
+
+%% 能源流向汇总（显式分流模型特有）
+fprintf('\n=== 全天能源流向汇总（kWh）===\n');
+fprintf('  光伏供负载 %10.4f   光伏充电 %10.4f   弃光 %10.4f\n', ...
+        rep.pv_load, rep.pv_chg, rep.curt_total);
+fprintf('  外网供负载 %10.4f   外网充电 %10.4f\n', rep.grid_load, rep.grid_chg);
+fprintf('  储能充电   %10.4f   储能放电 %10.4f\n', rep.chg_total, rep.dis_total);
+fprintf('  校验：光伏 %.4f = 供负载 %.4f + 充电 %.4f + 弃光 %.4f\n', ...
+        sum(pv_p)*prm.dt, rep.pv_load, rep.pv_chg, rep.curt_total);
+fprintf('        负载 %.4f = 光伏供 %.4f + 外网供 %.4f + 放电 %.4f\n', ...
+        sum(load_p)*prm.dt, rep.pv_load, rep.grid_load, rep.dis_total);
+fprintf('        充电 %.4f = 光伏充电 %.4f + 外网充电 %.4f\n', ...
+        rep.chg_total, rep.pv_chg, rep.grid_chg);
+fprintf('        购电 %.4f = 外网供负载 %.4f + 外网充电 %.4f\n', ...
+        rep.buy_total, rep.grid_load, rep.grid_chg);

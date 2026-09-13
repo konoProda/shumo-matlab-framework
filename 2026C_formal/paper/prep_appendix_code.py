@@ -28,7 +28,9 @@ DST = os.path.join(HERE, 'code')
 
 # (源文件, 输出名, 小节标题, 截断（保留到第几行；None = 全文）)
 FILES = [
-    ('问题一/main_q1.m',  'main_q1.m',  r'问题一：典型日计划购电（\texttt{main\_q1.m}）', 104),
+    # keep=None = 全文收录。附录代码必须**完整**（编程手 2026-09-13 要求），
+    # 不再对末尾的打印段做截断。
+    ('问题一/main_q1.m',  'main_q1.m',  r'问题一：典型日计划购电（\texttt{main\_q1.m}）', None),
     ('问题二/main_q2c.m', 'main_q2c.m', r'问题二：7 日滚动两阶段随机规划（\texttt{main\_q2c.m}）', None),
     ('问题三/main_q3b.m', 'main_q3b.m', r'问题三：日内多阶段预报更新与再调整（\texttt{main\_q3b.m}）', None),
     ('问题四/main_q4.m',  'main_q4.m',  r'问题四：电价不确定性与日内价格更新（\texttt{main\_q4.m}）', None),
@@ -60,8 +62,10 @@ def main():
                 r'\VerbatimInput{code/%s}' % out_name, '']
         print('  %-22s ← src/%-20s %3d 行' % (out_name, src_rel, len(lines)))
     open(MANIFEST, 'w', encoding='utf-8').write('\n'.join(tex))
-    print('\n附录 B 代码合计 %d 行，预算 426 行（6 页 × 71 行，\\scriptsize 估）' % total)
-    return 0 if total <= 426 else 1
+    print('\n附录 B 代码合计 %d 行（约 %.1f 页，\\scriptsize 按 71 行/页估）'
+          % (total, total / 71.0))
+    print('  注：附录代码要求完整，故不再截断；正文页数另受 30 页约束（附录可另计）。')
+    return 0
 
 
 if __name__ == '__main__':
