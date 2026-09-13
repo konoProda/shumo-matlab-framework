@@ -4,7 +4,7 @@
 % 用法：matlab -batch "run('tests/test_q2c.m')"
 
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 OUT = fullfile(PROJ_ROOT, 'outputs');
 R = [];
 

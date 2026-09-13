@@ -11,7 +11,7 @@
 clear; close all; clc;
 THIS_DIR  = fileparts(mfilename('fullpath'));
 PROJ_ROOT = fullfile(THIS_DIR, '..', '..', '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 D = readtable(fullfile(THIS_DIR, 'data.csv'), 'Encoding', 'UTF-8');
 
 % ---------- 绘图参数 ----------

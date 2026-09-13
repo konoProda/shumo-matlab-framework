@@ -1,11 +1,11 @@
 % test_q3.m —— 问题三一致性测试（组内产物，不交付）
 % 验证 src/ 的实现与 decisions_q3.md 的模型口径一致；全部通过后方可进入 /report。
-% 结果写 outputs/test_results_q3.mat，日志写 outputs/test_log_q3.txt。
+% 结果写 outputs/测试记录/test_results_q3.mat，日志写 outputs/测试记录/test_log_q3.txt。
 % 滚动类检查一律用前 NTS 天的小切片（秒级），不为测试跑全年。
 
 clear; clc;
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 
 log_path = fullfile(PROJ_ROOT, 'outputs', 'test_log_q3.txt');
 if exist(log_path, 'file'); delete(log_path); end
@@ -315,7 +315,7 @@ R.summary = sprintf('%d/%d', nP, nT);
 R.time = char(datetime('now'), 'yyyy-MM-dd HH:mm:ss');
 save(fullfile(PROJ_ROOT, 'outputs', 'test_results_q3.mat'), 'R');
 diary off;
-disp('测试日志已写入 outputs/test_log_q3.txt');
+disp('测试日志已写入 outputs/测试记录/test_log_q3.txt');
 
 % ---------------------------------------------------------------- 局部函数
 function R = rec(R, name, ok, txt)

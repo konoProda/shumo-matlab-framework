@@ -36,26 +36,26 @@
 
 | 公式/项 | 数学内容 | 代码位置 |
 |---|---|---|
-| A-1~A-3 分流辅助量 | \(PV^L_t=\min(PV_t,L_t)\)、\(\overline L_t\)、\(\overline{PV}_t\) | `src/func_build_q1.m:32-34` |
-| (1) 目标函数 | \(\min Z=\sum_t \pi_t (G^L_t+G^{ch}_t)\Delta t\) | `src/func_build_q1.m:46-49` |
-| (2) 负荷平衡 | \(G^L_t+D_t=\overline L_t\) | `src/func_build_q1.m:72-77` |
-| (3) 充电来源平衡 | \(PV^{ch}_t+G^{ch}_t-C_t=0\) | `src/func_build_q1.m:79-83` |
-| (4) 光伏剩余平衡 | \(PV^{ch}_t+V_t=\overline{PV}_t\) | `src/func_build_q1.m:85-88` |
-| (5) 储能状态转移 | \(E_t=E_{t-1}+\eta_c C_t\Delta t-D_t\Delta t/\eta_d\) | `src/func_build_q1.m:90-102` |
-| (6a) 容量上下限 | \(1200\le E_t\le 10800\) | `src/func_build_q1.m:59-60` |
-| (6b) 期末储电量 | \(E_T=E_0=6000\) | `src/func_build_q1.m:104-107` |
-| (7) 充放电功率 | \(0\le C_t,D_t\le 5000\) | `src/func_build_q1.m:57-58` |
-| (8) 充放电互斥 | \(C_t-P_{\max}u_t\le0,\ D_t+P_{\max}u_t\le P_{\max}\) | `src/func_build_q1.m:112-118` |
-| 二元变量声明 | \(u_t\in\{0,1\}\) | `src/func_build_q1.m:120` |
-| 数据读取（按列索引） | 附件1 B/C/D 列 | `src/main_q1.m:22-25` |
-| 时间轴程序化生成 | \([0{:}00,24{:}00)\) 共 144 槽 | `src/main_q1.m:73-75` |
-| 装配与求解 | `intlinprog` | `src/main_q1.m:28-31` |
-| 结果校验（含总平衡导出量） | 流量平衡 + 状态 + 边界 + 互斥 | `src/func_check_q1.m:1-52` |
-| 功率→电量换算 | \(电量=功率\times\Delta t\) | `src/main_q1.m:64-71` |
-| 能源流向汇总 | 五条流向 + 四组交叉校验 | `src/main_q1.m:117-129` |
-| 结果文件写出 | `outputs/result1.xlsx` | `src/func_write_q1.m:1-59` |
+| A-1~A-3 分流辅助量 | \(PV^L_t=\min(PV_t,L_t)\)、\(\overline L_t\)、\(\overline{PV}_t\) | `src/问题一/func_build_q1.m:32-34` |
+| (1) 目标函数 | \(\min Z=\sum_t \pi_t (G^L_t+G^{ch}_t)\Delta t\) | `src/问题一/func_build_q1.m:46-49` |
+| (2) 负荷平衡 | \(G^L_t+D_t=\overline L_t\) | `src/问题一/func_build_q1.m:72-77` |
+| (3) 充电来源平衡 | \(PV^{ch}_t+G^{ch}_t-C_t=0\) | `src/问题一/func_build_q1.m:79-83` |
+| (4) 光伏剩余平衡 | \(PV^{ch}_t+V_t=\overline{PV}_t\) | `src/问题一/func_build_q1.m:85-88` |
+| (5) 储能状态转移 | \(E_t=E_{t-1}+\eta_c C_t\Delta t-D_t\Delta t/\eta_d\) | `src/问题一/func_build_q1.m:90-102` |
+| (6a) 容量上下限 | \(1200\le E_t\le 10800\) | `src/问题一/func_build_q1.m:59-60` |
+| (6b) 期末储电量 | \(E_T=E_0=6000\) | `src/问题一/func_build_q1.m:104-107` |
+| (7) 充放电功率 | \(0\le C_t,D_t\le 5000\) | `src/问题一/func_build_q1.m:57-58` |
+| (8) 充放电互斥 | \(C_t-P_{\max}u_t\le0,\ D_t+P_{\max}u_t\le P_{\max}\) | `src/问题一/func_build_q1.m:112-118` |
+| 二元变量声明 | \(u_t\in\{0,1\}\) | `src/问题一/func_build_q1.m:120` |
+| 数据读取（按列索引） | 附件1 B/C/D 列 | `src/问题一/main_q1.m:22-25` |
+| 时间轴程序化生成 | \([0{:}00,24{:}00)\) 共 144 槽 | `src/问题一/main_q1.m:73-75` |
+| 装配与求解 | `intlinprog` | `src/问题一/main_q1.m:28-31` |
+| 结果校验（含总平衡导出量） | 流量平衡 + 状态 + 边界 + 互斥 | `src/问题一/func_check_q1.m:1-52` |
+| 功率→电量换算 | \(电量=功率\times\Delta t\) | `src/问题一/main_q1.m:64-71` |
+| 能源流向汇总 | 五条流向 + 四组交叉校验 | `src/问题一/main_q1.m:117-129` |
+| 结果文件写出 | `outputs/result1.xlsx` | `src/问题一/func_write_q1.m:1-59` |
 
-**参数一致性**：\(T=144\)、\(\Delta t=1/6\) h、\(\eta_c=\eta_d=0.90\)、\(E_0=6000\)、\(E_{\min}=1200\)、\(E_{\max}=10800\)、\(P_{\max}=5000\) kW，全部集中定义于 `src/main_q1.m:11-20`，与 `outputs/decisions_q1.md` 的 N1~N4 裁决逐条一致。
+**参数一致性**：\(T=144\)、\(\Delta t=1/6\) h、\(\eta_c=\eta_d=0.90\)、\(E_0=6000\)、\(E_{\min}=1200\)、\(E_{\max}=10800\)、\(P_{\max}=5000\) kW，全部集中定义于 `src/问题一/main_q1.m:11-20`，与 `outputs/裁决与映射/decisions_q1.md` 的 N1~N4 裁决逐条一致。
 
 **模型说明**：总能量平衡 \(G_t+PV_t+D_t=L_t+C_t+V_t\) **不作为约束**，而是由 (2)(3)(4) 导出的恒等式，
 在 `func_check_q1.m` 中作为校验量（`rep.total_bal`）保留；约束 (2)(4) 配合非负性分别隐含 \(D_t\le\overline L_t\) 与 \(V_t\le\overline{PV}_t\)，无需另设不等式。
@@ -82,7 +82,7 @@
 
 ## 三、测试验证结论
 
-测试脚本 `tests/test_q1.m`，日志 `outputs/test_log_q1.txt`，结果 `outputs/test_results_q1.mat`。**30 项全部通过。**
+测试脚本 `tests/test_q1.m`，日志 `outputs/测试记录/test_log_q1.txt`，结果 `outputs/测试记录/test_results_q1.mat`。**30 项全部通过。**
 
 | 测试组 | 项数 | 结论 | 要点 |
 |---|---|---|---|
@@ -101,7 +101,7 @@
 
 ### 灵敏度（替代灵敏度图，不占图件配额）
 
-充放电效率口径敏感性（`scripts/sens_q1_eta.m`）：
+充放电效率口径敏感性（`scripts/_旧版_勿引用/sens_q1_eta.m`）：
 
 | \(\eta\) | 说明 | 购电费（元） | 相对基准 |
 |---|---|---|---|
@@ -188,14 +188,14 @@
 | 类型 | 文件 |
 |---|---|
 | 结果文件 | `outputs/result1.xlsx`（官方模板：计划购电量 / 充放电量） |
-| 完整明细 | `outputs/q1_solution.csv`（144 槽逐槽）、`outputs/q1_solution.mat` |
+| 完整明细 | `outputs/统计中间件/q1_solution.csv`（144 槽逐槽）、`outputs/统计中间件/q1_solution.mat` |
 | 正式运行结果 | `outputs/final_results_q1.mat` |
-| 测试 | `tests/test_q1.m`、`outputs/test_log_q1.txt`、`outputs/test_results_q1.mat` |
-| 图件 | `figures/q1_price_buy.png/pdf`、`figures/q1_soc.png/pdf`（300dpi） |
+| 测试 | `tests/test_q1.m`、`outputs/测试记录/test_log_q1.txt`、`outputs/测试记录/test_results_q1.mat` |
+| 图件 | `figures/问题一/01 典型日计划购电策略/问题一 典型日计划购电策略.png`、`figures/问题一/02 储能充放电与储电量/问题一 储能充放电与储电量.png`（300dpi；一图一自包含文件夹） |
 | 图件 | `figures/问题一/01 典型日计划购电策略/`、`02 储能充放电与储电量/`（各含脚本 + data.csv + PNG + PDF） |
 | 绘图数据 | 各图件文件夹内的 `data.csv`（与绘图脚本同目录） |
-| 灵敏度 | `scripts/sens_q1_eta.m`（组内） |
-| 交付代码 | `src/main_q1.m`、`func_build_q1.m`、`func_check_q1.m`、`func_write_q1.m`、`plot_q1_*.m`、`func_fig_pal.m`、`func_fig_style.m` |
+| 灵敏度 | `scripts/_旧版_勿引用/sens_q1_eta.m`（组内） |
+| 交付代码 | `src/问题一/main_q1.m`、`func_build_q1.m`、`func_check_q1.m`、`func_write_q1.m`、`plot_q1_*.m`、`func_fig_pal.m`、`func_fig_style.m` |
 
 ---
 
@@ -228,20 +228,20 @@
 
 | 公式编号 | 符号/内容 | 代码位置 |
 |---|---|---|
-| (OBJ) | 目标：正常购电 + 5 倍紧急购电 | `src/func_build_q2.m:66-70` |
-| (1) | 负荷平衡 \(G^L+H^L+D=\overline L\) | `src/func_build_q2.m:92-95`（行 87 定义） |
-| (2) | 充电来源平衡 \(PV^{ch}+G^{ch}+H^{ch}=C\) | `src/func_build_q2.m:97-101` |
-| (3) | 光伏剩余平衡 \(PV^{ch}+V=\overline{PV}\) | `src/func_build_q2.m:103-106` |
-| (4) | 储能状态转移 + 跨日衔接 | `src/func_build_q2.m:108-119` |
-| (5)(6) | 充放电互斥 | `src/func_build_q2.m:131-135` |
-| (7) | 变量上下界 | `src/func_build_q2.m:72-84` |
-| 变量分段（10 块） | \(G^L,G^{ch},H^L,H^{ch},PV^{ch},C,D,E,V,u\) | `src/func_build_q2.m:45-53, 60` |
-| 分流辅助量 | \(PV^L,\overline L,\overline{PV}\) | `src/func_build_q2.m:38-41` |
-| 时间轴口径 | 标签为起始时刻 + 严格跨日 | `src/func_read_q2.m:30-36` |
-| 逐日滚动求解 | 储能状态跨日传递 | `src/main_q2.m:48-74` |
-| 全年联合松弛 | 无二元、无互斥行 | `src/main_q2_year.m:26, 36` |
-| 结果写表 | 三张表 | `src/func_write_q2.m:30`（计划购电量）/`41`（充放电量）/`64`（紧急购电量） |
-| 约束校验 | 残差、越界、流向汇总 | `src/func_check_q2.m:31-56` |
+| (OBJ) | 目标：正常购电 + 5 倍紧急购电 | `src/_旧版_勿引用/func_build_q2.m:66-70` |
+| (1) | 负荷平衡 \(G^L+H^L+D=\overline L\) | `src/_旧版_勿引用/func_build_q2.m:92-95`（行 87 定义） |
+| (2) | 充电来源平衡 \(PV^{ch}+G^{ch}+H^{ch}=C\) | `src/_旧版_勿引用/func_build_q2.m:97-101` |
+| (3) | 光伏剩余平衡 \(PV^{ch}+V=\overline{PV}\) | `src/_旧版_勿引用/func_build_q2.m:103-106` |
+| (4) | 储能状态转移 + 跨日衔接 | `src/_旧版_勿引用/func_build_q2.m:108-119` |
+| (5)(6) | 充放电互斥 | `src/_旧版_勿引用/func_build_q2.m:131-135` |
+| (7) | 变量上下界 | `src/_旧版_勿引用/func_build_q2.m:72-84` |
+| 变量分段（10 块） | \(G^L,G^{ch},H^L,H^{ch},PV^{ch},C,D,E,V,u\) | `src/_旧版_勿引用/func_build_q2.m:45-53, 60` |
+| 分流辅助量 | \(PV^L,\overline L,\overline{PV}\) | `src/_旧版_勿引用/func_build_q2.m:38-41` |
+| 时间轴口径 | 标签为起始时刻 + 严格跨日 | `src/共用/func_read_q2.m:30-36` |
+| 逐日滚动求解 | 储能状态跨日传递 | `src/_旧版_勿引用/main_q2.m:48-74` |
+| 全年联合松弛 | 无二元、无互斥行 | `src/_旧版_勿引用/main_q2_year.m:26, 36` |
+| 结果写表 | 三张表 | `src/共用/func_write_q2.m:30`（计划购电量）/`41`（充放电量）/`64`（紧急购电量） |
+| 约束校验 | 残差、越界、流向汇总 | `src/_旧版_勿引用/func_check_q2.m:31-56` |
 
 ## 二、运行记录
 
@@ -268,15 +268,15 @@
 | T9 全年基准界性质 | 2 | 通过（全年联合 ≤ 逐日；全年 LP 互斥 0/52560 槽） |
 | **合计** | **23** | **全部通过** |
 
-日志：`outputs/test_log_q2.txt`；结果：`outputs/test_results_q2.mat`。
+日志：`outputs/测试记录/test_log_q2.txt`；结果：`outputs/测试记录/test_results_q2.mat`。
 
 ### 附带算例（不入测试判定，供论文使用）
 
 | 算例 | 结果 | 出处 |
 |---|---|---|
-| 反事实对照（计划基于附件1 单日预测，属第一部分的朴素预测检验） | 紧急购电 1,046,326.48 kWh、费用 17,060,124.83 元（**+39.71%**） | `scripts/counter_q2_forecast.m`、`outputs/q2_counter_daily.csv` |
-| 效率灵敏度 | η=0.85/0.90/0.95 → 12,682,048 / 12,210,827 / 11,760,573 元（−3.69% ~ +3.86%） | `scripts/sens_q2_eta.m` |
-| 逐日最优性缺口 | 窗口差 54.88 元（4.49×10⁻⁶）；294/334 天无差异 | `scripts/gap_q2_daily.m` |
+| 反事实对照（计划基于附件1 单日预测，属第一部分的朴素预测检验） | 紧急购电 1,046,326.48 kWh、费用 17,060,124.83 元（**+39.71%**） | `scripts/_旧版_勿引用/counter_q2_forecast.m`、`outputs/统计中间件/q2_counter_daily.csv` |
+| 效率灵敏度 | η=0.85/0.90/0.95 → 12,682,048 / 12,210,827 / 11,760,573 元（−3.69% ~ +3.86%） | `scripts/_旧版_勿引用/sens_q2_eta.m` |
+| 逐日最优性缺口 | 窗口差 54.88 元（4.49×10⁻⁶）；294/334 天无差异 | `scripts/_旧版_勿引用/gap_q2_daily.m` |
 
 ## 四、代码质量与风险提示
 
@@ -296,7 +296,7 @@
 
 ### 静态检查
 
-全部 `.m` 文件通过 `checkcode`（`scripts/selftest_q2.m` 可复现）；
+全部 `.m` 文件通过 `checkcode`（`scripts/_旧版_勿引用/selftest_q2.m` 可复现）；
 装配尺寸断言（变量数、约束行列数、上下界方向）全部通过。
 
 ### 图件执行核对（六项）
@@ -334,11 +334,11 @@
 
 | 类别 | 文件 |
 |---|---|
-| 代码 | `src/main_q2.m`、`src/main_q2_year.m`、`src/func_build_q2.m`、`src/func_read_q2.m`、`src/func_check_q2.m`、`src/func_write_q2.m`；绘图脚本 4 个随图件放在 `figures/问题二/*/` |
+| 代码 | `src/_旧版_勿引用/main_q2.m`、`src/_旧版_勿引用/main_q2_year.m`、`src/_旧版_勿引用/func_build_q2.m`、`src/共用/func_read_q2.m`、`src/_旧版_勿引用/func_check_q2.m`、`src/共用/func_write_q2.m`；绘图脚本 4 个随图件放在 `figures/问题二/*/` |
 | 结果 | `outputs/result2.xlsx`、`q2_daily.csv`、`q2_solution.csv`、`final_results_q2.mat`、`q2_year_daily.csv`、`q2_year_result.mat`、`q2_counter_daily.csv` |
 | 图件 | `figures/问题二/01~04 四个自包含文件夹`（核心结果 3 张 + 检验 1 张） |
-| 测试 | `tests/test_q2.m`、`outputs/test_log_q2.txt`、`outputs/test_results_q2.mat` |
-| 组内 | `scripts/probe_q2_toy.m`、`selftest_q2.m`、`gap_q2_daily.m`、`counter_q2_forecast.m`、`sens_q2_eta.m` |
+| 测试 | `tests/test_q2.m`、`outputs/测试记录/test_log_q2.txt`、`outputs/测试记录/test_results_q2.mat` |
+| 组内 | `scripts/_旧版_勿引用/probe_q2_toy.m`、`selftest_q2.m`、`gap_q2_daily.m`、`counter_q2_forecast.m`、`sens_q2_eta.m` |
 
 ---
 
@@ -436,7 +436,7 @@
 3. **但备用并未换来费用下降**：相比逐日计划口径，年视野口径的费用仅降 0.53%、紧急购电仅降 5.7%。
    原因见 §六。
 
-### 季节规律与逐时规律（数据源：`scripts/data_q2_season.m`，图 07 / 图 08）
+### 季节规律与逐时规律（数据源：`scripts/_旧版_勿引用/data_q2_season.m`，图 07 / 图 08）
 
 **光伏发电量的季节规律**：月度区间 **112.6 万 kWh（12 月）～ 216.9 万 kWh（8 月），最高为最低的 1.93 倍**；
 夏季（6+7+8 月）590.2 万 kWh、冬季（12+1+2 月，含 1 月、全年口径）363.0 万 kWh（为夏季的 61.5%）。
@@ -506,16 +506,16 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 | 内容 | 代码位置 |
 |---|---|
-| 同星期滚动均值（逐日 / 地平线两种模式） | `src/func_forecast_q2.m:44-77` |
-| 信息泄漏断言 | `src/func_forecast_q2.m:79` |
-| 全年视野滚动引擎（每天重解剩余视界、只执行当天） | `src/func_roll_q2.m:37-83` |
-| 互斥性逐日自检 | `src/func_roll_q2.m:61` |
-| 计划层两层结构（物理层 + 经济层） | `src/func_exec_q2.m:32-58` |
-| 逐槽守恒断言 | `src/func_exec_q2.m:44,51` |
-| 四个入口 | `src/main_q2.m`（理想·逐日）/`main_q2_year.m`（理想·全年）/`main_q2_roll_corr.m`（年视野·带纠偏，正式）/`main_q2_roll_plan.m`（年视野·不带纠偏，消融） |
-| 视野灵敏度 | `scripts/sens_q2_horizon.m` |
-| 分层目标对照 | `scripts/cmp_q2_lexico.m` |
-| 成因诊断 | `scripts/diag_q2_roll.m` |
+| 同星期滚动均值（逐日 / 地平线两种模式） | `src/共用/func_forecast_q2.m:44-77` |
+| 信息泄漏断言 | `src/共用/func_forecast_q2.m:79` |
+| 全年视野滚动引擎（每天重解剩余视界、只执行当天） | `src/_旧版_勿引用/func_roll_q2.m:37-83` |
+| 互斥性逐日自检 | `src/_旧版_勿引用/func_roll_q2.m:61` |
+| 计划层两层结构（物理层 + 经济层） | `src/_旧版_勿引用/func_exec_q2.m:32-58` |
+| 逐槽守恒断言 | `src/_旧版_勿引用/func_exec_q2.m:44,51` |
+| 四个入口 | `src/_旧版_勿引用/main_q2.m`（理想·逐日）/`main_q2_year.m`（理想·全年）/`main_q2_roll_corr.m`（年视野·带纠偏，正式）/`main_q2_roll_plan.m`（年视野·不带纠偏，消融） |
+| 视野灵敏度 | `scripts/_旧版_勿引用/sens_q2_horizon.m` |
+| 分层目标对照 | `scripts/_旧版_勿引用/cmp_q2_lexico.m` |
+| 成因诊断 | `scripts/_旧版_勿引用/diag_q2_roll.m` |
 
 ## 八、测试验证结论
 
@@ -565,19 +565,19 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 | 类别 | 文件 |
 |---|---|
-| 代码 | `src/func_forecast_q2.m`、`src/func_roll_q2.m`、`src/main_q2_roll_corr.m`、`src/main_q2_roll_plan.m` |
+| 代码 | `src/共用/func_forecast_q2.m`、`src/_旧版_勿引用/func_roll_q2.m`、`src/_旧版_勿引用/main_q2_roll_corr.m`、`src/_旧版_勿引用/main_q2_roll_plan.m` |
 | 结果 | `outputs/result2.xlsx`（按**年视野·带纠偏**写出）、`q2_roll_corr_daily.csv`、`q2_roll_plan_daily.csv`、`final_results_q2_roll_corr.mat`、`final_results_q2_roll_plan.mat`、`q2_horizon_sens.csv`、`q2_lexico_cmp.csv` |
 | 图件 | `figures/问题二/04~08`（五个自包含文件夹） |
-| 测试 | `tests/test_q2.m`（T10–T15）、`outputs/test_log_q2.txt` |
-| 组内 | `scripts/probe_q2_horizon.m`、`data_q2_dual.m`、`data_q2_sens.m`、`data_q2_soc3.m`、`sens_q2_horizon.m`、`cmp_q2_lexico.m`、`diag_q2_roll.m` |
+| 测试 | `tests/test_q2.m`（T10–T15）、`outputs/测试记录/test_log_q2.txt` |
+| 组内 | `scripts/_旧版_勿引用/probe_q2_horizon.m`、`data_q2_dual.m`、`data_q2_sens.m`、`data_q2_soc3.m`、`sens_q2_horizon.m`、`cmp_q2_lexico.m`、`diag_q2_roll.m` |
 
 ---
 
 # 问题二 · 第三轮：预测层偏差校正（**现行口径**）
 
 > 生成阶段：/report（Q2b 轮）｜ 日期：2026-09-12
-> 口径：`outputs/decisions_q2b.md`（时间口径 A5~A9、校正器 A13~A24、对照 A32~A36、一月口径 A45~A50）
-> 数值块：`outputs/q2b_handback_tables.md`（表A~表E）｜ 诊断：`outputs/log_q2b_diag.txt` ｜ 测试：`outputs/log_q2b_test.txt`
+> 口径：`outputs/裁决与映射/decisions_q2b.md`（时间口径 A5~A9、校正器 A13~A24、对照 A32~A36、一月口径 A45~A50）
+> 数值块：`outputs/分析记录/q2b_handback_tables.md`（表A~表E）｜ 诊断：`outputs/历史日志/log_q2b_diag.txt` ｜ 测试：`outputs/历史日志/log_q2b_test.txt`
 > **口径声明**：本章的费用与紧急购电数字**取代**前两部分（含第一部分理想基准口径下的对照）。
 > 前两部分的费用、紧急购电与视野灵敏度数字均为旧口径（预测一月 + 旧电价相位），**已作废**。
 
@@ -591,14 +591,14 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 | 关键指标 | 数值 | 出处 |
 |---|---|---|
-| 基线（B0）全年 / 报送窗口费用 | 19,156,615.90 / 17,632,245.85 元 | `outputs/q2b_handback_tables.md` 表B1/B2 |
+| 基线（B0）全年 / 报送窗口费用 | 19,156,615.90 / 17,632,245.85 元 | `outputs/分析记录/q2b_handback_tables.md` 表B1/B2 |
 | 正式配置（B3）全年 / 报送窗口费用 | **17,824,983.98 / 16,300,613.93 元** | 同上 |
 | B3 全年 / 报送窗口紧急购电量 | 679,225.0 kWh（291 天 / 3317 槽） | 同上 |
 | 报送窗口净负荷 MAE（B0→B3） | 370.00 → **298.24 kW** | 表C |
 | 报送窗口净负荷正误差累计（B0→B3） | 147.45 → **110.78 万 kWh** | 表C |
 | 报送窗口净负荷 Bias（B0→B3） | −2.12 → **−21.84 kW**（MAE 改善、均值偏差略变负） | 表C |
-| 测试通过率 | **59 / 59** | `outputs/log_q2b_test.txt` |
-| 本轮全年运行 | **5 次**（M1 + B0~B3），单次约 5.8 min，单 MATLAB 会话顺序执行 | `outputs/log_q2b_run.txt` |
+| 测试通过率 | **59 / 59** | `outputs/历史日志/log_q2b_test.txt` |
+| 本轮全年运行 | **5 次**（M1 + B0~B3），单次约 5.8 min，单 MATLAB 会话顺序执行 | `outputs/历史日志/log_q2b_run.txt` |
 
 ## 一、代码与口径变更清单
 
@@ -606,16 +606,16 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 | 类别 | 文件 | 内容 |
 |---|---|---|
-| **新增** | `src/func_resid_q2.m` | 残差档案：\(e^X(s,t)=X^{\text{act}}(s,t)-\hat X^0(s,t\mid s)\)，净负荷误差 \(e^N=e^L-e^{PV}\)；只由**当时已发布**的原始预测形成（A14/A15） |
-| **新增** | `src/func_bias_q2.m` | 因果分时校正量：小时粒度（同小时 6 槽共享）、回溯窗口 W=28 个已完成自然日、最少 5 个有效历史日、分组回退不足则取 0（A16~A18） |
-| **新增** | `src/main_q2b.m` | 本轮入口：B0~B3 四方案各自独立全年运行（A32） |
+| **新增** | `src/共用/func_resid_q2.m` | 残差档案：\(e^X(s,t)=X^{\text{act}}(s,t)-\hat X^0(s,t\mid s)\)，净负荷误差 \(e^N=e^L-e^{PV}\)；只由**当时已发布**的原始预测形成（A14/A15） |
+| **新增** | `src/共用/func_bias_q2.m` | 因果分时校正量：小时粒度（同小时 6 槽共享）、回溯窗口 W=28 个已完成自然日、最少 5 个有效历史日、分组回退不足则取 0（A16~A18） |
+| **新增** | `src/_旧版_勿引用/main_q2b.m` | 本轮入口：B0~B3 四方案各自独立全年运行（A32） |
 | **新增** | `run_q2b.sh` | 单会话顺序执行脚本（3GB 环境，同时仅一个 MATLAB 进程） |
 | **新增** | `tests/test_q2b.m` | T1~T12 共 59 项测试 |
-| **新增** | `scripts/cmp_q2_timefix.m`、`scripts/report_q2b.m` | 中间基线 M1；诊断与回传数值块生成 |
-| **改造** | `src/func_read_q2.m` | 电价 **`0:00+1` 行归位到首槽（整表循环右移一位）**；首日 `[0:00,0:10)` 槽改取附件1 典型日值（A7/A8） |
-| **改造** | `src/func_forecast_q2.m` | 接口保持兼容（原三输出调用方式不变），新增"回退标记"第四输出；一月不再产生预报后，其冷启动/扩展均值回退分支只服务于残差档案与"决策日在一月时的远视野目标日" |
-| **改造** | `src/func_roll_q2.m` | 一月（报告窗口前）目标日**改用已知实际数据、不再预测**；校正通过配置显式启用；原预测、校正量、校正后预测、有效期数与回退层级逐日留档（A13/A23/A45~A49） |
-| **改造** | `src/func_write_q2.m` | "计划购电量"表**按标签逐列对应**，末列按日周期回绕填本日第 1 槽（A9/C6） |
+| **新增** | `scripts/_旧版_勿引用/cmp_q2_timefix.m`、`scripts/_旧版_勿引用/report_q2b.m` | 中间基线 M1；诊断与回传数值块生成 |
+| **改造** | `src/共用/func_read_q2.m` | 电价 **`0:00+1` 行归位到首槽（整表循环右移一位）**；首日 `[0:00,0:10)` 槽改取附件1 典型日值（A7/A8） |
+| **改造** | `src/共用/func_forecast_q2.m` | 接口保持兼容（原三输出调用方式不变），新增"回退标记"第四输出；一月不再产生预报后，其冷启动/扩展均值回退分支只服务于残差档案与"决策日在一月时的远视野目标日" |
+| **改造** | `src/_旧版_勿引用/func_roll_q2.m` | 一月（报告窗口前）目标日**改用已知实际数据、不再预测**；校正通过配置显式启用；原预测、校正量、校正后预测、有效期数与回退层级逐日留档（A13/A23/A45~A49） |
+| **改造** | `src/共用/func_write_q2.m` | "计划购电量"表**按标签逐列对应**，末列按日周期回绕填本日第 1 槽（A9/C6） |
 
 **兼容性**：原预测函数的输入输出尺寸与时间索引**未变**（测试 T11-1 三输出调用方式不变）；
 校正开关**默认关闭**，问题三在默认配置下行为不变（A24）；问题三历史结果文件未被覆盖（T11-2）。
@@ -649,7 +649,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 | 再修首日首槽（= B0） | 19,156,615.90 | −17.96 元 | 17,632,245.85 | 911,873.2 |
 
 > ⚠ **口径限制**：本轮把"一月按已知"与"电价相位修复"**合并为一次**基线更新，**未再分离测量**。
-> "电价相位修复"单独一测只在**上一轮（仍预测一月）**做过，为 **+4.68 万元**（`outputs/preprocess_log_q2.txt` §9.1）；
+> "电价相位修复"单独一测只在**上一轮（仍预测一月）**做过，为 **+4.68 万元**（`outputs/测试记录/preprocess_log_q2.txt` §9.1）；
 > 静态估算是 +31.24 万元。三者口径不同，**不得表述为"电价修复省了 50 万"**。
 
 ## 二、运行记录
@@ -659,14 +659,14 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 | 全年运行次数 | **5 次**（中间基线 M1 + B0/B1/B2/B3） |
 | 单次耗时 | M1 **5.8 min**；B0 5.7、B1 5.6、B2 5.7、B3 6.2 min（B0~B3 合计 **23.3 min**） |
 | 执行方式 | **单 MATLAB 会话顺序执行**（3GB 环境单进程铁律），后台运行 + 定时轮询 |
-| 中间基线 | `scripts/cmp_q2_timefix.m` → `outputs/final_results_q2b_M1.mat`（电价已修、首日首槽未修） |
+| 中间基线 | `scripts/_旧版_勿引用/cmp_q2_timefix.m` → `outputs/_旧版_勿引用/final_results_q2b_M1.mat`（电价已修、首日首槽未修） |
 | 模型规模 | 单次全年视野 473,040 变量 / 210,240 等式行（与前两部分同规模）；逐日重解剩余视野、只执行当天 |
 | 一月轨迹共享 | B0~B3 的 2 月 1 日日初储电量 = **8,550 kWh**，四者**逐位相同**（极差 0.000e+00 kWh） |
-| 日志 | `outputs/log_q2b_run.txt`（运行）、`log_q2b_diag.txt`（诊断）、`log_q2b_test.txt`（测试） |
+| 日志 | `outputs/历史日志/log_q2b_run.txt`（运行）、`log_q2b_diag.txt`（诊断）、`log_q2b_test.txt`（测试） |
 
 ## 三、测试验证结论
 
-`tests/test_q2b.m`，**59 项全部通过、失败 0**（`outputs/log_q2b_test.txt`）：
+`tests/test_q2b.m`，**59 项全部通过、失败 0**（`outputs/历史日志/log_q2b_test.txt`）：
 
 | 测试组 | 覆盖 | 关键结论 |
 |---|---|---|
@@ -685,7 +685,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 ### 结果汇总（本章引用的全部数字）
 
-**表A 时间口径修复的三步对比**：见 §一（3）；出处 `outputs/q2b_handback_tables.md` 表A。
+**表A 时间口径修复的三步对比**：见 §一（3）；出处 `outputs/分析记录/q2b_handback_tables.md` 表A。
 
 **表B1 全年 365 天**（出处：表B1）
 
@@ -749,9 +749,9 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 （窗口内残差日数达 5 日才算达标；B0 的 γ 为 0，即使达标也不施加校正）；
 窗口内残差日数最大值 28 日；校正通道启用起始日 **2025-02-06**。
 
-> 另据 `outputs/log_q2b_diag.txt` §A，本轮还留档了"高峰前连续 1/2/3 小时累计净负荷误差分布"
+> 另据 `outputs/历史日志/log_q2b_diag.txt` §A，本轮还留档了"高峰前连续 1/2/3 小时累计净负荷误差分布"
 > （早/晚高峰 × 1/2/3 小时 × 中位/均值/P95，B0 与 B3 对照）与逐日逐槽预测明细
-> （`outputs/q2b_forecast_diag.csv`），供论文检验章取用。
+> （`outputs/统计中间件/q2b_forecast_diag.csv`），供论文检验章取用。
 
 ## 四、代码质量与风险提示
 
@@ -798,20 +798,22 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 | 类别 | 文件 |
 |---|---|
-| 代码 | `src/main_q2b.m`、`src/func_resid_q2.m`、`src/func_bias_q2.m`；改造 `src/func_read_q2.m`、`func_forecast_q2.m`、`func_roll_q2.m`、`func_write_q2.m` |
-| 脚本 | `run_q2b.sh`、`scripts/cmp_q2_timefix.m`、`scripts/report_q2b.m`、`scripts/write_q2b_deliver.m` |
-| 结果 | `outputs/final_results_q2b_{M1,B0,B1,B2,B3}.mat`、`outputs/q2b_compare.csv` |
-| 诊断 | `outputs/q2b_dispatch.csv`、`q2b_timefix.csv`、`q2b_forecast_diag.csv`、`q2b_handback_tables.md` |
-| 测试 | `tests/test_q2b.m`、`outputs/log_q2b_test.txt` |
-| 日志 | `outputs/log_q2b_run.txt`、`log_q2b_diag.txt` |
+| 代码 | `src/_旧版_勿引用/main_q2b.m`、`src/共用/func_resid_q2.m`、`src/共用/func_bias_q2.m`；改造 `src/共用/func_read_q2.m`、`func_forecast_q2.m`、`func_roll_q2.m`、`func_write_q2.m` |
+| 脚本 | `run_q2b.sh`、`scripts/_旧版_勿引用/cmp_q2_timefix.m`、`scripts/_旧版_勿引用/report_q2b.m`、`scripts/_旧版_勿引用/write_q2b_deliver.m` |
+| 结果 | `outputs/final_results_q2b_{M1,B0,B1,B2,B3}.mat`、`outputs/统计中间件/q2b_compare.csv` |
+| 诊断 | `outputs/统计中间件/q2b_dispatch.csv`、`q2b_timefix.csv`、`q2b_forecast_diag.csv`、`q2b_handback_tables.md` |
+| 测试 | `tests/test_q2b.m`、`outputs/历史日志/log_q2b_test.txt` |
+| 日志 | `outputs/历史日志/log_q2b_run.txt`、`log_q2b_diag.txt` |
 
 ---
 
 # 问题三 · 分阶段调整（0/6/12/18 四阶段 + 差额结算 + 实际运行）
 
+> ⚠️ **本节的第三问为第一版口径，已被取代。** 现行交付口径见文末「问题三 · 第二版：日内多时点预报更新 + 多阶段滚动（**现行口径**）」一节。本节保留仅为留痕，**论文一律采用第二版**。
+
 > 生成阶段：/report（Phase 3）｜ 日期：2026-09-12
-> 模型口径：`outputs/decisions_q3.md`（A/B/N 系列 + 建模手回执 C1~C5）；代码：`src/*_q3.m`
-> 测试：`tests/test_q3.m`（**44 / 44 通过**，日志 `outputs/test_log_q3.txt`）
+> 模型口径：`outputs/裁决与映射/decisions_q3.md`（A/B/N 系列 + 建模手回执 C1~C5）；代码：`src/*_q3.m`
+> 测试：`tests/test_q3.m`（**44 / 44 通过**，日志 `outputs/测试记录/test_log_q3.txt`）
 
 ## 〇、执行摘要
 
@@ -834,7 +836,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 ## 一、数学 → 代码映射表（含代码位置）
 
-完整映射见 `outputs/math_to_code_mapping_q3.md`（含 §10 代码位置回填）。核心对应：
+完整映射见 `outputs/裁决与映射/math_to_code_mapping_q3.md`（含 §10 代码位置回填）。核心对应：
 
 | 模型要素 | 代码位置 |
 |---|---|
@@ -859,7 +861,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 - 规模：阶段 0 单次最多 48,096 槽 / 432,864 变量（连续、无二值）；阶段 1~3 为 108/72/36 槽、≤1,296 变量（含 ≤108 二值）。
 - 内存：单会话峰值约 1.5 GB（3 GB 环境内，单 MATLAB 会话铁律）。
-- 全部 6 次全年模拟串行后台执行，日志 `outputs/log_q3_run.txt`。
+- 全部 6 次全年模拟串行后台执行，日志 `outputs/历史日志/log_q3_run.txt`。
 
 ## 三、测试验证结论
 
@@ -953,22 +955,22 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 ## 五、产物清单
 
 - 结果文件：`outputs/result3.xlsx`（四张表：计划购电量 / 调整购电量 / 充放电量 / 紧急购电量）
-- 数据：`outputs/final_results_q3.mat`、`final_results_q3_sens.mat`、`final_results_q3_nocorr.mat`、`q3_daily.csv`、`q3_sens.csv`
+- 数据：`outputs/_旧版_勿引用/final_results_q3.mat`、`final_results_q3_sens.mat`、`final_results_q3_nocorr.mat`、`q3_daily.csv`、`q3_sens.csv`
 - 图件：`figures/问题三/01~11`（每图一文件夹：绘图脚本 + data.csv + PNG + PDF）
-- 测试：`tests/test_q3.m`、`outputs/test_log_q3.txt`、`test_results_q3.mat`
-- 日志：`outputs/log_q3_run.txt`、`log_q3_fig.txt`
+- 测试：`tests/test_q3.m`、`outputs/测试记录/test_log_q3.txt`、`test_results_q3.mat`
+- 日志：`outputs/历史日志/log_q3_run.txt`、`log_q3_fig.txt`
 
 ---
 
 # 问题二 · 第四轮：7 日滚动 SAA 两阶段随机 MILP（**现行交付口径**）
 
 > 生成阶段：/report（Q2c 轮）｜ 日期：2026-09-12
-> 建模依据：《问题二_7日滚动SAA两阶段MILP_给编程手.md》｜ 裁决清单：`outputs/decisions_q2c.md`（A0-1~A0-3、A1~A6、B1~B4、C1~C12、D1~D7、E1~E4、F1~F3、G1~G4）
-> 数值块：`outputs/q2c_handback_tables.md`（表 1~表 10）｜ 数学↔代码映射：`outputs/math_to_code_mapping_q2c.md`｜ 求解策略：`outputs/solve_strategy_q2c.md`
-> 基准审计：`outputs/q2c_l1b_audit.txt`｜ 运行日志：`outputs/log_q2c_run.txt`、`outputs/log_q2c_l1b.txt`｜ 测试：`outputs/test_log_q2c.txt`
+> 建模依据：《问题二_7日滚动SAA两阶段MILP_给编程手.md》｜ 裁决清单：`outputs/裁决与映射/decisions_q2c.md`（A0-1~A0-3、A1~A6、B1~B4、C1~C12、D1~D7、E1~E4、F1~F3、G1~G4）
+> 数值块：`outputs/分析记录/q2c_handback_tables.md`（表 1~表 10）｜ 数学↔代码映射：`outputs/裁决与映射/math_to_code_mapping_q2c.md`｜ 求解策略：`outputs/裁决与映射/solve_strategy_q2c.md`
+> 基准审计：`outputs/分析记录/q2c_l1b_audit.txt`｜ 运行日志：`outputs/历史日志/log_q2c_run.txt`、`outputs/历史日志/log_q2c_l1b.txt`｜ 测试：`outputs/测试记录/test_log_q2c.txt`
 > **口径声明**：本轮正式交付口径为 **L2（R=7 / K=4 / 含 B3 偏差校正）**，其费用与紧急购电数字**取代**第二、三部分的现实模型数字；
 > L1b、L1、L2b、L2r1、L2r3、L2k8 六组为对照臂，只用于分解代价来源与稳定性检验，**不作交付口径**。
-> 本轮**未新出图件**（`outputs/decisions_q2c.md` §十一 第 7 项：图件待建模调整定稿后统一生成）。
+> 本轮**未新出图件**（`outputs/裁决与映射/decisions_q2c.md` §十一 第 7 项：图件待建模调整定稿后统一生成）。
 
 ## 〇、执行摘要
 
@@ -979,18 +981,18 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 | 关键指标 | 数值 | 出处 |
 |---|---|---|
-| 正式口径（L2）报送窗口费用 | **14,806,890.28 元** | `outputs/q2c_handback_tables.md` 表 1 / 表 2 |
+| 正式口径（L2）报送窗口费用 | **14,806,890.28 元** | `outputs/分析记录/q2c_handback_tables.md` 表 1 / 表 2 |
 | 正式口径全年费用 | 16,331,260.33 元 | 表 1 / 表 2 |
 | 正式口径窗口紧急购电量 | 269,240.9 kWh（175 天 / 1,342 个时段） | 表 2 |
-| 全年联合完美信息基准（L1b，LP 松弛） | 12,227,142.86 元（紧急 0.0 kWh） | 表 3、`outputs/q2c_l1b_audit.txt` |
+| 全年联合完美信息基准（L1b，LP 松弛） | 12,227,142.86 元（紧急 0.0 kWh） | 表 3、`outputs/分析记录/q2c_l1b_audit.txt` |
 | 逐日完美信息基准（L1） | 12,253,936.65 元（紧急 0.0 kWh） | 表 3 |
 | 预测不确定性代价（L2 − L1） | 2,552,953.63 元 | 表 3 |
 | 单日视野（SOC 短视）代价（L1 − L1b） | 26,793.79 元 | 表 3 |
 | 视野 R=3 与 R=7 的窗口费用差 | 28.01 元 | 表 4 |
 | 情景数 K=8 相对 K=4 的差 | 费用 −1.962%、紧急电量 −14.56% | 表 5 |
 | B3 消融差（SAA+B3 相对 SAA−B3） | 费用 +135,686.00 元（+0.92%）、紧急电量 −5,048.3 kWh | 表 6 |
-| 测试通过率 | **35 / 35** | `outputs/test_log_q2c.txt` |
-| 运行 | 六组单会话一次跑通合计 57.3 min；全年联合基准单跑 7.0 s | `outputs/log_q2c_run.txt`、`outputs/log_q2c_l1b.txt` |
+| 测试通过率 | **35 / 35** | `outputs/测试记录/test_log_q2c.txt` |
+| 运行 | 六组单会话一次跑通合计 57.3 min；全年联合基准单跑 7.0 s | `outputs/历史日志/log_q2c_run.txt`、`outputs/历史日志/log_q2c_l1b.txt` |
 
 **七组运行速览**（窗口口径；各组的视界 / 情景数 / B3 配置见第一节表 1）
 
@@ -1015,7 +1017,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 每天只执行当天求得的那一组计划，次日重新预测、重新抽情景、重新求解（滚动视野 R=7 天）。
 第一层为理想信息确定性 MILP（当天真实数据已知），提供完美信息基准。
 
-**表 1 七组运行总览**（出处：`outputs/q2c_handback_tables.md` 表 1）
+**表 1 七组运行总览**（出处：`outputs/分析记录/q2c_handback_tables.md` 表 1）
 
 | 运行 | 含义 | 视界 R | 情景 K | B3 | 全年费用(元) | 窗口费用(元) | 窗口紧急电量(kWh) | 窗口紧急天数 | 最大间隙 | 均单次耗时(s) | 总耗时(min) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1039,23 +1041,23 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 | 裁决 / 公式 | 落地位置 | 复核 |
 |---|---|---|
-| 第一阶段变量 $G^{plan}_{d,t}$（全情景共用，C6） | `src/func_build_q2c.m` 第 44 行（`aux.iGP`）、第 152 行（当日块连接式引用同一组列） | 已核对 |
-| 第二阶段变量与 W 的偏移（C7；当日 10 个、未来日 11 个） | `src/func_build_q2c.m` 第 33~35 行 | 已核对 |
-| 未来日临时计划 $G^{plan,(\omega)}_{\tau,t}$（C8） | `src/func_build_q2c.m` 第 149~153 行（`j≥2` 时连接式引用 `offB.GPF`） | 已核对 |
-| 目标函数三部分系数（C11） | `src/func_build_q2c.m` 第 70~78 行（第 71 / 73 / 75~76 行分别为第一阶段、当日紧急、未来日系数） | 已核对 |
-| 负荷平衡 / 充电来源 / 光伏剩余 / SOC 递推 / 计划连接（§11.1~11.4、§10） | `src/func_build_q2c.m` 第 114~118 / 120~123 / 125~129 / 131~143 / 145~154 行 | 已核对 |
-| 充放电互斥（§11.6，仅 `u` 取整） | `src/func_build_q2c.m` 第 160~189 行 | 已核对 |
-| 情景抽样因果性（C1）与逐日独立子流（G4 修正） | `src/func_scen_q2c.m` 第 23~24 行（因果库）、第 40~41 行（`rng(seed+d)` 与 `randperm`） | 已核对 |
-| 退化判据（C2：有效残差 < max(K,5) 时退化为 K=1） | `src/func_scen_q2c.m` 第 26~34 行 | 已核对 |
-| 情景构造（D4：同一情景内 R 天共用同一误差模板） | `src/func_scen_q2c.m` 第 42~45 行 | 已核对 |
-| 执行层逐槽优先级（E2/E3）与计费（E1） | `src/func_exec_q2c.m` 第 25~64 行；计费第 70~72 行（按完整计划量计费） | 已核对 |
-| 视野内 B3 校正与情景误差库同源（D5/D6） | `src/func_roll_q2c.m` 第 68~80 行、第 101~104 行 | 已核对 |
-| 只执行当天计划（C12） | `src/func_roll_q2c.m` 第 143~144 行 | 已核对 |
-| 跨日 SOC 传递 $E^{act}_{d+1,0}=E^{act}_{d,T}$（E4） | `src/func_roll_q2c.m` 第 153 行 | 已核对 |
-| 断点续跑（每 20 天存档 + 源码指纹签名） | `src/func_roll_q2c.m` 第 41~60 行 | 已核对 |
-| 七组运行清单（配置切换，非复制代码） | `src/main_q2c.m` 第 26~32 行 | 已核对 |
+| 第一阶段变量 $G^{plan}_{d,t}$（全情景共用，C6） | `src/问题二/func_build_q2c.m` 第 44 行（`aux.iGP`）、第 152 行（当日块连接式引用同一组列） | 已核对 |
+| 第二阶段变量与 W 的偏移（C7；当日 10 个、未来日 11 个） | `src/问题二/func_build_q2c.m` 第 33~35 行 | 已核对 |
+| 未来日临时计划 $G^{plan,(\omega)}_{\tau,t}$（C8） | `src/问题二/func_build_q2c.m` 第 149~153 行（`j≥2` 时连接式引用 `offB.GPF`） | 已核对 |
+| 目标函数三部分系数（C11） | `src/问题二/func_build_q2c.m` 第 70~78 行（第 71 / 73 / 75~76 行分别为第一阶段、当日紧急、未来日系数） | 已核对 |
+| 负荷平衡 / 充电来源 / 光伏剩余 / SOC 递推 / 计划连接（§11.1~11.4、§10） | `src/问题二/func_build_q2c.m` 第 114~118 / 120~123 / 125~129 / 131~143 / 145~154 行 | 已核对 |
+| 充放电互斥（§11.6，仅 `u` 取整） | `src/问题二/func_build_q2c.m` 第 160~189 行 | 已核对 |
+| 情景抽样因果性（C1）与逐日独立子流（G4 修正） | `src/问题二/func_scen_q2c.m` 第 23~24 行（因果库）、第 40~41 行（`rng(seed+d)` 与 `randperm`） | 已核对 |
+| 退化判据（C2：有效残差 < max(K,5) 时退化为 K=1） | `src/问题二/func_scen_q2c.m` 第 26~34 行 | 已核对 |
+| 情景构造（D4：同一情景内 R 天共用同一误差模板） | `src/问题二/func_scen_q2c.m` 第 42~45 行 | 已核对 |
+| 执行层逐槽优先级（E2/E3）与计费（E1） | `src/问题二/func_exec_q2c.m` 第 25~64 行；计费第 70~72 行（按完整计划量计费） | 已核对 |
+| 视野内 B3 校正与情景误差库同源（D5/D6） | `src/问题二/func_roll_q2c.m` 第 68~80 行、第 101~104 行 | 已核对 |
+| 只执行当天计划（C12） | `src/问题二/func_roll_q2c.m` 第 143~144 行 | 已核对 |
+| 跨日 SOC 传递 $E^{act}_{d+1,0}=E^{act}_{d,T}$（E4） | `src/问题二/func_roll_q2c.m` 第 153 行 | 已核对 |
+| 断点续跑（每 20 天存档 + 源码指纹签名） | `src/问题二/func_roll_q2c.m` 第 41~60 行 | 已核对 |
+| 七组运行清单（配置切换，非复制代码） | `src/问题二/main_q2c.m` 第 26~32 行 | 已核对 |
 
-> 上表行号在 /report 阶段对当前 `src/` 逐条复核。`outputs/math_to_code_mapping_q2c.md` §九 中 C12 与"断点续跑"两行
+> 上表行号在 /report 阶段对当前 `src/` 逐条复核。`outputs/裁决与映射/math_to_code_mapping_q2c.md` §九 中 C12 与"断点续跑"两行
 > 为 /prep 阶段记录，抽样口径修正后代码有位移；本章以复核后的行号为准。
 
 > **单位约定（实现风险点）**：`func_build_q2c.m` 中的购电、充放电、紧急变量均为**功率**（kW）；
@@ -1075,8 +1077,8 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 - **预测不确定性代价** = L2 − L1 = 2,552,953.63 元；**单日视野（SOC 短视）代价** = L1 − L1b = 26,793.79 元。
   前者约为后者的 95 倍：本系统的费用劣势主要来自"不知道未来真实值"，而不是"看得不够远"。
 - **L1b 是真实最优值，不是下界估计**：全年 365 天 × 144 槽 = 52,560 个时段，若引入充放电互斥的整数变量会超出本机求解边界，
-  故 L1b 以 **LP 松弛**方式求解（`scripts/run_q2c_l1b.m`；求解器返回 exitflag=1、迭代 173,633 次、耗时 7.0 s）。
-  求解后**逐槽审计**（`outputs/q2c_l1b_audit.txt`）：**存在同槽同时充放的日数 = 0 / 365，最大 min(C,D) = 0.0000 kW**，
+  故 L1b 以 **LP 松弛**方式求解（`scripts/_旧版_勿引用/run_q2c_l1b.m`；求解器返回 exitflag=1、迭代 173,633 次、耗时 7.0 s）。
+  求解后**逐槽审计**（`outputs/分析记录/q2c_l1b_audit.txt`）：**存在同槽同时充放的日数 = 0 / 365，最大 min(C,D) = 0.0000 kW**，
   即松弛解在全部 52,560 个时段上满足互斥，可配上整数变量直接构成合法解，**整数间隙为 0**。
   因此 12,227,142.86 元是全年联合完美信息的**真实最优值**，可直接作为理论下界使用。
 - R=3 与 R=7 的窗口费用只差 28.01 元、日末 SOC 均值只差 0.3 kWh（表 4）：7 天视野相对 3 天视野没有额外收益，
@@ -1120,7 +1122,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 | 2025-12-21 | 66,180.88 | 0.00 | 0 | 9,391.2 | 101,929.1 | 59,738.40 |
 
 > 交付结果表 `outputs/result2_q2c.xlsx` 按本表口径直出（计划购电量 = `G^plan·Δt`；充放电量与紧急购电量取真实数据下**实际执行**值，
-> 不含任何情景平均值），四个日期的逐槽明细在 `outputs/q2c_指定日期表.md`；上一轮的 `outputs/result2.xlsx` 未被改动。
+> 不含任何情景平均值），四个日期的逐槽明细在 `outputs/分析记录/q2c_指定日期表.md`；上一轮的 `outputs/result2.xlsx` 未被改动。
 
 ## 五、视野长度对照（T7）
 
@@ -1198,7 +1200,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 - **修正**：改为逐日独立子流 `rng(seed+d)`——逐日不同（独立），给定决策日完全可复现（种子固定）；
   回归判据写入测试 T11（连续 5 日抽中的相对滞后集合互不相同）。
 - **影响**：改为独立抽样后窗口费用由 14,465,096.26 元变为 14,806,890.28 元（**+341,794.02 元，+2.36%**），
-  紧急电量由 199,824.4 变为 269,240.9 kWh。旧口径结果保存在 `outputs/final_results_q2c_L2_固滞抽样对照.mat`，
+  紧急电量由 199,824.4 变为 269,240.9 kWh。旧口径结果保存在 `outputs/_旧版_勿引用/final_results_q2c_L2_固滞抽样对照.mat`，
   **只作对照、不作交付口径**；表 1 的七组结果已全部按新口径重跑。
 
 ## 九、运行记录
@@ -1214,11 +1216,11 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 | L1b | — | 7.0 s | 全年联合基准（单次 LP，迭代 173,633 次） |
 
 - 执行方式：L1 / L2 / L2b / L2r1 / L2r3 / L2k8 六组在**单 MATLAB 会话内顺序执行**（`run_q2c.sh`，3 GB 环境单进程铁律），
-  一次跑通（exit=0），合计 **57.3 min**；L1b 由 `scripts/run_q2c_l1b.m` 单独一跑（7.0 s）。
-- 单次求解规模：R=7、K=4 时 43,920 列 / 4,032 个二元变量（`outputs/solve_strategy_q2c.md` 实测探针）。
+  一次跑通（exit=0），合计 **57.3 min**；L1b 由 `scripts/_旧版_勿引用/run_q2c_l1b.m` 单独一跑（7.0 s）。
+- 单次求解规模：R=7、K=4 时 43,920 列 / 4,032 个二元变量（`outputs/裁决与映射/solve_strategy_q2c.md` 实测探针）。
   每次求解先解 LP 松弛并把松弛解作为 `x0` 传给 `intlinprog`（实测 4.44 s → 0.93 s，最优值与间隙不变）。
-  L1b 单次装配 578,160 列 / 262,800 等式行 / 105,120 不等式行，装配耗时 0.2 s（`outputs/log_q2c_l1b.txt`）。
-- 日志：`outputs/log_q2c_run.txt`（六组运行）、`log_q2c_l1b.txt`（全年联合基准）、`log_q2c_post.txt`（数值块与交付表生成）、
+  L1b 单次装配 578,160 列 / 262,800 等式行 / 105,120 不等式行，装配耗时 0.2 s（`outputs/历史日志/log_q2c_l1b.txt`）。
+- 日志：`outputs/历史日志/log_q2c_run.txt`（六组运行）、`log_q2c_l1b.txt`（全年联合基准）、`log_q2c_post.txt`（数值块与交付表生成）、
   `log_q2c_run_被OOM中断_1950.txt`、`log_q2c_run_旧抽样_2020.txt`、`log_q2c_run_语法错_2004.txt`（三次中断的过程记录）。
 
 **环境与中断处置**
@@ -1235,7 +1237,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 ## 十、测试验证结论
 
-`tests/test_q2c.m`，**35 项全部通过、失败 0**（`outputs/test_log_q2c.txt`）：
+`tests/test_q2c.m`，**35 项全部通过、失败 0**（`outputs/测试记录/test_log_q2c.txt`）：
 
 | 测试组 | 覆盖 | 关键结论 |
 |---|---|---|
@@ -1255,7 +1257,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 ### 代码结构
 
-`src/main_q2c.m` 为唯一入口，六组运行由清单切换配置而非复制代码；模型装配 `func_build_q2c.m`、情景生成 `func_scen_q2c.m`、
+`src/问题二/main_q2c.m` 为唯一入口，六组运行由清单切换配置而非复制代码；模型装配 `func_build_q2c.m`、情景生成 `func_scen_q2c.m`、
 执行层 `func_exec_q2c.m`、滚动调度与断点 `func_roll_q2c.m` 各自独立成函数；预测与偏差校重复用既有的
 `func_forecast_q2.m` / `func_bias_q2.m` / `func_resid_q2.m`，保证"第一阶段非预见性""情景因果性""V/W 分流"三项可被单独测试。
 
@@ -1268,18 +1270,18 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 ### 静态检查
 
 新增与改造的 `.m` 文件全部通过 `checkcode`；8 项静态自检（行列向量、约束行号 1 基、目标系数符号、稀疏装配行号、链式索引等）逐项核对。
-求解规模由 `scripts/probe_q2c_size.m`、`scripts/probe_q2c_opts.m` 先小规模探针再上全量。
+求解规模由 `scripts/_旧版_勿引用/probe_q2c_size.m`、`scripts/_旧版_勿引用/probe_q2c_opts.m` 先小规模探针再上全量。
 
 ### 图件
 
-本轮**未新出图件**：`outputs/decisions_q2c.md` §十一 第 7 项明确"图件待建模调整定稿后统一生成"。
+本轮**未新出图件**：`outputs/裁决与映射/decisions_q2c.md` §十一 第 7 项明确"图件待建模调整定稿后统一生成"。
 问题二现有图件仍为 `figures/问题二/01~08`（第二、三轮口径），**与本章 L2 数字不对应**，论文引用前须按本轮口径重绘。
 
 ### ⚠ 已知警告与限制
 
 | 编号 | 内容 |
 |---|---|
-| W15 | **执行层拥有当天全天完美信息**：当天 0:00 即掌握 144 个时段的真实负荷与光伏曲线，故本章费用与紧急电量是**乐观口径**（真实系统里执行层只能看到已发生的时段）。该口径下的紧急购电量是"计划电量一次性锁定、未用完不退、不允许售回外网"之后缺口所**必然产生**的量，不是分流优先级规则造成的浪费——此结论有专项审计留档（见 `outputs/q2c_exec_audit.md`）：对窗口内全部 175 个有紧急购电的日子，在计划购电量**完全固定**的前提下逐日求最小可能紧急购电量的线性规划，实际执行合计 269,240.937 kWh 与线性规划最小合计 269,240.937 kWh **完全相同，最大单日差 0.000000 kWh**。另有独立复核重实现预测层、偏差层、执行层与单日确定性模型并与主链路逐位比对（最大差 ≤1e-11），确认执行层无实现偏差 |
+| W15 | **执行层拥有当天全天完美信息**：当天 0:00 即掌握 144 个时段的真实负荷与光伏曲线，故本章费用与紧急电量是**乐观口径**（真实系统里执行层只能看到已发生的时段）。该口径下的紧急购电量是"计划电量一次性锁定、未用完不退、不允许售回外网"之后缺口所**必然产生**的量，不是分流优先级规则造成的浪费——此结论有专项审计留档（见 `outputs/分析记录/q2c_exec_audit.md`）：对窗口内全部 175 个有紧急购电的日子，在计划购电量**完全固定**的前提下逐日求最小可能紧急购电量的线性规划，实际执行合计 269,240.937 kWh 与线性规划最小合计 269,240.937 kWh **完全相同，最大单日差 0.000000 kWh**。另有独立复核重实现预测层、偏差层、执行层与单日确定性模型并与主链路逐位比对（最大差 ≤1e-11），确认执行层无实现偏差 |
 | W16 | **SAA 只用 4 个情景、且为经验分布**：情景从最近 28 个有效预测残差日中的历史误差模板构造，未覆盖未见过的误差形态；K=8 时窗口费用低 1.962%、紧急电量低 14.56%（未收敛到稳定值） |
 | W17 | **一月按已知数据处理**：题面窗口自 2 月 1 日起，一月不预测、不产生残差、不进入误差库（裁决 A4）；该处理来自团队人工裁决，题面未明文规定 |
 | W18 | **已购未用 W 与弃光 V 的量级**：全年 W = 1,136,190.3 kWh，占计划购电总量 23,780,405.8 kWh 的 **4.778%**；未消纳光伏 V = 1,327,853.2 kWh。计划电量一经提交即按全额计费，W 是"计划锁定"的经济代价 |
@@ -1287,7 +1289,7 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 | W20 | **日末 SOC 触底**：报送窗口内 1,190 个槽的日末储电量位于下限 1,200 kWh（全年 1,465 个）。滚动视野止于第 7 日末、日末储电自由，模型倾向用尽储能压低当期购电费；该现象不违反约束，但会削弱对后续日的缓冲 |
 | W21 | **求解间隙未完全归零**：正式口径最大间隙 8.69e-04 元（`intlinprog` 的绝对间隙量级），相对费用量级可忽略，但"全局最优"的表述须限定为"间隙小于 8.69e-04 元" |
 | W22 | **B3 消融结论与直觉相反**：SAA+B3 比 SAA−B3 贵 135,686.00 元（+0.92%），紧急电量少 5,048.3 kWh；正式口径保留 B3 的依据是建模手裁决 C4 / D2，不是费用更优（详见第七节） |
-| W23 | **抽样口径已修正**：旧的"每日重置同一随机种子"实为全年固定置换，与裁决 G4"每天独立"不符；修正后窗口费用上升 341,794.02 元（+2.36%）。旧结果仅作对照（`outputs/final_results_q2c_L2_固滞抽样对照.mat`），**不作交付口径** |
+| W23 | **抽样口径已修正**：旧的"每日重置同一随机种子"实为全年固定置换，与裁决 G4"每天独立"不符；修正后窗口费用上升 341,794.02 元（+2.36%）。旧结果仅作对照（`outputs/_旧版_勿引用/final_results_q2c_L2_固滞抽样对照.mat`），**不作交付口径** |
 | W24 | **本轮未出图件**：问题二现有图件为第二、三轮口径，与本章 L2 数字不对应，引用前须重绘 |
 
 ### ⚠ 必须在论文中体现的风险（风险 → 论文对接表）
@@ -1311,9 +1313,10 @@ corr(光伏, 紧急) = **−0.451**、corr(负载, 紧急) = +0.286、**corr(净
 
 | 类别 | 文件 |
 |---|---|
-| 代码 | `src/main_q2c.m`、`src/func_build_q2c.m`、`src/func_scen_q2c.m`、`src/func_exec_q2c.m`、`src/func_roll_q2c.m`（复用 `src/func_forecast_q2.m`、`src/func_bias_q2.m`、`src/func_resid_q2.m`） |
-| 脚本 | `run_q2c.sh`、`scripts/run_q2c_l1b.m`、`scripts/report_q2c.m`、`scripts/probe_q2c_size.m`、`scripts/probe_q2c_opts.m`、`scripts/probe_q2c_ckpt.m`、`scripts/probe_q2c_smoke.m`、`scripts/probe_q2c_fix.m`、`scripts/probe_q2c_gap.m` |
-| 结果 | `outputs/final_results_q2c_{L1,L2,L2b,L2r1,L2r3,L2k8,L1b}.mat`、`outputs/final_results_q2c_L2_固滞抽样对照.mat`、`outputs/result2_q2c.xlsx` |
-| 数值块与明细 | `outputs/q2c_handback_tables.md`（表 1~表 10）、`outputs/q2c_指定日期表.md`、`outputs/q2c_l1b_audit.txt` |
-| 测试 | `tests/test_q2c.m`、`outputs/test_log_q2c.txt` |
-| 日志 | `outputs/log_q2c_run.txt`、`log_q2c_l1b.txt`、`log_q2c_post.txt`、`log_q2c_run_被OOM中断_1950.txt`、`log_q2c_run_旧抽样_2020.txt`、`log_q2c_run_语法错_2004.txt` |
+| 代码 | `src/问题二/main_q2c.m`、`src/问题二/func_build_q2c.m`、`src/问题二/func_scen_q2c.m`、`src/问题二/func_exec_q2c.m`、`src/问题二/func_roll_q2c.m`（复用 `src/共用/func_forecast_q2.m`、`src/共用/func_bias_q2.m`、`src/共用/func_resid_q2.m`） |
+| 脚本 | `run_q2c.sh`、`scripts/_旧版_勿引用/run_q2c_l1b.m`、`scripts/_旧版_勿引用/report_q2c.m`、`scripts/_旧版_勿引用/probe_q2c_size.m`、`scripts/_旧版_勿引用/probe_q2c_opts.m`、`scripts/_旧版_勿引用/probe_q2c_ckpt.m`、`scripts/_旧版_勿引用/probe_q2c_smoke.m`、`scripts/_旧版_勿引用/probe_q2c_fix.m`、`scripts/_旧版_勿引用/probe_q2c_gap.m` |
+| 结果 | `outputs/final_results_q2c_{L1,L2,L2b,L2r1,L2r3,L2k8,L1b}.mat`、`outputs/_旧版_勿引用/final_results_q2c_L2_固滞抽样对照.mat`、`outputs/result2_q2c.xlsx` |
+| 数值块与明细 | `outputs/分析记录/q2c_handback_tables.md`（表 1~表 10）、`outputs/分析记录/q2c_指定日期表.md`、`outputs/分析记录/q2c_l1b_audit.txt` |
+| 测试 | `tests/test_q2c.m`、`outputs/测试记录/test_log_q2c.txt` |
+| 日志 | `outputs/历史日志/log_q2c_run.txt`、`log_q2c_l1b.txt`、`log_q2c_post.txt`、`log_q2c_run_被OOM中断_1950.txt`、`log_q2c_run_旧抽样_2020.txt`、`log_q2c_run_语法错_2004.txt` |
+

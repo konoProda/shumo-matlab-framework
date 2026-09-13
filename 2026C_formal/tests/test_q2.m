@@ -1,10 +1,10 @@
 % test_q2.m —— 问题二一致性测试（组内产物，不交付）
 % 验证 src/ 的实现与 decisions_q2.md 的模型口径一致；全部通过后方可进入 /report。
-% 结果写 outputs/test_results_q2.mat，日志写 outputs/test_log_q2.txt。
+% 结果写 outputs/测试记录/test_results_q2.mat，日志写 outputs/测试记录/test_log_q2.txt。
 
 clear; clc;
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 
 log_path = fullfile(PROJ_ROOT, 'outputs', 'test_log_q2.txt');
 if exist(log_path, 'file'); delete(log_path); end
@@ -109,7 +109,7 @@ R = rec(R, 'T3-3 最优性缺口定量（告知）', true, ...
     func_build_q2(p1, l1, v1, prm.E_init, prm, true);
 rowT = sparse(1, numel(f1d)); rowT(aux1.idx.E + T - 1) = 1;
 [~, Zq1] = intlinprog(f1d, ic1d, A1d, b1d, [Aeq1d; rowT], [beq1d; prm.E_init], lb1d, ub1d, optM);
-S1 = load(fullfile(PROJ_ROOT,'outputs','q1_solution.mat'), 'Z');   % 与问题一实际最优值比对
+S1 = load(fullfile(PROJ_ROOT,'outputs','统计中间件','q1_solution.mat'), 'Z');   % 与问题一实际最优值比对
 Zq1_ref = S1.Z;
 R = rec(R, 'T3-4 退化为问题一模型', abs(Zq1-Zq1_ref)/Zq1_ref < 1e-6, ...
     sprintf('Z = %.6f，问题一 %.6f 元，相对误差 %.2e', Zq1, Zq1_ref, abs(Zq1-Zq1_ref)/Zq1_ref));
@@ -433,7 +433,7 @@ R.summary = sprintf('%d/%d', nP, nT);
 R.time = char(datetime('now'), 'yyyy-MM-dd HH:mm:ss');
 save(fullfile(PROJ_ROOT, 'outputs', 'test_results_q2.mat'), 'R');
 diary off;
-disp('测试日志已写入 outputs/test_log_q2.txt');
+disp('测试日志已写入 outputs/测试记录/test_log_q2.txt');
 
 % ---------------------------------------------------------------- 局部函数
 function R = rec(R, name, ok, txt)

@@ -7,7 +7,7 @@
 %   用法：matlab -batch "run('scripts/prep_q2c_figdata.m')"
 
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 OUT = fullfile(PROJ_ROOT, 'outputs');
 FIG = fullfile(PROJ_ROOT, 'figures', '问题二');
 prm = struct('T',144,'dt',1/6,'eta_ch',0.90,'eta_dis',0.90,'E_init',6000, ...

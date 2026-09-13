@@ -3,7 +3,7 @@
 % 用法：matlab -batch "run('tests/test_q2b.m')"
 
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 OUT = fullfile(PROJ_ROOT, 'outputs');
 dt = 1/6;
 R = [];                                  % 1 = 通过，0 = 失败

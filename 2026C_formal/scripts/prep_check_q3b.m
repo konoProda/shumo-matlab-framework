@@ -9,9 +9,9 @@
 %   用法：matlab -batch "run('scripts/prep_check_q3b.m')"
 
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 OUT = fullfile(PROJ_ROOT, 'outputs');
-fid = fopen(fullfile(OUT, 'preprocess_log_q3b.txt'), 'w', 'n', 'UTF-8');
+fid = fopen(fullfile(OUT, '测试记录', 'preprocess_log_q3b.txt'), 'w', 'n', 'UTF-8');
 if fid < 0; error('无法写日志'); end
 lg = @(varargin) fprintf(fid, varargin{:});
 say = @(varargin) fprintf(varargin{:});
@@ -89,65 +89,79 @@ lg('  口径：发布时刻 τ 的"预报第 k 小时" ↔ 区间 [τ+(k−1)h, 
 % 判据一：夜间全零。0:00 发布的 k=1..6（即 0:00—6:00）应恒为 0
 night_blk = fc3(:, 1, 1:6);
 lg('  判据一（0:00 发布 k=1..6 = 0:00—6:00 恒为夜）：最大 %.4f kW\n', max(night_blk(:)));
+lg('      ※ 该判据只在冬季严格成立：夏至前后 5:00—6:00 已见光，故上面有非零值。\n');
 % 18:00 发布的 k=1..3（18:00—21:00）
 night_blk2 = fc3(:, 4, 1:3);
 lg('  判据一（18:00 发布 k=1..3 = 18:00—21:00 恒为夜）：最大 %.4f kW\n', max(night_blk2(:)));
+lg('      ※ 近乎恒零说明附件3 几乎不预测 18:00 之后的日照——与下面"日落配对"中\n');
+lg('        预报比实际早约一小时熄火是同一件事（预报的固有形状偏差，非索引错位）。\n');
 
-% 判据二：逐阶段把整点预报线性插值成 10 min，与附件2 实际光伏对齐，
-%         若索引整体错位一小时，相关系数会明显下降
-hidx = floor((0:143)/6) + 1;
+% 判据二：逐阶段把整点预报线性插值成 10 min，与附件2 实际光伏逐槽对齐。
+%   注意阶段 s 的**槽**偏移是 6s（s 以小时计），不是 s——首版这里写错，相关性一度只有 0.1。
+% ★ 必须按**行主序**展平：pv_m(:) 是列主序（先跑完 365 天再换下一槽），
+%   用 (d-1)*144+t 索引会取到别的日子——数值多重集不变、均值不变，
+%   所以偏差看不出来，只有相关性与 MAE 会崩。跨年再平延一天备用。
+pvall = [reshape(pv_m.', [], 1); pv_m(D, :).'];
 for j = 1:4
     s0 = (j-1)*6;                          % 发布时刻（小时）
-    ns = 144 - s0;                         % 该阶段覆盖的槽数（当天剩余 + 次日同刻）
+    sl = s0 * 6;                           % 该时刻在日内的槽偏移
+    ns = 144 - sl;                         % 该阶段覆盖的槽数（当天剩余 + 次日同刻）
     Fc = zeros(D, ns);  Ac = zeros(D, ns);
     for d = 1:D
         f24 = squeeze(fc3(d, j, :)).';     % 1×24
         tt = 0:ns-1;
-        h = floor(tt/6);  m = mod(tt, 6);
-        p_lo = f24(h + 1);
-        p_hi = f24(min(h + 2, 24));        % 末位平延，不外推
+        hh = floor(tt/6);  m = mod(tt, 6);
+        p_lo = f24(hh + 1);
+        p_hi = f24(min(hh + 2, 24));       % 末位平延，不外推
         Fc(d, :) = p_lo + (m/6).*(p_hi - p_lo);
-        % 实际光伏：跨日取（发布后 ns 个 10 min 槽）
-        g0 = (d-1)*144 + s0;               % 全局 0 基槽号
-        gi = g0 + (1:ns);
-        gi = min(gi, D*144);
-        Ac(d, :) = pv_m(gi);
+        gi = (d-1)*144 + sl + (1:ns);      % 全局 1 基槽号，可跨入次日
+        Ac(d, :) = pvall(gi);
     end
-    c = pcorr(Fc(:), Ac(:));
-    lg('  判据二 s=%2d:00 发布：插值预报 vs 实际光伏  相关 %.4f  MAE %8.2f kW  偏差 %+8.2f kW\n', ...
-       s0, c, mean(abs(Fc(:)-Ac(:))), mean(Fc(:)-Ac(:)));
+    nz = Ac(:) > 0;
+    lg('  判据二 s=%2d:00：插值预报 vs 实际光伏  相关 %.4f  MAE %8.2f kW  偏差 %+8.2f\n', ...
+       s0, pcorr(Fc(:), Ac(:)), mean(abs(Fc(:)-Ac(:))), mean(Fc(:)-Ac(:)));
+    lg('              仅白天槽：MAE %8.2f kW  偏差 %+8.2f kW（系统偏差将由 SAA 情景吸收）\n', ...
+       mean(abs(Fc(nz)-Ac(nz))), mean(Fc(nz)-Ac(nz)));
+    lg('              夜槽（实际=0）中预报也为 0 的比例：%.1f%%\n', ...
+       100 * mean(Fc(Ac <= 0) <= 0));
 end
 
-% 判据二对照：错位一小时
-lg('  判据二对照（人为把预报整体错位 +1 小时，相关性应下降）：\n');
+% 判据二补：日出配对（尖锐判据）。整条曲线平滑，全局相关系数对 ±1 h 错位不敏感；
+% 真正的判别量是"首个亮度超过 50 kW 的小时序号"。夜间预报与实际都恒为 0，
+% 故索引若整体错位一小时，该序号之差会**整体**偏 1，而不只是零散几天。
+lg('  判据二补（日出配对，尖锐判据）：首个 >50 kW 的小时序号之差（预报 − 实际）\n');
+lg('      判读：全体集中在 0（少数 −1 是预报清晨偏低的固有误差）⇒ 索引无整体错位；\n');
+lg('            若口径整体差一小时，这里会**全体**偏 +1 或 −1。\n');
 for j = 1:4
-    s0 = (j-1)*6;  ns = 144 - s0;
-    Fc = zeros(D, ns);  Ac = zeros(D, ns);
+    sl = (j-1)*6*6;  ns = 144 - sl;  nhr = ns/6;
+    dif = [];
     for d = 1:D
-        f24 = squeeze(fc3(d, j, :)).';
-        tt = 0:ns-1;
-        h = floor(tt/6);  m = mod(tt, 6);
-        p_lo = f24(h + 1);
-        p_hi = f24(min(h + 2, 24));
-        Fc(d, :) = p_lo + (m/6).*(p_hi - p_lo);
-        g0 = (d-1)*144 + s0;  gi = min(g0 + (1:ns) + 6, D*144);
-        Ac(d, :) = pv_m(gi);
+        gi = (d-1)*144 + sl + (1:ns);
+        a = reshape(pvall(min(gi, numel(pvall))), 6, nhr).';
+        a = mean(a, 2);
+        f = squeeze(fc3(d, j, 1:nhr)).';
+        if max(a) > 50 && max(f) > 50
+            ai = find(a > 50, 1);  fi = find(f > 50, 1);
+            dif(end+1) = fi - ai;                        %#ok<SAGROW>
+        end
     end
-    lg('      s=%2d:00 错位后相关 %.4f\n', s0, pcorr(Fc(:), Ac(:)));
+    u = unique(dif);
+    lg('      s=%2d:00  可判 %3d 天：', (j-1)*6, numel(dif));
+    for k = u; lg('  %+d 出现 %d 天', k, nnz(dif == k)); end
+    lg('\n');
 end
 
-% 判据三：按提前量分档看误差（提前量越大应越差）
-lg('  判据三 误差随提前量分档（s=0:00 发布，按小时档）：\n');
-f24all = squeeze(fc3(:, 1, :));            % D×24
-e = zeros(D, 24);
-for k = 1:24
-    gi = (0:D-1)*144 + (k-1)*6 + 3;        % 该小时中点槽
-    e(:, k) = mean(pv_m(gi), 2) - f24all(:, k);
+% 判据三：误差随提前量分档（s=0:00 发布）
+lg('  判据三 误差随提前量分档（s=0:00 发布，按小时档，仅白天档）：\n');
+for a = 1:4
+    ks = (a-1)*6 + (1:6);
+    gi = (0:D-1).' * 144 + (ks - 1) * 6 + (1:6);         % D×6 全局槽号
+    aa = mean(pvall(gi), 2);                             % D×1 该小时档实际均值
+    ff = mean(squeeze(fc3(:, 1, ks)), 2);                % D×1 该小时档预报均值
+    m = aa > 0;
+    lg('      提前量 %2d-%2d h：MAE %8.2f kW  偏差 %+8.2f kW（%d 个白天日）\n', ...
+       ks(1), ks(end), mean(abs(ff(m)-aa(m))), mean(ff(m)-aa(m)), nnz(m));
 end
-lg('      提前量 1-6h   MAE %8.2f  偏差 %+8.2f kWh/kW\n', mean(abs(e(:, 1:6)), 'all'), mean(e(:, 1:6), 'all'));
-lg('      提前量 7-12h  MAE %8.2f  偏差 %+8.2f\n', mean(abs(e(:, 7:12)), 'all'), mean(e(:, 7:12), 'all'));
-lg('      提前量 13-18h MAE %8.2f  偏差 %+8.2f\n', mean(abs(e(:, 13:18)), 'all'), mean(e(:, 13:18), 'all'));
-lg('      提前量 19-24h MAE %8.2f  偏差 %+8.2f\n', mean(abs(e(:, 19:24)), 'all'), mean(e(:, 19:24), 'all'));
 
 %% ---------- 附件5 模板 ----------
 lg('\n【附件5 result3.xlsx 模板】\n');

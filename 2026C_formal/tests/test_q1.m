@@ -4,7 +4,7 @@
 
 clear; clc;
 PROJ_ROOT = fullfile(fileparts(mfilename('fullpath')), '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 addpath(fullfile(PROJ_ROOT, 'tests'));
 
 log_path = fullfile(PROJ_ROOT, 'outputs', 'test_log_q1.txt');

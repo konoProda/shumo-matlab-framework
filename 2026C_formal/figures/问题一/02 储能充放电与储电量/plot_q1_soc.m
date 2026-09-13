@@ -1,5 +1,5 @@
 %% plot_q1_soc —— 问题一：储能充放电量与储电量
-% 图名:     储能充放电与储电量
+% 图名:     问题一 储能充放电与储电量
 % 对应问题: 问题一
 % 数据来源: 本目录 data.csv（与脚本同目录）
 % 论文位置: 问题一·结果分析（配合论文表2）
@@ -8,12 +8,12 @@ clear; close all; clc;
 % 组织方式：本图件自包含于同一文件夹（脚本 + data.csv + PNG + PDF），便于人工查找与修改
 THIS_DIR  = fileparts(mfilename('fullpath'));
 PROJ_ROOT = fullfile(THIS_DIR, '..', '..', '..');
-addpath(fullfile(PROJ_ROOT, 'src'));
+addpath(genpath(fullfile(PROJ_ROOT, 'src')));
 D = readtable(fullfile(THIS_DIR, 'data.csv'));
 
 % ---------- 绘图参数（集中定义） ----------
 FIG_W = 15;   FIG_H = 11;
-NAME  = '储能充放电与储电量';
+NAME  = '问题一 储能充放电与储电量';
 TITLE = '储能充放电与储电量';
 AXPOS = [0.150 0.27 0.680 0.58];
 XTIT  = 0.025;                      % 图名的图归一化纵坐标
