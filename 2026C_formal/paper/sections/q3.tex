@@ -29,15 +29,9 @@ Q2\text{ 正式模型}
 
 \subsection{时间与信息结构}
 
-每天划分为
-
-\[
-T=144,
+每天划分为 \(T=144,
 \qquad
-\Delta t=\frac16\ {\rm h}.
-\]
-
-阶段集合为
+\Delta t=\frac16\ \mathrm{h}\)。 阶段集合为
 
 \[
 \mathcal S=\{0,6,12,18\}.
@@ -53,23 +47,11 @@ T=144,
 
 \subsection{负荷与光伏预测}
 
-问题三没有提供新的负荷预报，因此每天 0:00 仍使用问题二的负荷预测模型产生未来 7 日中心预测
-
-\[
-\hat L_{\tau,t}^{(d)},
+问题三没有提供新的负荷预报，因此每天 0:00 仍使用问题二的负荷预测模型产生未来 7 日中心预测 \(\hat L_{\tau,t}^{(d)},
 \qquad
-\tau=d,\ldots,d+6.
-\]
+\tau=d,\ldots,d+6\)。 同一天 6:00、12:00、18:00 不重新训练负荷预测。
 
-同一天 6:00、12:00、18:00 不重新训练负荷预测。
-
-对于光伏，在阶段
-
-\[
-s\in\{0,6,12,18\}
-\]
-
-将附件 3 当前阶段最新发布的未来 24 h 预测作为近端中心预测，记为 \(\widehat{PV}^{(d,s)}\)。 发布时刻 \(\tau\) 的第 \(k\) 小时预报对应 \([\tau+(k-1)\mathrm{h},\tau+k\mathrm{h})\)。 附件 3 为整点预测，而调度粒度为 10 min，因此采用线性插值：
+对于光伏，在阶段 \(s\in\{0,6,12,18\}\) 将附件 3 当前阶段最新发布的未来 24 h 预测作为近端中心预测，记为 \(\widehat{PV}^{(d,s)}\)。 发布时刻 \(\tau\) 的第 \(k\) 小时预报对应 \([\tau+(k-1)\mathrm{h},\tau+k\mathrm{h})\)。 附件 3 为整点预测，而调度粒度为 10 min，因此采用线性插值：
 
 \begin{equation}
 F_{h,m}
@@ -121,19 +103,7 @@ PV^{act}_{r,\ell}
 
 残差按预测提前量对齐，并使用最近 28 个有效历史日。负荷与光伏残差尽量从同一历史日期联合抽取。
 
-正式取
-
-\[
-K=4,
-\]
-
-稳定性分析取
-
-\[
-K=8,
-\]
-
-随机种子为 2026。
+正式取 \(K=4\)， 稳定性分析取 \(K=8\)， 随机种子为 2026。
 
 第 \(\omega\) 个负荷情景为
 
@@ -412,46 +382,6 @@ S_3=\{0,6,12,18\}.
 
 结果分析时应重点判断：新增预报是主要降低了紧急购电、降低了已购未用电，还是仅增加调整频率而没有产生足够经济收益。
 
-%FIG:BEGIN q3-year
-问题三逐日的购电与调整结构见图~\ref{fig:q3-year}。
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.78\textwidth]{figures/q3_year.png}
-\caption{问题三逐日购电与调整结构（电量单位：kWh）}
-\label{fig:q3-year}
-\end{figure}
-
-引入日内预报更新后，最终生效购电量仍逐日平稳，而调增与调减在大量日期发生：全年 339 天有调增、340 天有调减、225 天触发紧急购电，说明计划再调整已是常态机制而非个别现象。图中调减量以负值画在零线下方，属瀑布式堆叠约定，不代表负购电。
-%FIG:END q3-year
-
-%FIG:BEGIN q3-soc
-问题三日末储电量的全年轨迹见图~\ref{fig:q3-soc}。
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.78\textwidth]{figures/q3_soc.png}
-\caption{问题三报送窗口内日末储电量轨迹（电量单位：kWh）}
-\label{fig:q3-soc}
-\end{figure}
-
-报送窗口内日末储电量均值为 6\,848 kWh，仅 4 天触及下限（问题二为 1 天）。触底天数增加是日内多次重优化的代价，但储能运行整体仍保持平稳。
-%FIG:END q3-soc
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \begin{table}[H]
 \centering
 \zihao{5}
@@ -471,6 +401,18 @@ S_3=\{0,6,12,18\}.
 \label{tab:9}
 \end{table}
 
+%FIG:BEGIN q3-year
+问题三逐日的购电与调整结构见图~\ref{fig:q3-year}。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth,height=0.26\textheight,keepaspectratio]{figures/q3_year.png}
+\caption{问题三逐日购电与调整结构（电量单位：kWh）}
+\label{fig:q3-year}
+\end{figure}
+
+引入日内预报更新后，最终生效购电量仍逐日平稳，而调增与调减在大量日期发生：全年 339 天有调增、340 天有调减、225 天触发紧急购电，说明计划再调整已是常态机制。
+%FIG:END q3-year
 %MANDATED:BEGIN
 按题目表 1、表 2 与表 3 要求的格式，四个指定日期的结果整理见后续横版页。
 
@@ -483,20 +425,26 @@ S_3=\{0,6,12,18\}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/q3_stages.png}
+\includegraphics[width=0.78\textwidth,height=0.26\textheight,keepaspectratio]{figures/q3_stages.png}
 \caption{问题三四个指定日期的四阶段计划轨迹与紧急购电（电量单位：kWh）}
 \label{fig:q3-stage}
 \end{figure}
 
-再调整的方向与幅度逐日不同：03-20 与 06-21 为净调减，09-23 与 12-21 为净调增，说明模型确实在利用日内预报修正偏差，而不是单向动作。橙线（0:00 原计划）与蓝线（最终生效计划）在 0:00 时段重合，是该时段尚未发生调整的必然结果。
+再调整的方向与幅度逐日不同：03-20 与 06-21 为净调减，09-23 与 12-21 为净调增，说明模型确实在利用日内预报修正偏差，而不是单向动作。
 %FIG:END q3-stage
 
+%FIG:BEGIN q3-soc
+问题三日末储电量的全年轨迹见图~\ref{fig:q3-soc}。
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth,height=0.26\textheight,keepaspectratio]{figures/q3_soc.png}
+\caption{问题三报送窗口内日末储电量轨迹（电量单位：kWh）}
+\label{fig:q3-soc}
+\end{figure}
 
-
-
-
-
+报送窗口内日末储电量均值为 6\,848 kWh，仅 4 天触及下限（问题二为 1 天）。触底天数增加是日内多次重优化的代价，但储能运行整体仍保持平稳。
+%FIG:END q3-soc
 
 \subsection{模型检验}
 

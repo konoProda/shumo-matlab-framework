@@ -10,13 +10,7 @@
 
 另一方面，计划购电已经在 0:00 确定并按计划量计费，当实际负荷低于预测、储能又无法继续吸收时，计划电中可能有一部分无法利用，因此增加 \(W_{d,t}\)， 表示已购未用电功率。由此，问题二的变量沿用问题一的物理变量，只在题目的计划机制下自然增加 \(G^{plan},H,W\)。
 
-每天仍划分为
-
-\[
-T=144,\qquad \Delta t=\frac16\ {\rm h}.
-\]
-
-2025 年 1 月作为已知数据预热期，直接使用真实负荷和真实光伏建立预测历史；正式滚动规划从 2025 年 2 月 1 日开始。
+每天仍划分为 \(T=144,\qquad \Delta t=\frac16\ \mathrm{h}\)。 2025 年 1 月作为已知数据预热期，直接使用真实负荷和真实光伏建立预测历史；正式滚动规划从 2025 年 2 月 1 日开始。
 
 储能参数保持
 
@@ -82,13 +76,7 @@ PV_{r,t}^{act}
 
 每个历史日保留完整的 144 槽误差向量，负荷误差与光伏误差尽量从同一历史日期联合抽取，不逐槽独立打乱。
 
-正式模型保留最近 28 个有效历史残差日，并随机无放回抽取
-
-\[
-K=4
-\]
-
-个完整误差日，随机种子固定为 2026。
+正式模型保留最近 28 个有效历史残差日，并随机无放回抽取 \(K=4\) 个完整误差日，随机种子固定为 2026。
 
 第 \(\omega\) 个情景为
 
@@ -234,15 +222,9 @@ E^{act}_{d,t-1}
 \frac{D^{act}_{d,t}\Delta t}{0.9}
 \end{equation}
 
-更新，并将
-
-\[
-E^{act}_{d+1,0}
+更新，并将 \(E^{act}_{d+1,0}
 =
-E^{act}_{d,T}
-\]
-
-传递至下一滚动日。
+E^{act}_{d,T}\) 传递至下一滚动日。
 
 \subsection{模型求解}
 
@@ -257,15 +239,9 @@ E^{act}_{d,T}
 
 正式报送窗口为 2025 年 2 月 1 日至 12 月 31 日。
 
-全天计划购电费用为 \(13\,149\,064.98\ \mathrm{元}\)， 紧急购电费用为 \(1\,657\,825.30\ \mathrm{元}\)， 总购电费用为
-
-\[
-\boxed{
-14\,806\,890.28\ {\rm 元}
-}.
-\]
-
-累计紧急购电量为 \(269\,240.9\ \mathrm{kWh}\)。 334 个报送日中，共有 175 天发生紧急购电，紧急购电时段共 1342 个，最大单个 10 min 时段紧急购电量为 966.770 kWh。
+全天计划购电费用为 \(13\,149\,064.98\ \mathrm{元}\)， 紧急购电费用为 \(1\,657\,825.30\ \mathrm{元}\)， 总购电费用为 \(\boxed{
+14\,806\,890.28\ \mathrm{元}
+}\)。 累计紧急购电量为 \(269\,240.9\ \mathrm{kWh}\)。 334 个报送日中，共有 175 天发生紧急购电，紧急购电时段共 1342 个，最大单个 10 min 时段紧急购电量为 966.770 kWh。
 
 报送窗口日末储电量统计为
 
@@ -300,25 +276,12 @@ E^{act}_{d,T}
 \label{tab:7}
 \end{table}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 %FIG:BEGIN q2-year
 报送窗口内逐日的购电结构见图~\ref{fig:q2-year}。
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/q2_year.png}
+\includegraphics[width=0.78\textwidth,height=0.26\textheight,keepaspectratio]{figures/q2_year.png}
 \caption{报送窗口内逐日购电结构（电量单位：kWh）}
 \label{fig:q2-year}
 \end{figure}
@@ -331,7 +294,7 @@ E^{act}_{d,T}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/q2_soc.png}
+\includegraphics[width=0.78\textwidth,height=0.26\textheight,keepaspectratio]{figures/q2_soc.png}
 \caption{问题二报送窗口内日末储电量轨迹（电量单位：kWh）}
 \label{fig:q2-soc}
 \end{figure}
@@ -350,20 +313,13 @@ E^{act}_{d,T}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/q2_keydate.png}
+\includegraphics[width=0.78\textwidth,height=0.26\textheight,keepaspectratio]{figures/q2_keydate.png}
 \caption{问题二四个指定日期的计划购电与紧急购电（电量单位：kWh）}
 \label{fig:q2-key}
 \end{figure}
 
-四天中仅 09-23 触发紧急购电（5\,351.69 kWh，分 08:20—10:00 与 19:50—22:00 两段），其余三天均为零，与表~\ref{tab:7} 的逐日指标一致。
+四天中仅 09-23 触发紧急购电（5\,351.69 kWh，分 08:20—10:00 与 19:50—22:00 两段），其余三天均为零。
 %FIG:END q2-key
-
-
-
-
-
-
-
 
 为分析预测不确定性的成本，构造“全年联合完美信息—逐日完美信息—7 日滚动 SAA”三级信息集阶梯。三种模型对应费用分别为
 
@@ -379,15 +335,9 @@ E^{act}_{d,T}
 14\,806\,890.28\ {\rm 元}.
 \]
 
-因此正式随机模型相对于全年联合完美信息增加
-
-\[
-2\,579\,747.42\ {\rm 元}
+因此正式随机模型相对于全年联合完美信息增加 \(2\,579\,747.42\ \mathrm{元}
 =
-257.97\ {\rm 万元}.
-\]
-
-其中，跨日/有限视野部分为
+257.97\ \mathrm{万元}\)。 其中，跨日/有限视野部分为
 
 \[
 12\,253\,936.65
@@ -440,15 +390,9 @@ R=1,3,7
 
 \subsubsection{情景数稳定性}
 
-当 \(K=4\) 时，
-
-\[
-Z=14\,806\,890.28\ {\rm 元},
+当 \(K=4\) 时， \(Z=14\,806\,890.28\ \mathrm{元},
 \qquad
-Q_{em}=269\,240.9\ {\rm kWh}.
-\]
-
-当 \(K=8\) 时，
+Q_{em}=269\,240.9\ \mathrm{kWh}\)。 当 \(K=8\) 时，
 
 \[
 Z=14\,516\,318.96\ {\rm 元},

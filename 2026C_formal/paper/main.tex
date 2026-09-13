@@ -29,7 +29,8 @@
 % ---- 横版页（题目强制表 1/2/3 需横版）----
 % pdflscape 会把该页旋转 90°，阅读时无需歪头；若发行版缺该宏包，
 % 换成 lscape 也能编译，只是页面不自动旋转。
-\usepackage{pdflscape}
+% 横版宏包已不需要：题目表 1/2/3 改为按题目版式**内联**进正文
+% \usepackage{pdflscape}
 
 % ---- 行距 ----
 \usepackage{setspace}
@@ -78,7 +79,7 @@
   font=small,
   labelfont=bf,
   labelsep=quad,
-  skip=6pt
+  skip=3pt          % 图题与正文/图的间距，收紧以省版面
 }
 
 \setlist[itemize]{leftmargin=2em}
@@ -95,9 +96,21 @@
 % 公式上下间距收到 3pt：全文行间公式 160 余处，累计可省约 2 页
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
-\setlength{\floatsep}{8pt plus 2pt minus 2pt}
-\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
-\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+% ---- 浮动体摆放参数（大段空白的真因）----
+% LaTeX 默认 topfraction=0.7、textfraction=0.2、floatpagefraction=0.5，
+% 一张图稍高就放不进文字页，被推到"只有浮动的整页"，于是正文页留下大片空白。
+% 放宽比例后，图可以与文字共处一页，空白随之消失（图件数量不变）。
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.55}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.72}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{7pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
 
 \pagestyle{plain}
 

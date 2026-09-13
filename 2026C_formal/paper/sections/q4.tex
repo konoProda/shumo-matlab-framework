@@ -68,19 +68,7 @@ e^\pi_{r,t}
 
 问题四中的未来随机量包括 \(L,\quad PV,\quad \pi\)。 为尽量保留三者的历史共同结构，同一个 SAA 情景中的 \(e^L,\quad e^{PV},\quad e^\pi\) 尽量从同一历史日期联合抽取。
 
-正式情景数取
-
-\[
-K=4,
-\]
-
-稳定性分析取
-
-\[
-K=8,
-\]
-
-随机种子为 2026。
+正式情景数取 \(K=4\)， 稳定性分析取 \(K=8\)， 随机种子为 2026。
 
 价格情景为
 
@@ -181,13 +169,7 @@ Q4-3 继承问题三的 0:00、6:00、12:00、18:00 四阶段结构。
 \item 当前真实储电量作为新阶段初值。
 \end{itemize}
 
-设当天基础价格预测为 \(\hat\pi_{d,t}^{base}\)。 阶段 \(s\) 只允许使用
-
-\[
-\{\pi^{act}_{d,\tau}:\tau<s\}
-\]
-
-中已经发生的真实价格构造日内校正项 \(b_{d,s}\)，则剩余时段中心预测写为
+设当天基础价格预测为 \(\hat\pi_{d,t}^{base}\)。 阶段 \(s\) 只允许使用 \(\{\pi^{act}_{d,\tau}:\tau<s\}\) 中已经发生的真实价格构造日内校正项 \(b_{d,s}\)，则剩余时段中心预测写为
 
 \begin{equation}
 \hat\pi_{d,t}^{(d,s)}
@@ -355,19 +337,7 @@ C_d^{em,act}
 
 \subsection{模型求解}
 
-Q4-2 经联合情景展开后属于
-
-\[
-\boxed{\text{7 日滚动两阶段 SAA-MILP}},
-\]
-
-Q4-3 属于
-
-\[
-\boxed{\text{日内多阶段滚动 SAA-MILP}}.
-\]
-
-两者的连续能量流变量与二元充放电状态、Q4-3 的调增调减互斥状态共同构成混合整数线性规划。
+Q4-2 经联合情景展开后属于 7 日滚动两阶段 SAA-MILP，Q4-3 属于日内多阶段滚动 SAA-MILP。 两者的连续能量流变量与二元充放电状态、Q4-3 的调增调减互斥状态共同构成混合整数线性规划。
 
 底层继续采用分支定界/分支切割，并利用 MATLAB \texttt{intlinprog} 求解。首先求解 LP 松弛作为热启动，再对非整数变量进行分支，通过节点下界、整数上界和切平面逐步缩小搜索空间。
 
@@ -377,8 +347,6 @@ Q4-3 的日内执行方式为：0:00 用负荷预测、光伏预报与价格预�
 即坚持“求解、执行、更新真实状态与价格信息、再求解”的循环。
 
 \subsection{结果分析框架}
-
-
 
 \begin{table}[H]
 \centering
@@ -437,19 +405,13 @@ RMSE_\pi
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/q4_price_week.png}
+\includegraphics[width=0.78\textwidth,height=0.26\textheight,keepaspectratio]{figures/q4_price_week.png}
 \caption{一周中心电价预测与实测电价对照（电价单位：元/kWh）}
 \label{fig:q4-week}
 \end{figure}
 
-中心预测能够刻画日内峰谷形态，高低价时段基本对齐，该周预测对实测的 MAE 为 0.0371 元/kWh；但峰谷出现的具体时刻仍有偏差。本图只画实际电价与中心预测两条线，不含情景带——情景带是 SAA 的内部构造，不可直接观测。
+中心预测能够刻画日内峰谷形态，高低价时段基本对齐，该周预测对实测的 MAE 为 0.0371 元/kWh；但峰谷出现的具体时刻仍有偏差。
 %FIG:END q4-week
-
-
-
-
-
-
 
 \begin{table}[H]
 \centering
@@ -471,27 +433,11 @@ RMSE & 0.0602 \\
 \label{tab:12}
 \end{table}
 
-%FIG:BEGIN q4-prof
-电价预测的逐小时误差画像见图~\ref{fig:q4-prof}。
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.78\textwidth]{figures/q4_price_profile.png}
-\caption{电价预测的逐小时误差画像（误差单位：元/kWh）}
-\label{fig:q4-prof}
-\end{figure}
-
-经逐小时偏差校正后各小时误差普遍下降，整体 MAE 由 0.0489 降至 0.0432 元/kWh，改善 11.57\%，校正后残余偏差最大仅 0.0122 元/kWh。误差的时段分布并不均匀，清晨与傍晚相对更大，逐时 MAE 的最大值出现在 10:00—11:00。
-%FIG:END q4-prof
-
-
 同时以只按中心价格预测的方案 \(P0\) 与含价格误差 SAA 的方案 \(P1\) 作消融对比，衡量价格风险建模的贡献。
 
 建立“未来真实价格提前已知”的完美价格信息基准，用于计算价格不确定性代价：
 
 \begin{equation}
-
-
 
 \Delta C_{\rm price}
 =
@@ -499,6 +445,19 @@ C_{\rm forecast}
 -
 C_{\rm perfect-price}.
 \end{equation}
+
+%FIG:BEGIN q4-prof
+电价预测的逐小时误差画像见图~\ref{fig:q4-prof}。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth,height=0.26\textheight,keepaspectratio]{figures/q4_price_profile.png}
+\caption{电价预测的逐小时误差画像（误差单位：元/kWh）}
+\label{fig:q4-prof}
+\end{figure}
+
+经逐小时偏差校正后各小时误差普遍下降，整体 MAE 由 0.0489 降至 0.0432 元/kWh，改善 11.57\%，校正后残余偏差最大仅 0.0122 元/kWh。误差的时段分布并不均匀，清晨与傍晚相对更大，逐时 MAE 的最大值出现在 10:00—11:00。
+%FIG:END q4-prof
 
 其结果为
 
@@ -514,13 +473,7 @@ C_{\rm perfect-price}.
 
 校验覆盖未来真实价格无泄漏、三类误差同日联合抽样、Q4-3 阶段价格更新的因果性、最终费用按真实价格重算，以及紧急购电按 \(5\pi^{act}\)、调增调减按 \(1.5\pi^{act}\) 与 \(0.5\pi^{act}\) 结算；同时确认 H-1 计划购电物理上界与 H-2 调增调减互斥均生效，负价格情景不导致模型无界、\(W\) 不出现负价套利，阶段执行与最终重放一致。
 
-H-2 启用后，应有
-
-\[
-\#\{t:\Delta_t^+>0\text{ 且 }\Delta_t^->0\}=0.
-\]
-
-最大等式残差：
+H-2 启用后，应有 \(\#\{t:\Delta_t^+>0\text{ 且 }\Delta_t^->0\}=0\)。 最大等式残差：
 
 \[
 6.96\times10^{-10}.
