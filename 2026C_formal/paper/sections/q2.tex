@@ -15,21 +15,17 @@
 储能参数保持
 
 \[
-1200\le E_{d,t}\le10800,
-\]
-
-\[
-0\le C_{d,t},D_{d,t}\le5000,
-\]
-
-\[
+1200\le E_{d,t}\le10800,\\
+0\le C_{d,t},D_{d,t}\le5000,\\
 \eta_c=\eta_d=0.90.
 \]
 
 问题二不再要求每天首末储电量相同，而采用跨日连续：
 
 \begin{equation}
+\begin{gathered}
 E^{act}_{d+1,0}=E^{act}_{d,T}.
+\end{gathered}
 \end{equation}
 
 \subsection{完美信息确定性基准模型}
@@ -80,6 +76,7 @@ PV_{r,t}^{act}
 第 \(\omega\) 个情景为
 
 \begin{equation}
+\begin{gathered}
 L_{\tau,t}^{(\omega)}
 =
 \max
@@ -88,10 +85,7 @@ L_{\tau,t}^{(\omega)}
 \hat L_{\tau,t}^{(d)}
 +
 e^L_{r_\omega,t}
-\right\},
-\end{equation}
-
-\begin{equation}
+\right\},\\
 PV_{\tau,t}^{(\omega)}
 =
 \max
@@ -101,6 +95,7 @@ PV_{\tau,t}^{(\omega)}
 +
 e^{PV}_{r_\omega,t}
 \right\}.
+\end{gathered}
 \end{equation}
 
 SAA 的作用是用有限个历史误差情景近似未来预测误差分布，使 0:00 的计划购电能够提前考虑 5 倍紧急购电风险。
@@ -235,10 +230,7 @@ E^{act}_{d,T}\) 传递至下一滚动日。
 \[
 \text{mean}=7046.0,
 \qquad
-\text{median}=8058.5,
-\]
-
-\[
+\text{median}=8058.5,\\
 \min=1200,
 \qquad
 \max=10800\ {\rm kWh}.
@@ -311,14 +303,8 @@ E^{act}_{d,T}\) 传递至下一滚动日。
 为分析预测不确定性的成本，构造“全年联合完美信息—逐日完美信息—7 日滚动 SAA”三级信息集阶梯。三种模型对应费用分别为
 
 \[
-12\,227\,142.86\ {\rm 元},
-\]
-
-\[
-12\,253\,936.65\ {\rm 元},
-\]
-
-\[
+12\,227\,142.86\ {\rm 元},\\
+12\,253\,936.65\ {\rm 元},\\
 14\,806\,890.28\ {\rm 元}.
 \]
 

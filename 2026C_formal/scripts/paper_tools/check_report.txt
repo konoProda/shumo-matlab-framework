@@ -1,12 +1,12 @@
 L0   编码（BOM / CRLF / UTF-8 / 控制字符）                            PASS  
 L1   配对（花括号 / \[ \] / 环境栈 / \left\right）                      PASS  
-L2   equation == 52                                           PASS  实际 52
+L2   equation == 50                                           PASS  实际 50
 L2   table 环境 + longtable + 横版裸 tabular 总数                    PASS  31 / 31
 L2   表格体总数 == 31                                              PASS  实际 31
 L2   includegraphics == 11                                    PASS  实际 11
 L2   \tag 残留 == 0                                             PASS  实际 0
 L2   $$ 残留 == 0                                               PASS  实际 0
-L2   \[ == \]（排除 \\[ 换行）                                      PASS  44 / 44
+L2   \[ == \]（排除 \\[ 换行）                                      PASS  36 / 36
 L3   文本模式危险字符（# & _ ^ 与裸 %）                                   PASS  
 L4   规范合规（编号重定义 / 无 listings / 标题无手写序号）                       PASS  
 L5   Markdown 残留（标题 / 管道表 / ** / 项目符号 / 反引号）                  PASS  
