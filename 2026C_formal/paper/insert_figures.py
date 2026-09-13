@@ -109,7 +109,10 @@ JOBS = [
      'after', ['q3-year', 'q3-soc']),
     ('sections/q3.tex', '%MANDATED:END', 'after', ['q3-stage']),
     ('sections/q4.tex', r'RMSE_\pi', 'env-after', ['q4-week']),
-    ('sections/q4.tex', r'\label{tab:12}', 'after', ['q4-prof']),
+    # after-env：插到该锚点所在的**整个浮动体之后**。
+    # 早先写成 after，结果图被插在 \label{tab:12} 与 \end{table} 之间——
+    # 浮动体套浮动体，编译报 "Not in outer par mode"。
+    ('sections/q4.tex', r'\label{tab:12}', 'after-env', ['q4-prof']),
 ]
 
 
@@ -167,6 +170,23 @@ def main():
             ins = pos
         elif where == 'after':
             ins = pos + 1
+        elif where == 'after-env':
+            # 跳到锚点所在的**整个环境之后**（锚点可能是 \label{tab:12}，
+            # 它后面还有 \end{table}——插在两者之间会让浮动体套浮动体，编译必报
+            # "Not in outer par mode"）。按 \begin/\end 配对跳。
+            ins = pos
+            depth = 0
+            while ins < len(lines):
+                s = lines[ins].strip()
+                if re.match(r'^\\(begin|end)\{', s):
+                    depth += (1 if s.startswith(r'\begin') else -1)
+                    if depth == 0:
+                        ins += 1
+                        break
+                ins += 1
+            else:
+                print('  !! %s 中锚点 %r 之后未找到环境结束' % (fn, anchor[:30]))
+                return 1
         else:                                   # env-after：跳到该公式环境之后
             # 编号公式收在 \end{equation}，不编号的收在 \]，两者都要认
             ins = pos

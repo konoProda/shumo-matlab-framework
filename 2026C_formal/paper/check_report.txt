@@ -10,7 +10,7 @@ L2   \[ == \]（排除 \\[ 换行）                                      PASS  
 L3   文本模式危险字符（# & _ ^ 与裸 %）                                   PASS  
 L4   规范合规（编号重定义 / 无 listings / 标题无手写序号）                       PASS  
 L5   Markdown 残留（标题 / 管道表 / ** / 项目符号 / 反引号）                  PASS  
-L6   引用与浮动体（label 唯一 / 引用可解 / 图片与 input 存在）                   PASS  
+L6   引用与浮动体（label 唯一 / 引用可解 / 图片与 input 存在 / 不套嵌）             PASS  
 L7   附录代码（制表符 / 排版开关 / 页数预算）                                  PASS  
 
 共 14 项：PASS 14，FAIL 0

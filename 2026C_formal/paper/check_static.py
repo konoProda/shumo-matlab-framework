@@ -140,6 +140,14 @@ def main():
          len(re.findall(r'(?<!\\)\\\[', j)) == len(re.findall(r'(?<!\\)\\\]', j)),
          '%d / %d' % (len(re.findall(r'(?<!\\)\\\[', j)), len(re.findall(r'(?<!\\)\\\]', j)))),
     ]
+    # 行内 $ 必须成对。少一个会让后面整段变成数学模式，错得很远，
+    # 编译信息常常指不到真正的位置。
+    for name, t in body.items():
+        n = 0
+        for ln in strip_comments(t).split('\n'):
+            n += len(re.findall(r'(?<!\\)\$', ln))
+        if n % 2:
+            checks.append(('%s 行内 $ 成对' % name, False, '计数 %d（奇数）' % n))
     for item, ok, note in checks:
         rec('L2', item, ok, note)
 
@@ -301,8 +309,24 @@ def main():
         p = os.path.join(HERE, m.group(1) + '.tex')
         if not os.path.exists(p):
             is6.append('\\input 目标不存在：%s' % m.group(1))
-    rec('L6', '引用与浮动体（label 唯一 / 引用可解 / 图片与 input 存在）', not is6,
-        '; '.join(is6[:5]))
+    # 浮动体套浮动体：编译报 "Not in outer par mode"（曾因插图锚点取在
+    # \label{tab:12} 之后、\end{table} 之前而真实发生）
+    NEST_BAD = {'table', 'figure', 'equation', 'align', 'gather',
+                'tabular', 'array', 'cases', 'split'}
+    for name, t in body.items():
+        st = []
+        for m in re.finditer(r'\\(begin|end)\{([^}]+)\}', strip_comments(t)):
+            e = m.group(2)
+            if m.group(1) == 'begin':
+                if e in ('figure', 'table') and any(x in NEST_BAD for x in st):
+                    bad = next(x for x in reversed(st) if x in NEST_BAD)
+                    is6.append('%s：\\begin{%s} 嵌在 %s 内（浮动体套浮动体，编译必错）'
+                               % (name, e, bad))
+                st.append(e)
+            elif st and st[-1] == e:
+                st.pop()
+    rec('L6', '引用与浮动体（label 唯一 / 引用可解 / 图片与 input 存在 / 不套嵌）',
+        not is6, '; '.join(is6[:5]))
 
     # ---------------- L7 附录代码 ----------------
     is7 = []
