@@ -134,11 +134,32 @@ def check_deliver():
             fail('%s 缺结果表 xlsx' % d)
     jpgs = [f for f in os.listdir('deliver') if f.endswith('.jpg')]
     if len(jpgs) != 4:
-        fail('deliver 顶层 jpg 应为 4 张，实为 %d 张：%s' % (len(jpgs), jpgs))
+        fail('deliver 顶层 jpg 应为 4 张（每问一张提要图），实为 %d 张：%s' % (len(jpgs), jpgs))
     for f in jpgs:
         if not re.match(r'^问题[一二三四] ', f):
             warn('顶层图命名不合规范：%s' % f)
-    ok('B 交付：四问文件夹 + 顶层 %d 张关键结果图' % len(jpgs))
+
+    # 图件附件：**完整交付**，每张图带 绘图脚本 + data.csv + PNG + PDF
+    n_fig = 0
+    for q in qs:
+        dq = os.path.join('deliver', '图件', q)
+        if not os.path.isdir(dq):
+            fail('交付缺图件目录：%s' % dq)
+            continue
+        for sub in sorted(os.listdir(dq)):
+            p = os.path.join(dq, sub)
+            if not os.path.isdir(p):
+                continue
+            n_fig += 1
+            fs = os.listdir(p)
+            for ext, desc in [('.png', 'PNG'), ('.pdf', 'PDF'), ('.csv', 'data.csv')]:
+                if not any(f.endswith(ext) for f in fs):
+                    fail('交付图 %s 缺 %s' % (p, desc))
+            if not any(f.startswith('plot_') for f in fs):
+                fail('交付图 %s 缺绘图脚本' % p)
+    if n_fig != 14:
+        fail('deliver/图件 下应有 14 张图，实为 %d 张' % n_fig)
+    ok('B 交付：四问代码文件夹 + 顶层 %d 张提要图 + **图件附件完整 %d 张**' % (len(jpgs), n_fig))
 
 
 # ----------------------------------------------------------------- C 结果

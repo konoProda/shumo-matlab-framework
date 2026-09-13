@@ -194,7 +194,15 @@ b = sprintf('<!-- AUTO:%s BEGIN -->', tag);
 e = sprintf('<!-- AUTO:%s END -->', tag);
 blk = [b newline];
 if ~isempty(head); blk = [blk head newline newline]; end
-blk = [blk sprintf('%s\n', lines{:}) e newline];
+% ★ 各段落是用**单引号**字面量写的，MATLAB 单引号串不认 `\n` 转义——
+%   `'## 标题\n'` 里的 `\n` 是**两个字面字符**，直接落盘会在文档里显示成 "\n"。
+%   故此处统一把字面 `\n` 换成真换行；已带真换行的行不再重复追加。
+for i = 1:numel(lines)
+    ln = strrep(lines{i}, '\n', newline);
+    blk = [blk ln];                                            %#ok<AGROW>
+    if ~endsWith(ln, newline); blk = [blk newline]; end         %#ok<AGROW>
+end
+blk = [blk e newline];
 
 if exist(fpath, 'file') == 2
     t = fileread(fpath);

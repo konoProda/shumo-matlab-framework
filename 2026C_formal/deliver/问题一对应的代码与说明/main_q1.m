@@ -77,9 +77,12 @@ out_tbl = table((1:T).', lab, price_v, (sol.GL+sol.GC)*prm.dt, sol.GL*prm.dt, so
     aux.PVL*prm.dt, sol.PVC*prm.dt, sol.C*prm.dt, sol.D*prm.dt, sol.V*prm.dt, sol.E, ...
     'VariableNames', {'slot','period','price','buy_kwh','g_load_kwh','g_chg_kwh', ...
                       'pv_load_kwh','pv_chg_kwh','chg_kwh','dis_kwh','curt_kwh','E_kwh'});
-writetable(out_tbl, fullfile(PROJ_ROOT, 'outputs', 'q1_solution.csv'));
+% 逐槽结果算"统计中间件"（与其它问的逐日统计同类；见 outputs/README.md 的分类口径）
+SUB = fullfile(PROJ_ROOT, 'outputs', '统计中间件');
+if exist(SUB, 'dir') ~= 7; mkdir(SUB); end
+writetable(out_tbl, fullfile(SUB, 'q1_solution.csv'));
 
-save(fullfile(PROJ_ROOT, 'outputs', 'q1_solution.mat'), 'sol', 'prm', 'aux', 'Z', 'rep', 'output', 'exitflag');
+save(fullfile(SUB, 'q1_solution.mat'), 'sol', 'prm', 'aux', 'Z', 'rep', 'output', 'exitflag');
 
 %% 绘图数据落盘（写入各图件文件夹，与绘图脚本同目录；plot 脚本只读不算）
 fig1 = fullfile(PROJ_ROOT, 'figures', '问题一', '01 典型日计划购电策略');
@@ -98,7 +101,7 @@ writetable(table((1:T).', lab, sol.C*prm.dt, sol.D*prm.dt, E_start, sol.E, ...
 tab = func_write_q1(sol, prm, ...
     fullfile(PROJ_ROOT, 'data', '附件', '附件5', 'result1.xlsx'), ...
     fullfile(PROJ_ROOT, 'outputs', 'result1.xlsx'));
-fprintf('\n结果已写入 outputs/result1.xlsx 与 outputs/q1_solution.csv\n');
+fprintf('\n结果已写入 outputs/result1.xlsx 与 outputs/统计中间件/q1_solution.csv\n');
 
 %% 论文表 1 / 表 2 数值
 fprintf('\n=== 论文表1 指定时段购电量 ===\n');

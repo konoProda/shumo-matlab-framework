@@ -71,7 +71,11 @@ put "问题四对应的代码与说明" outputs/result4-2.xlsx result4-2.xlsx
 put "问题四对应的代码与说明" outputs/result4-3.xlsx result4-3.xlsx
 
 echo
-echo "=== 顶层关键结果图（人工筛选后的选图清单见 scripts/make_top_figs.py） ==="
+echo "=== 图件附件（完整交付：每张图带 脚本+data.csv+PNG+PDF） ==="
+python3 scripts/pack_figures.py
+
+echo
+echo "=== 顶层关键结果图（每问一张提要图，选图清单见 scripts/make_top_figs.py） ==="
 python3 scripts/make_top_figs.py
 
 echo
