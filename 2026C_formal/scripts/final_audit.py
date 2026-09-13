@@ -6,8 +6,9 @@
 
 六组检查，全部只读，不改动任何产物：
 
-  A 图件完整性   14 张图各自包含 绘图脚本 + data.csv + PNG + PDF，且 PNG 晚于 data.csv
-  B 交付完整性   deliver/ 四问文件夹含入口程序 + 子函数 + docx + 结果表；顶层每问一张 jpg
+  A 图件完整性   入选图件各自包含 绘图脚本 + data.csv + 人工修证定稿 PNG
+  B 交付完整性   deliver/ 四问文件夹含入口程序 + 子函数 + docx + 结果表；
+                 顶层每问一张 jpg；图件附件与 figures/ 入选口径一致（含改.png，无 pdf）
   C 结果完整性   final_results_*.mat 可读且含 s/res 关键字段
   D 文档完整性   根目录内部文档齐备且非空
   E 数字一致性   文档中引用的关键数字与结果文件**逐项对账**（对应确认点 #3）
@@ -21,6 +22,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
+N_FIG = 10          # 入选图件数（figures/问题X/ 下未归档的文件夹）
 
 FAIL, WARN, OK = [], [], []
 
@@ -76,10 +78,9 @@ def check_figures():
     base = 'figures'
     want = {
         '问题一': ['01 典型日计划购电策略', '02 储能充放电与储电量'],
-        '问题二': ['01 全年逐日购电结构', '02 日末储电量轨迹', '03 指定日期_计划购电与紧急购电',
-                   '04 紧急购电_逐时分布', '05 对照与灵敏度_四面板', '06 预测精度_校正前后'],
+        '问题二': ['01 全年逐日购电结构', '02 日末储电量轨迹', '03 指定日期_计划购电与紧急购电'],
         '问题三': ['01 逐日购电与调整结构', '02 日末储电量轨迹', '03 指定日期四阶段轨迹'],
-        '问题四': ['01 电价预测画像', '02 峰谷时刻预测误差', '03 一周电价预测对照'],
+        '问题四': ['01 电价预测画像', '03 一周电价预测对照'],
     }
     n = 0
     for q, dirs in want.items():
@@ -95,11 +96,8 @@ def check_figures():
                     fail('%s 缺 %s' % (p, desc))
             # 排除人工改图（内部对照件，不属交付图，也不进 deliver）
             pngs = [f for f in files if f.endswith('.png') and f != '改.png']
-            pdfs = [f for f in files if f.endswith('.pdf')]
             if not pngs:
                 fail('%s 缺 PNG' % p)
-            if not pdfs:
-                fail('%s 缺 PDF' % p)
             for f in pngs:
                 fp = os.path.join(p, f)
                 if os.path.getsize(fp) < 20000:
@@ -111,7 +109,7 @@ def check_figures():
             for f in pngs:
                 if not f.startswith(q + ' '):
                     warn('%s 文件名未以「%s 」开头' % (p, q))
-    ok('A 图件：%d 张全部具备 脚本+data.csv+PNG+PDF' % n)
+    ok('A 图件：%d 张全部具备 脚本+data.csv+PNG' % n)
 
 
 # ----------------------------------------------------------------- B 交付
@@ -153,14 +151,14 @@ def check_deliver():
                 continue
             n_fig += 1
             fs = os.listdir(p)
-            for ext, desc in [('.png', 'PNG'), ('.pdf', 'PDF'), ('.csv', 'data.csv')]:
+            for ext, desc in [('.csv', 'data.csv')]:
                 if not any(f.endswith(ext) for f in fs):
                     fail('交付图 %s 缺 %s' % (p, desc))
             if not any(f.startswith('plot_') for f in fs):
                 fail('交付图 %s 缺绘图脚本' % p)
-    if n_fig != 14:
-        fail('deliver/图件 下应有 14 张图，实为 %d 张' % n_fig)
-    ok('B 交付：四问代码文件夹 + 顶层 %d 张提要图 + **图件附件完整 %d 张**' % (len(jpgs), n_fig))
+    if n_fig != N_FIG:
+        fail('deliver/图件 下应有 %d 张入选图，实为 %d 张' % (N_FIG, n_fig))
+    ok('B 交付：四问代码文件夹 + 顶层 %d 张提要图 + **入选图件 %d 张（人工修证定稿）**' % (len(jpgs), n_fig))
 
 
 # ----------------------------------------------------------------- C 结果

@@ -31,7 +31,7 @@ ax.YAxis.Exponent = 0;
 func_fig_style(ax);
 ax.XTickLabelRotation = 0;
 legend(ax, {'最终生效购电','调增','调减','紧急购电'}, 'Location','northoutside', ...
-       'Orientation','horizontal', 'Box','off', 'FontSize', 22);
+       'Orientation','horizontal', 'Box','off', 'FontSize', 22, 'TextColor', 'k');
 func_fig_style(ax, 'Title', TITLE, 'TitleFigY', XTIT);
 
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');

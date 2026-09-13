@@ -48,7 +48,7 @@ func_fig_style(ax1, 'Title', TITLE, 'TitleFigY', XTIT);
 for k = 1:numel(b1)
     text(ax1, b1(k).XEndPoints, b1(k).YEndPoints + 0.030 * max(MAE(:)), ...
          cellstr(compose('%.1f', b1(k).YEndPoints)), ...
-         'HorizontalAlignment', 'center', 'FontSize', 22);
+         'HorizontalAlignment', 'center', 'FontSize', 22, 'Color', 'k');
 end
 
 % 右：RMSE
@@ -66,17 +66,17 @@ func_fig_style(ax2);
 for k = 1:numel(b2)
     text(ax2, b2(k).XEndPoints, b2(k).YEndPoints + 0.030 * max(RMS(:)), ...
          cellstr(compose('%.1f', b2(k).YEndPoints)), ...
-         'HorizontalAlignment', 'center', 'FontSize', 22);
+         'HorizontalAlignment', 'center', 'FontSize', 22, 'Color', 'k');
 end
 
 % 图例置于坐标区之外（图归一化坐标固定，避免压缩坐标轴）
 CNF = get(get(ax1, 'XLabel'), 'FontName');
 set(ax1, 'FontName', CNF);               % 横轴刻度为中文，整轴改用中文字体
 set(ax2, 'FontName', CNF);
-lg = legend(ax1, b1, KD, 'Orientation', 'horizontal');
+lg = legend(ax1, b1, KD, 'Orientation', 'horizontal', 'FontSize', 22, 'TextColor', 'k');
 lg.Units = 'normalized';
 lg.Position = [0.360 0.912 0.280 0.038];
-set(lg, 'FontName', CNF, 'FontSize', 22, 'Box', 'off');
+set(lg, 'FontName', CNF, 'FontSize', 22, 'Box', 'off', 'TextColor', 'k');
 
 % --- 保存 ---
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');

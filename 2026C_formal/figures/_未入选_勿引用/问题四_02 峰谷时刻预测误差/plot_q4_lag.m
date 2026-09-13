@@ -33,7 +33,7 @@ xlabel(ax, '预测时刻 − 实际时刻（个 10 分钟槽）');
 ylabel(ax, '出现天数');
 func_fig_style(ax);
 legend(ax, {'峰价时刻','谷价时刻'}, 'Location','northoutside', ...
-       'Orientation','horizontal', 'Box','off', 'FontSize', 22);
+       'Orientation','horizontal', 'Box','off', 'FontSize', 22, 'TextColor', 'k');
 func_fig_style(ax, 'Title', TITLE, 'TitleFigY', XTIT);
 
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');

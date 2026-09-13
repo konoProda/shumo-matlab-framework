@@ -47,15 +47,20 @@ ylabel(ax, '储电量（kWh）');
 xlabel(ax, '时刻');
 
 func_fig_style(ax, 'Title', TITLE, 'TitleFigY', XTIT);
+% 双轴各自定色：左轴黑、右轴与右侧序列同色。样式函数只能设到当前活动侧，
+% 两侧都要显式声明，否则另一侧的刻度与轴名会沿用主题默认的灰。
+yyaxis(ax, 'left');   ax.YColor = 'k';
+set(get(ax, 'YLabel'), 'Color', 'k');
+yyaxis(ax, 'right');  ax.YColor = func_fig_pal(2);
+set(get(ax, 'YLabel'), 'Color', func_fig_pal(2));
 FN = get(get(ax,'XLabel'), 'FontName');
 yyaxis(ax, 'left');
 bc.FaceColor = func_fig_pal(3);  bd.FaceColor = func_fig_pal(4);
 yyaxis(ax, 'right');
-set(get(ax,'YLabel'), 'FontName', FN, 'FontSize', 22);
 
 lg = legend(ax, [bc, bd, hl], {'充电量', '放电量（负值）', '储电量'}, ...
-            'Orientation', 'horizontal', 'Location', 'northoutside');
-set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off');
+            'Orientation', 'horizontal', 'Location', 'northoutside', 'FontSize', 22, 'TextColor', 'k');
+set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off', 'TextColor', 'k');
 
 % 储电量区间、0:00/24:00 储电量、等效循环次数由论文表2 与正文给出
 

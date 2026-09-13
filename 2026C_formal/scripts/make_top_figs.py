@@ -9,6 +9,7 @@
     目标结果为评审一眼可读的短语，禁"最终版"等模糊词。
 
 选图口径：每问一张，取该问最能独立说明结论者（人工筛选，见 FIGURES_GUIDE.md §一）。
+取图源：优先用人工修证稿 `改.png`（它是写进论文的定稿），没有时才退回脚本输出。
 改选图只改下面 PICKS 一行即可，不要改文件名格式。
 """
 import os
@@ -39,6 +40,10 @@ def main():
             print('  [警告] 缺少源图 %s' % src, file=sys.stderr)
             bad += 1
             continue
+        # 有人工修证稿就用它——那才是写进论文的图
+        edited = os.path.join(os.path.dirname(src_p), '改.png')
+        if os.path.exists(edited):
+            src_p = edited
         im = Image.open(src_p).convert('RGB')
         out = os.path.join(dst_dir, dst)
         im.save(out, 'JPEG', quality=95, dpi=(300, 300), optimize=True)

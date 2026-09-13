@@ -31,7 +31,7 @@ xlabel(ax, '日期');
 ylabel(ax, '电价（元/kWh）');
 func_fig_style(ax);
 legend(ax, {'实测电价','中心预测'}, 'Location','northoutside', ...
-       'Orientation','horizontal', 'Box','off', 'FontSize', 22);
+       'Orientation','horizontal', 'Box','off', 'FontSize', 22, 'TextColor', 'k');
 func_fig_style(ax, 'Title', TITLE, 'TitleFigY', XTIT);
 
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');

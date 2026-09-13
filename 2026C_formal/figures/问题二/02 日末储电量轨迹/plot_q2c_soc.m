@@ -52,8 +52,8 @@ FN = get(get(ax, 'XLabel'), 'FontName');
 lg = legend(ax, [hband, hline, g1, g2, g3, g4], ...
             {'日内波动范围（最小—最大）', '日末储电量', '上限 10,800', '下限 1,200', ...
              '窗口日末均值 7,046', '报送窗口起点 02-01'}, ...
-            'Orientation', 'horizontal', 'Location', 'northoutside');
-set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off');
+            'Orientation', 'horizontal', 'Location', 'northoutside', 'FontSize', 22, 'TextColor', 'k');
+set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off', 'TextColor', 'k');
 xlim(ax, [D.date(1), D.date(end)]);     % 图例会重置日期轴，冻结一次
 
 %% 导出

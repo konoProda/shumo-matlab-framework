@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""pack_figures.py —— 把**全部图件**（含绘图脚本与数据）打包进 deliver/
+"""pack_figures.py —— 把入选图件打包进 deliver/图件/
 
 用法：python3 scripts/pack_figures.py
 
-为什么要有这一层（2026-09-13 编程手裁定）：
-    deliver 的图件**不是"每问选一张"**，而是要交付**完整附件**。
-    因此把 `figures/<问题X>/<NN 图名>/` 整个自包含文件夹原样复制到
-    `deliver/图件/<问题X>/<NN 图名>/`，每张图都带齐四件：
+入选口径（2026-09-13 编程手裁定）：
+    `figures/问题X/<NN 图名>/` 下**还留着的就是入选的**——未入选的 4 张已移到
+    `figures/_未入选_勿引用/`，带 `_` 前缀的目录一律不进交付。每个入选文件夹带齐：
 
-        绘图脚本 plot_*.m  +  data.csv  +  <交付中文名>.png  +  <交付中文名>.pdf
+        plot_*.m   +   data.csv   +   <问题X 图名>.png
 
-    这样评审拿到任意一张图，都能对出"这个数字是怎么画出来的"。
-    `deliver/` 顶层的每问一张 jpg 是**另外**的东西——那是给评审一眼看结论的提要图，
-    与本目录并存不冲突。
+    其中 `<问题X 图名>.png` 是**人工修证后的定稿**（原 `改.png` 已正式改名并替换脚本输出）。
 
-跳过规则：只复制 `figures/<问题X>/<NN 图名>/` 这一层（即"NN 图名"为子目录名），
-其余以 `_` 开头的目录（`_已删除_勿引用/`、`_旧版_勿引用/` 等）一律不进交付面——
-按本仓约定，"勿引用"目录是历史留档，论文与交付都不得引用。
+不做的事：
+    不带 .pdf（交付不出 pdf）；不带 `_未入选_勿引用/`、`_旧版_勿引用/`、
+    `_已删除_勿引用/`、`_人工改图_备份/` 等以 `_` 开头的目录。
 """
 import os
 import shutil
@@ -26,6 +23,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 QS = ['问题一', '问题二', '问题三', '问题四']
 DST_BASE = os.path.join(ROOT, 'deliver', '图件')
+KEEP_EXT = ('.m', '.csv', '.png')
 
 
 def main():
@@ -35,7 +33,6 @@ def main():
     for q in QS:
         src_q = os.path.join(ROOT, 'figures', q)
         if not os.path.isdir(src_q):
-            print('  [警告] 缺少图件目录 %s' % src_q, file=sys.stderr)
             continue
         for name in sorted(os.listdir(src_q)):
             if name.startswith('_'):
@@ -44,13 +41,15 @@ def main():
             if not os.path.isdir(src):
                 continue
             files = os.listdir(src)
-            if not any(f.endswith('.png') for f in files):
-                continue
             dst = os.path.join(DST_BASE, q, name)
-            shutil.copytree(src, dst, dirs_exist_ok=True,
-                            ignore=shutil.ignore_patterns('改.png'))   # 人工改图是内部对照件，不进交付
+            os.makedirs(dst, exist_ok=True)
+            for f in files:
+                if f.endswith(KEEP_EXT):
+                    shutil.copy2(os.path.join(src, f), os.path.join(dst, f))
             n_fig += 1
-            miss = [e for e in ('.png', '.pdf', 'data.csv') if not any(f.endswith(e) for f in files)]
+            miss = [e for e in ('data.csv',) if e not in files]
+            if not any(f.endswith('.png') for f in files):
+                miss.append('PNG 定稿')
             if not any(f.startswith('plot_') for f in files):
                 miss.append('plot_*.m')
             print('  %s/%s%s' % (q, name, '  [缺 ' + '、'.join(miss) + ']' if miss else ''))

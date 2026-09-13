@@ -41,7 +41,7 @@ for k = 1:numel(DATES)
     title(ax, datestr(DATES(k), 'yyyy-mm-dd'), 'FontSize', 22);
     if k == 1
         lg = legend(ax, {'负荷','光伏','0:00 原计划','最终生效计划','紧急购电'}, ...
-                    'Orientation','horizontal', 'Box','off', 'FontSize', 22);
+                    'Orientation','horizontal', 'Box','off', 'FontSize', 22, 'TextColor', 'k');
         lg.Units = 'normalized';  lg.Position = LGPOS;
     end
 end

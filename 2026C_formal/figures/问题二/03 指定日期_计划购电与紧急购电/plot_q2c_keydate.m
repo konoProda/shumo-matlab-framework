@@ -57,7 +57,7 @@ for k = 1:numel(DAYS)
     [vE, iE] = max(S.em_kwh);
     if vE > TOL
         text(ax, XH(iE), vE + 0.035 * PK, sprintf('%.0f', round(vE)), ...
-             'HorizontalAlignment', 'center', 'FontSize', 22);
+             'HorizontalAlignment', 'center', 'FontSize', 22, 'Color', 'k');
     end
 
     func_fig_style(ax);
@@ -69,10 +69,10 @@ func_fig_style(axs(1), 'Title', TITLE, 'TitleFigY', XTIT);
 
 % 图例置于全图顶部、坐标区之外
 FN = get(get(axs(1), 'XLabel'), 'FontName');
-lg = legend(axs(1), [hB(1), hE(1)], {'计划购电量', '紧急购电量'}, 'Orientation', 'horizontal');
+lg = legend(axs(1), [hB(1), hE(1)], {'计划购电量', '紧急购电量'}, 'Orientation', 'horizontal', 'FontSize', 22, 'TextColor', 'k');
 lg.Units = 'normalized';
 lg.Position = [0.290 0.928 0.420 0.034];
-set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off');
+set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off', 'TextColor', 'k');
 
 % --- 保存 ---
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');

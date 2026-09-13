@@ -20,16 +20,19 @@
 | `prep_check_q3b.m`、`prep_check_q4.m` | 数据校验器（读取层自检，正式运行前跑） |
 | `probe_q3b_build.m`、`probe_q3b_smoke.m`、`probe_q3b_stage.m`、`probe_q4_smoke.m` | 本轮探针（小规模验证装配器/阶段/滚动引擎） |
 | `pack_deliver.sh` | **交付打包**：`src/` → 各问文件夹 + docx + 结果表 + 顶层 jpg |
+| **`pack_figures.py`** | 图件打包：**只带含 `改.png`（人工修证稿）的图件**进 `deliver/图件/`；只带 .m/.csv/.png，不出 pdf |
+| `make_top_figs.py` | 顶层提要图：每问一张 jpg，**优先取人工修证稿** |
 | `make_docx.py` | 纯文本说明 → `.docx`（自然段落，无命令与目录树） |
-| `make_top_figs.py` | 人工筛选的关键结果图 → `deliver/` 顶层 `.jpg`（选图清单在文件内 `PICKS`） |
 | `flatten_deliver_code.py` | 整理交付副本：摘除指向 `src/` 的路径行，补"同目录自动解析"提示 |
-| **`final_audit.py`** | **交付前产物完整性自检**（Python，不占 MATLAB 会话）：图件 14 张完整性 / 交付目录 / 结果 .mat / 文档 / **数字一致性逐项对账** / 路径引用。退出码 0 = 通过 |
+| **`final_audit.py`** | **交付前产物完整性自检**（Python，不占 MATLAB 会话）：图件入选口径完整性（10 张、须含人工修证稿 `改.png`） / 交付目录 / 结果 .mat / 文档 / **数字一致性逐项对账** / 路径引用。退出码 0 = 通过 |
 
 ## 子目录
 
 | 目录 | 内容 |
 |---|---|
 | `sched/` | 调度脚本，见下 |
+| `deliver_text/` | `q1.txt` ～ `q4.txt`，交付说明正文（由 `make_deliver_text.m` 生成，`pack_deliver.sh` 转 docx） |
+| `_旧版_勿引用/` | 历次一次性脚本（数据统计、灵敏度、早期探针等）。**留档备查，不要运行** |
 
 ### `sched/` 下的调度脚本
 
@@ -44,8 +47,6 @@
 > ⚠️ **调度脚本里杀进程一律用 PID**（`pgrep -x MATLAB`），**不要用 `pkill -f <文本>`**——
 > bash 会把 `-c` 的整段正文（含 heredoc）放进自己的 argv，模式串会自匹配、把 shell 自己杀掉。
 > 本项目已因此误杀三次，详见 `RETROSPECTIVE.md` R22b。
-| `deliver_text/` | `q1.txt` ～ `q4.txt`，交付说明正文（由 `make_deliver_text.m` 生成，`pack_deliver.sh` 转 docx） |
-| `_旧版_勿引用/` | 历次一次性脚本：`data_q2*/q3*`（数据统计）、`sens_*`（灵敏度）、`probe_q1/q2*/q3_toy`（早期探针）、`diag_*`、`cmp_*`、`gap_*`、`counter_*`、`report_q2b/q2c`、`write_q2b/q2c_deliver`、早期 `run_*.sh`。**留档备查，不要运行** |
 
 ## 一键流程
 

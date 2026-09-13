@@ -60,7 +60,7 @@ FN = get(get(ax, 'XLabel'), 'FontName');
 hk = plot(ax, D.date(1:2), nan(2, 1), ':', 'Color', func_fig_pal(6), 'LineWidth', 1.1);
 lg = legend(ax, [hA; hk], {'计划购电量', '已购未用 W', '弃光量 V', '紧急购电量', '二分二至'}, ...
             'Orientation', 'horizontal', 'Location', 'northoutside');
-set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off');
+set(lg, 'FontName', FN, 'FontSize', 22, 'Box', 'off', 'TextColor', 'k');
 xlim(ax, [D.date(1), D.date(end)]);     % 图例会重置日期轴，冻结一次
 
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');

@@ -35,7 +35,7 @@ xlabel(ax, '时段起点（时）');
 ylabel(ax, '误差（元/kWh）');
 func_fig_style(ax);
 legend(ax, {'校正前 MAE','校正后 MAE','校正后偏差'}, 'Location','northoutside', ...
-       'Orientation','horizontal', 'Box','off', 'FontSize', 22);
+       'Orientation','horizontal', 'Box','off', 'FontSize', 22, 'TextColor', 'k');
 func_fig_style(ax, 'Title', TITLE, 'TitleFigY', XTIT);
 
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');

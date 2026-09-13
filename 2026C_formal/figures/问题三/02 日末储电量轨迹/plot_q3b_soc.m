@@ -33,7 +33,7 @@ xlabel(ax, '日期');
 ax.YAxis.Exponent = 0;
 func_fig_style(ax);
 legend(ax, {'日内范围','日末储电量','储电量上/下限'}, 'Location','northoutside', ...
-       'Orientation','horizontal', 'Box','off', 'FontSize', 22);
+       'Orientation','horizontal', 'Box','off', 'FontSize', 22, 'TextColor', 'k');
 func_fig_style(ax, 'Title', TITLE, 'TitleFigY', XTIT);
 
 print(f, fullfile(THIS_DIR, [NAME '.png']), '-dpng', '-r300');

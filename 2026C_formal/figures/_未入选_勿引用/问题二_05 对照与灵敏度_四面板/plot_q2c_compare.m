@@ -56,7 +56,7 @@ for k = 1:numel(PN)
     % 逐柱标数据（每面板至多三根柱，柱顶标值不压字）
     for j = 1:numel(v)
         text(ax, x(j), v(j) + 0.030 * YT{k}(end), sprintf(['%.' num2str(DIG(k)) 'f'], v(j)), ...
-             'HorizontalAlignment', 'center', 'FontSize', 22);
+             'HorizontalAlignment', 'center', 'FontSize', 22, 'Color', 'k');
     end
 end
 

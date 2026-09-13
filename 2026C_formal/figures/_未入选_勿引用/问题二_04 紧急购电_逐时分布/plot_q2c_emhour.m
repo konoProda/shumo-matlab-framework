@@ -43,7 +43,7 @@ for k = 1:numel(x)
     if D.em_kwh(k) > 0.04 * max(D.em_kwh)
         text(ax1, x(k), D.em_kwh(k) + 0.012 * MX1, sprintf('%.0f', D.em_kwh(k)), ...
              'Rotation', ROT, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', ...
-             'FontSize', 22);
+             'FontSize', 22, 'Color', 'k');
     end
 end
 
@@ -64,7 +64,7 @@ for k = 1:numel(x)
     if D.n_slot(k) > 0.04 * max(D.n_slot)
         text(ax2, x(k), D.n_slot(k) + 0.012 * MX2, sprintf('%d', D.n_slot(k)), ...
              'Rotation', ROT, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', ...
-             'FontSize', 22);
+             'FontSize', 22, 'Color', 'k');
     end
 end
 
