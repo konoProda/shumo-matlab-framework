@@ -1,0 +1,42 @@
+论文处                        论文数值           出处文件 · 字段                                      核查
+----------------------------------------------------------------------------------------------------------
+问题一 全天购电费                  35126.95       final_results_q1.mat · Z                       ✓
+问题一 全天购电量                  59482.70       result1.xlsx · 计划购电量·全天购电量                     ✓
+问题二 窗口总费用                  14806890.28    final_results_q2c_L2.mat · res.cost（窗口求和）      ✓
+问题二 正常+调整费用                13149064.98    final_results_q2c_L2.mat · res.cost_plan（窗口求和） ✓
+问题二 紧急购电费用                 1657825.30     final_results_q2c_L2.mat · res.cost_em（窗口求和）   ✓
+问题二 紧急购电量                  269240.94      final_results_q2c_L2.mat · res.em_m（窗口求和）      ✓
+问题二 已购未用电                  1136190.28     final_results_q2c_L2.mat · res.waste_m（窗口求和）   ✓
+问题二 日末储电量均值                7045.97        final_results_q2c_L2.mat · res.Eend_m[:, -1]（窗口均值） ✓
+问题三 S0 总费用                 15644696.18    final_results_q3b_S0.mat · s.cost_win          ✓
+问题三 S1 总费用                 15579634.76    final_results_q3b_S1.mat · s.cost_win          ✓
+问题三 S2 总费用                 15011622.48    final_results_q3b_S2.mat · s.cost_win          ✓
+问题三 S3 总费用                 14485230.30    final_results_q3b_S3.mat · s.cost_win          ✓
+问题三 S3 紧急购电量               185523.91      final_results_q3b_S3.mat · s.em_win            ✓
+问题三 边际收益 ΔC6               65061.43       S0−S1 · 逐项相减                                   ✓
+问题三 边际收益 ΔC12              568012.28      S1−S2 · 逐项相减                                   ✓
+问题三 边际收益 ΔC18              526392.18      S2−S3 · 逐项相减                                   ✓
+问题三 K=8 总费用                14375420.41    final_results_q3b_S3k8.mat · s.cost_win        ✓
+问题四 Q4-2 总费用               16320514.83    final_results_q4_Q4-2.mat · s.cost_win         ✓
+问题四 Q4-3 总费用               15225713.07    final_results_q4_Q4-3.mat · s.cost_win         ✓
+问题四 Q4-2 紧急购电量             450371.13      final_results_q4_Q4-2.mat · s.em_win           ✓
+问题四 Q4-3 紧急购电量             200511.20      final_results_q4_Q4-3.mat · s.em_win           ✓
+问题四 完美价格信息基准               16253521.47    final_results_q4_Q4-2Ideal.mat · s.cost_win    ✓
+问题四 价格不确定性代价               66993.37       Q4-2 − Q4-2Ideal · 逐项相减                        ✓
+问题四 Q4-2 K=8 总费用           16240197.29    final_results_q4_Q4-2k8.mat · s.cost_win       ✓
+问题四 Q4-3 K=8 总费用           15100131.61    final_results_q4_Q4-3k8.mat · s.cost_win       ✓
+电价预测 MAE（校正后）              0.0432         final_results_q4_Q4-3.mat · prc.MAE            ✓
+电价预测 MAE（校正前）              0.0489         final_results_q4_Q4-3.mat · prc.MAE_base       ✓
+电价预测 RMSE                  0.0602         final_results_q4_Q4-3.mat · prc.RMSE           ✓
+峰值时刻精确命中率                  36.2           final_results_q4_Q4-3.mat · prc：argmax 命中比例    ✓
+谷值时刻精确命中率                  33.8           final_results_q4_Q4-3.mat · prc：argmin 命中比例    ✓
+峰值 1h 内命中率                 63.5           final_results_q4_Q4-3.mat · prc：|Δslot|≤6 比例   ✓
+谷值 1h 内命中率                 58.4           final_results_q4_Q4-3.mat · prc：|Δslot|≤6 比例   ✓
+峰谷差预测 MAE                  0.0675         final_results_q4_Q4-3.mat · prc：日内极差偏差均值       ✓
+问题三 最大等式残差                 2.39           final_results_q3b_S3.mat · s.max_viol（S3）      ✓
+问题四 最大等式残差                 6.96           final_results_q4_Q4-3.mat · s.max_viol（Q4-3）   ✓
+问题四 最大整数间隙                 1.16           final_results_q4_Q4-3.mat · s.max_gap（Q4-3）    ✓
+----------------------------------------------------------------------------------------------------------
+共 36 项：一致 36，未找到 0
+
+未直接对上出处的大额数字：
