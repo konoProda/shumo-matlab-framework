@@ -240,88 +240,26 @@ C^{normal}_{d,t}
 
 \subsection{物理执行变量与约束}
 
-沿用问题二变量 \(G^L,G^{ch},PV^{ch},C,D,E,V,W,H,u\)。 定义
-
-\[
-\overline L=\max(L-PV,0),
-\qquad
-\overline{PV}=\max(PV-L,0).
-\]
-
-负荷平衡：
-
-\begin{equation}
-G^L+D+H=\overline L.
-\end{equation}
-
-充电来源：
-
-\begin{equation}
-PV^{ch}+G^{ch}=C.
-\end{equation}
-
-光伏剩余：
-
-\begin{equation}
-PV^{ch}+V=\overline{PV}.
-\end{equation}
-
-当前阶段计划与执行连接为
+物理执行变量沿用问题二，物理约束的形式也与问题一、二逐条一致：负荷平衡、充电来源、
+光伏剩余平衡仍为 \(G^L+D+H=\overline L\)、\(PV^{ch}+G^{ch}=C\)、\(PV^{ch}+V=\overline{PV}\)，
+储能递推、储电量上下限、充放功率限制与充放电互斥亦不变。问题三新增的只是
+\textbf{阶段内的计划锁定关系}：当前阶段尚未执行的购电量由该阶段的计划给出，并与实际执行量守恒，
 
 \begin{equation}
 G^L+G^{ch}+W=X^s,
-\end{equation}
-
-其中
-
-\[
+\qquad
 X^s=
 \begin{cases}
 P,&s=0,\\
-A^s,&s=6,12,18.
+A^s,&s=6,12,18,
 \end{cases}
-\]
-
-储能递推为
-
-\begin{equation}
-E_t
-=
-E_{t-1}
-+
-0.9C_t\Delta t
--
-\frac{D_t\Delta t}{0.9},
 \end{equation}
 
-并满足
-
-\[
-1200\le E_t\le10800,
-\]
-
-\[
-0\le C_t,D_t\le5000,
-\]
-
-\[
-C_t\le5000u_t,
-\]
-
-\[
-D_t\le5000(1-u_t),
-\]
+其中 \(P\) 为 0:00 原始计划，\(A^s\) 为阶段 \(s\) 调整后的计划。每次进入新阶段重新求解时，
+以真实执行后的储电量作为初值：
 
 \begin{equation}
-u_t\in\{0,1\}.
-\end{equation}
-
-每个阶段重新求解时均使用真实执行后的储电量作为初值：
-
-\begin{equation}
-E^{(\omega)}_{d,s}
-=
-E^{act}_{d,s}.
+E^{(\omega)}_{d,s}=E^{act}_{d,s}.
 \end{equation}
 
 \subsection{目标函数}
@@ -479,7 +417,7 @@ S_3=\{0,6,12,18\}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/q3_year.png}
+\includegraphics[width=0.78\textwidth]{figures/q3_year.png}
 \caption{问题三逐日购电与调整结构（电量单位：kWh）}
 \label{fig:q3-year}
 \end{figure}
@@ -492,13 +430,25 @@ S_3=\{0,6,12,18\}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/q3_soc.png}
+\includegraphics[width=0.78\textwidth]{figures/q3_soc.png}
 \caption{问题三报送窗口内日末储电量轨迹（电量单位：kWh）}
 \label{fig:q3-soc}
 \end{figure}
 
 报送窗口内日末储电量均值为 6\,848 kWh，仅 4 天触及下限（问题二为 1 天）。触底天数增加是日内多次重优化的代价，但储能运行整体仍保持平稳。
 %FIG:END q3-soc
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -522,13 +472,9 @@ S_3=\{0,6,12,18\}.
 \end{table}
 
 %MANDATED:BEGIN
-按题目表 1、表 2 与表 3 要求的格式，上述四个指定日期的结果整理如表~\ref{tab:m1-q3} 至表~\ref{tab:m3-q3}。
+按题目表 1、表 2 与表 3 要求的格式，四个指定日期的结果整理见后续横版页。
 
-\input{tables/tab1_q3}
-
-\input{tables/tab2_q3}
-
-\input{tables/tab3_q3}
+\input{tables/t_q3}
 
 %MANDATED:END
 
@@ -537,7 +483,7 @@ S_3=\{0,6,12,18\}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/q3_stages.png}
+\includegraphics[width=0.78\textwidth]{figures/q3_stages.png}
 \caption{问题三四个指定日期的四阶段计划轨迹与紧急购电（电量单位：kWh）}
 \label{fig:q3-stage}
 \end{figure}
@@ -546,27 +492,17 @@ S_3=\{0,6,12,18\}.
 %FIG:END q3-stage
 
 
+
+
+
+
+
+
 \subsection{模型检验}
 
 程序应至少检查：
 
-\begin{itemize}
-\item 时间索引一致性；
-\item 附件 3 预测映射；
-\item 线性插值；
-\item 无未来信息泄漏；
-\item 第一阶段非预见性；
-\item 阶段边界不回改；
-\item 阶段初始储电量取真实值；
-\item 能量平衡；
-\item 储能递推；
-\item 充放电互斥；
-\item 计划电守恒；
-\item 调整费用手算样例；
-\item 多次临时调整只结算最终版本；
-\item \(S_0\sim S_3\) 独立全年模拟；
-\item 阶段执行与最终拼接重放一致。
-\end{itemize}
+校验覆盖时间索引一致性、附件 3 预测映射与线性插值、无未来信息泄漏与非预见性、阶段边界不回改、阶段初值取真实储电量、能量平衡与储能递推、充放电互斥、计划电守恒，并以手算样例核对调整费用、确认多次临时调整只结算最终版本；\(S_0\sim S_3\) 各自独立完成全年模拟，且阶段执行与最终拼接结果重放一致。
 
 最大等式残差：
 

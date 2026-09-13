@@ -19,21 +19,23 @@
 import os
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# 本脚本在 scripts/paper_tools/ 下，产物一律写回 ../../paper/
+HERE = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), 'paper')
 B = '%MANDATED:BEGIN'        # 用 LaTeX 注释作标记：HTML 注释会被原样排版出来
 E = '%MANDATED:END'
 
 # (章节文件, 插入锚点行, 锚点之后插入?, 引导句, 表片段列表)
 JOBS = [
     ('sections/q1.tex', r'\subsection{结论分析}', False,
-     r'按题目表 1 与表 2 要求的格式，将上述结果整理如表~\ref{tab:m1-q1} 与表~\ref{tab:m2-q1}。',
-     ['tab1_q1', 'tab2_q1']),
+     r'按题目表 1 与表 2 要求的格式，将上述结果整理见下页横版表。',
+     ['t_q1']),
     ('sections/q2.tex', r'\label{tab:7}', True,
-     r'按题目表 1、表 2 与表 3 要求的格式，上述四个指定日期的结果整理如表~\ref{tab:m1-q2} 至表~\ref{tab:m3-q2}。',
-     ['tab1_q2', 'tab2_q2', 'tab3_q2']),
+     r'按题目表 1、表 2 与表 3 要求的格式，四个指定日期的结果整理见后续横版页。',
+     ['t_q2']),
     ('sections/q3.tex', r'\label{tab:9}', True,
-     r'按题目表 1、表 2 与表 3 要求的格式，上述四个指定日期的结果整理如表~\ref{tab:m1-q3} 至表~\ref{tab:m3-q3}。',
-     ['tab1_q3', 'tab2_q3', 'tab3_q3']),
+     r'按题目表 1、表 2 与表 3 要求的格式，四个指定日期的结果整理见后续横版页。',
+     ['t_q3']),
 ]
 
 

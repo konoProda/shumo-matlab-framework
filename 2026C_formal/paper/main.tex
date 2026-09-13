@@ -26,6 +26,11 @@
 % ---- 代码（附录 B）----
 \usepackage{fvextra}
 
+% ---- 横版页（题目强制表 1/2/3 需横版）----
+% pdflscape 会把该页旋转 90°，阅读时无需歪头；若发行版缺该宏包，
+% 换成 lscape 也能编译，只是页面不自动旋转。
+\usepackage{pdflscape}
+
 % ---- 行距 ----
 \usepackage{setspace}
 
@@ -56,13 +61,13 @@
 % 标题格式
 % ============================================================
 \titleformat{\section}{\centering\heiti\zihao{3}}{\thesection、}{0pt}{}
-\titlespacing*{\section}{0pt}{1.2\baselineskip}{0.8\baselineskip}
+\titlespacing*{\section}{0pt}{0.8\baselineskip}{0.5\baselineskip}
 
 \titleformat{\subsection}{\heiti\zihao{4}}{\thesubsection}{0.8em}{}
-\titlespacing*{\subsection}{0pt}{0.8\baselineskip}{0.4\baselineskip}
+\titlespacing*{\subsection}{0pt}{0.5\baselineskip}{0.3\baselineskip}
 
 \titleformat{\subsubsection}{\heiti\zihao{-4}}{\thesubsubsection}{0.6em}{}
-\titlespacing*{\subsubsection}{0pt}{0.6\baselineskip}{0.3\baselineskip}
+\titlespacing*{\subsubsection}{0pt}{0.4\baselineskip}{0.2\baselineskip}
 
 % ============================================================
 % 版式细节
@@ -83,11 +88,13 @@
 % 达 7 列，超版心约 45%）。收到 4pt 后，除该表外全部落回版心内。
 \setlength{\tabcolsep}{4pt}
 
-\setstretch{1.28}
+% 行距：1.28 时全文 50 页，压到单倍是页数达标的主要手段（每页多出约 6 行）
+\setstretch{1.0}
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0pt}
-\setlength{\abovedisplayskip}{6pt}
-\setlength{\belowdisplayskip}{6pt}
+% 公式上下间距收到 3pt：全文行间公式 160 余处，累计可省约 2 页
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
 \setlength{\floatsep}{8pt plus 2pt minus 2pt}
 \setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
 \setlength{\intextsep}{8pt plus 2pt minus 2pt}
@@ -98,7 +105,7 @@
 % breaklines/breakanywhere 把超宽行**排版时软折行**——源码本身一字不改，
 % 附录与支撑材料保持同一份文本，便于评审核对（源码由 ../src/ 复制而来）。
 \fvset{
-  fontsize=\scriptsize,
+  fontsize=\fontsize{7.5pt}{9pt}\selectfont,   % 约六号，为把附录代码压到 ~30 页
   breaklines=true,
   breakanywhere=true,
   breaksymbolleft={},

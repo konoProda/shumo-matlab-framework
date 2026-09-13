@@ -4,27 +4,32 @@
 编译与渲染由编程手另做——本目录只保证**源码形式正确**，未在本机编译过（本机无 TeX 引擎）。
 
 ```
-paper/
-├── main.tex              导言区 + \input 各章节
-├── latexmkrc             固定 XeLaTeX 引擎
-├── README.md             本文件
-├── sections/             逐章正文（12 个 .tex）
-├── tables/               表格片段 9 个（题目强制表 8 + 附录 C 表 1）
-├── figures/              11 张 PNG（10 张定稿 + 1 张总体流程图，ASCII 名）
-├── code/                 附录 B 的代码副本 4 个
-├── values.json           【待补】填充所依据的全部数字（由 collect_values.py 生成）
-├── build_tex.py          初稿 Markdown → sections/*.tex
-├── gen_tables.py         生成题目强制表 1/2/3
-├── collect_values.py     从 outputs/ 汇总数字 → values.json
-├── fill_gaps.py          填 116 处【待补】
-├── insert_mandated_tables.py   把强制表接入正文
-├── insert_figures.py     复制图件并插图（含引导句与解释句）
-├── prep_appendix_code.py 从 ../src/ 取附录 B 代码
-├── check_static.py       静态自检（L0–L7，见下）
-├── check_numbers.py      数字一致性核查表（确认点 #3 的输入）
-├── check_report.txt      静态自检报告（生成物）
-└── number_check.txt      数字核查表（生成物）
+paper/                     ← 只放 LaTeX 源码与论文内容
+├── main.tex               导言区 + \input 各章节
+├── latexmkrc              固定 XeLaTeX 引擎
+├── README.md              本文件
+├── sections/              逐章正文（12 个 .tex）
+├── tables/                表格片段：横版强制表 3 页 + 附录 C 表 1
+├── figures/               11 张 PNG（10 张定稿 + 1 张总体流程图）
+├── code/                  附录 B 的代码副本（28 个 .m，完整收录，约 2827 行）
+└── code_manifest.tex      附录 B 的清单（\input 目标）
+
+scripts/paper_tools/       ← 全部生成与自检工具（不进交付）
+├── build_tex.py           初稿 Markdown → sections/*.tex
+├── gen_mandated_tables.py 生成横版强制表 1/2/3
+├── collect_values.py      从 outputs/ 汇总数字 → values.json
+├── fill_gaps.py           填【待补】
+├── inline_values.py       单值公式改行内
+├── insert_mandated_tables.py / insert_figures.py
+├── prep_appendix_code.py  取附录 B 代码
+├── check_static.py        静态自检（L0–L7）→ check_report.txt
+├── check_numbers.py       数字一致性核查表 → number_check.txt
+└── backup/                历次改动前的 sections 备份
 ```
+
+> 工具产物（`values.json`、`*_report.txt`、`number_check.txt`）与备份都留在
+> `scripts/paper_tools/`，**不写回本目录**——`paper/` 只应有 LaTeX 源码与论文内容。
+
 
 ## 编译
 
@@ -41,11 +46,12 @@ latexmk -C                       # 清理中间文件
 
 | 项 | 数量 | 说明 |
 |---|---|---|
-| 编号公式 | **85** | `equation` 环境，全文连续编号 1–85 |
+| 编号公式 | **58** | `equation` 环境，全文连续编号 1–58 |
 | 图 | **11** | 10 张人工修证结果图 + 1 张总体流程图 |
-| 表 | **19** | 18 张 `table` + 1 张 `longtable`（符号说明） |
+| 横版页 | **3** | 题目强制表 1/2/3（每题一页，全框线） |
+| 表 | **31** | 含横版页内 15 张 tabular + 正文 11 张 + longtable 1 张 |
 | 章节文件 | 12 | `sections/*.tex` |
-| 附录 B 代码 | 437 行 | **完整收录，不截断**（编程手 2026-09-13 要求） |
+| 附录 B 代码 | **2827 行 / 28 个 .m** | **完整收录每一问的全部代码**，约 32 页 |
 
 ## 三条容易踩的编号约束（改源码前务必先读）
 
@@ -108,7 +114,7 @@ python3 check_numbers.py         # 数字一致性核查表 → number_check.txt
 
 **`check_static.py`**（14 项，当前 14/14 PASS）覆盖：编码（BOM/CRLF）、
 配对（花括号 / `\[ \]` / 环境栈 / `\left\right` / **行内 `$` 成对**）、
-计数不变式（公式 85、表 19、图 11）、文本模式危险字符（`# & _ ^` 与**裸 `%`**）、
+计数不变式（公式 58、表格体 31、图 11）、文本模式危险字符（`# & _ ^` 与**裸 `%`**）、
 规范合规、Markdown 残留、引用与浮动体（含**浮动体不套嵌**）、
 附录代码排版开关与完整性。
 

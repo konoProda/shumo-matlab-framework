@@ -40,146 +40,21 @@ E^{act}_{d+1,0}=E^{act}_{d,T}.
 
 \subsection{完美信息确定性基准模型}
 
-为了衡量预测不确定性本身带来的额外成本，首先建立逐日完美信息基准。假设每天 0:00 已经知道当天真实负荷和真实光伏，则可在问题一模型基础上增加紧急购电变量 \(H\)。
-
-定义
-
-\[
-PV^L_{d,t}=\min(PV_{d,t},L_{d,t}),
-\]
-
-\[
-\overline L_{d,t}
-=
-\max(L_{d,t}-PV_{d,t},0),
-\]
-
-\[
-\overline{PV}_{d,t}
-=
-\max(PV_{d,t}-L_{d,t},0).
-\]
-
-负荷平衡为
+为衡量预测不确定性本身带来的额外成本，先建立逐日完美信息基准：假设每天 0:00 已知当天真实负荷与光伏，
+则在问题一模型上增加紧急购电变量 \(H\)。光伏直供量与富余量由真实数据直接构造
+（\(\overline L_{d,t}=\max(L_{d,t}-PV_{d,t},0)\)、\(\overline{PV}_{d,t}=\max(PV_{d,t}-L_{d,t},0)\)），
+负荷平衡、充电来源、光伏剩余平衡、储能状态递推、容量与功率限制、充放电互斥的形式
+均与问题一相同，只是负荷平衡中增加 \(H_{d,t}\)：
 
 \begin{equation}
-G^L_{d,t}+D_{d,t}+H_{d,t}
-=
-\overline L_{d,t}.
+G^L_{d,t}+D_{d,t}+H_{d,t}=\overline L_{d,t},
+\qquad
+PV^{ch}_{d,t}+G^{ch}_{d,t}=C_{d,t},
+\qquad
+PV^{ch}_{d,t}+V_{d,t}=\overline{PV}_{d,t}.
 \end{equation}
 
-储能充电来源为
-
-\begin{equation}
-PV^{ch}_{d,t}+G^{ch}_{d,t}
-=
-C_{d,t},
-\end{equation}
-
-光伏剩余平衡为
-
-\begin{equation}
-PV^{ch}_{d,t}+V_{d,t}
-=
-\overline{PV}_{d,t}.
-\end{equation}
-
-储能状态转移为
-
-\begin{equation}
-E_{d,t}
-=
-E_{d,t-1}
-+
-0.9C_{d,t}\Delta t
--
-\frac{D_{d,t}\Delta t}{0.9}.
-\end{equation}
-
-充放电互斥继续通过
-
-\[
-C_{d,t}\le5000u_{d,t},
-\]
-
-\[
-D_{d,t}\le5000(1-u_{d,t}),
-\]
-
-\begin{equation}
-u_{d,t}\in\{0,1\}
-\end{equation}
-
-实现。
-
-逐日完美信息基准的目标函数为
-
-\begin{equation}
-\min Z^{PI}
-=
-\sum_d\sum_t
-\left[
-\pi_t(G^L_{d,t}+G^{ch}_{d,t})
-+
-5\pi_tH_{d,t}
-\right]\Delta t.
-\end{equation}
-
-由于此时当天真实负荷和光伏完全已知，且正常购电量没有题面给定上限，因此理论上可以在正常价格下提前购买足够电量，故基准模型应得到
-
-\[
-H_{d,t}=0.
-\]
-
-该模型是一个理想基准，用于衡量“如果拥有完美信息，成本最低可以达到多少”。
-
-\subsection{7 日滚动 SAA 两阶段随机 MILP}
-
-现实情况下，每天 0:00 只能根据历史数据预测未来负荷和光伏，因此正式模型采用两阶段随机规划。
-
-\subsubsection{第一阶段：日前计划变量}
-
-每天 \(d\) 的 0:00 确定
-
-\begin{equation}
-G^{plan}_{d,t}\ge0,
-\qquad t=1,\ldots,144.
-\end{equation}
-
-该变量在所有 SAA 情景中完全相同，体现“计划在随机情景实现前已经提交”的非预见性。
-
-\subsubsection{第二阶段：情景实现后的执行变量}
-
-对每个随机情景 \(\omega\)，定义
-
-\[
-G^{L,(\omega)},\quad
-G^{ch,(\omega)},\quad
-PV^{ch,(\omega)},\quad
-C^{(\omega)},\quad
-D^{(\omega)},\quad
-E^{(\omega)},\quad
-V^{(\omega)},\quad
-H^{(\omega)},\quad
-W^{(\omega)},\quad
-u^{(\omega)}.
-\]
-
-其中 \(H\) 表示紧急购电，\(W\) 表示计划购电中已经支付但未被负荷或储能利用的部分。
-
-计划与执行之间满足
-
-\begin{equation}
-G_{d,t}^{L,(\omega)}
-+
-G_{d,t}^{ch,(\omega)}
-+
-W_{d,t}^{(\omega)}
-=
-G_{d,t}^{plan}.
-\end{equation}
-
-这样可以保证计划购电量不会在实际运行时无成本消失。
+该基准在已知真实数据的条件下求全天费用最小，构成预测不确定性成本的下界。
 
 \subsection{预测模型与 SAA 情景生成}
 
@@ -257,108 +132,25 @@ R=7.
 
 \subsection{随机情景下的物理约束}
 
-对每个 \((\omega,\tau,t)\)，定义
-
-\[
-\overline L_{\tau,t}^{(\omega)}
-=
-\max
-\left(
-L_{\tau,t}^{(\omega)}
--
-PV_{\tau,t}^{(\omega)},
-0
-\right),
-\]
-
-\[
-\overline{PV}_{\tau,t}^{(\omega)}
-=
-\max
-\left(
-PV_{\tau,t}^{(\omega)}
--
-L_{\tau,t}^{(\omega)},
-0
-\right).
-\]
-
-负荷平衡为
+物理约束与问题一逐条对应，只是全部带上情景标号。光伏直供量与富余量仍由情景数据直接构造：
+\(\overline L^{(\omega)}_{\tau,t}=\max(L^{(\omega)}_{\tau,t}-PV^{(\omega)}_{\tau,t},0)\)、
+\(\overline{PV}^{(\omega)}_{\tau,t}=\max(PV^{(\omega)}_{\tau,t}-L^{(\omega)}_{\tau,t},0)\)。
+三类能量流向平衡相应写为
 
 \begin{equation}
-G^{L,(\omega)}_{\tau,t}
-+
-D^{(\omega)}_{\tau,t}
-+
-H^{(\omega)}_{\tau,t}
-=
-\overline L_{\tau,t}^{(\omega)}.
+G^{L,(\omega)}_{\tau,t}+D^{(\omega)}_{\tau,t}+H^{(\omega)}_{\tau,t}=\overline L^{(\omega)}_{\tau,t},
+\qquad
+PV^{ch,(\omega)}_{\tau,t}+G^{ch,(\omega)}_{\tau,t}=C^{(\omega)}_{\tau,t},
+\qquad
+PV^{ch,(\omega)}_{\tau,t}+V^{(\omega)}_{\tau,t}=\overline{PV}^{(\omega)}_{\tau,t},
 \end{equation}
 
-充电来源为
+其中紧急购电 \(H\) 只用于补足负荷，不用于储能充电。储能递推、储电量上下限、充放电功率限制
+与充放电互斥约束的形式与问题一完全相同，仅在每个情景内各自成立。此外，每个滚动日开始时的
+储电量以当天真实值为准，所有情景共享同一初值：
 
 \begin{equation}
-PV^{ch,(\omega)}_{\tau,t}
-+
-G^{ch,(\omega)}_{\tau,t}
-=
-C^{(\omega)}_{\tau,t},
-\end{equation}
-
-且紧急购电 \(H\) 不用于储能充电。
-
-光伏剩余平衡为
-
-\begin{equation}
-PV^{ch,(\omega)}_{\tau,t}
-+
-V^{(\omega)}_{\tau,t}
-=
-\overline{PV}_{\tau,t}^{(\omega)}.
-\end{equation}
-
-储能递推为
-
-\begin{equation}
-E^{(\omega)}_{\tau,t}
-=
-E^{(\omega)}_{\tau,t-1}
-+
-0.9C^{(\omega)}_{\tau,t}\Delta t
--
-\frac{D^{(\omega)}_{\tau,t}\Delta t}{0.9}.
-\end{equation}
-
-每个滚动日开始时，所有情景共享当天真实储电量
-
-\begin{equation}
-E^{(\omega)}_{d,0}
-=
-E^{act}_{d,0}.
-\end{equation}
-
-容量、功率和互斥约束为
-
-\[
-1200\le E^{(\omega)}_{\tau,t}\le10800,
-\]
-
-\[
-0\le C^{(\omega)}_{\tau,t},D^{(\omega)}_{\tau,t}\le5000,
-\]
-
-\[
-C^{(\omega)}_{\tau,t}
-\le5000u^{(\omega)}_{\tau,t},
-\]
-
-\[
-D^{(\omega)}_{\tau,t}
-\le5000(1-u^{(\omega)}_{\tau,t}),
-\]
-
-\begin{equation}
-u^{(\omega)}_{\tau,t}\in\{0,1\}.
+E^{(\omega)}_{d,0}=E^{act}_{d,0}.
 \end{equation}
 
 \subsection{目标函数}
@@ -509,12 +301,24 @@ E^{act}_{d,T}
 \end{table}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 %FIG:BEGIN q2-year
 报送窗口内逐日的购电结构见图~\ref{fig:q2-year}。
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/q2_year.png}
+\includegraphics[width=0.78\textwidth]{figures/q2_year.png}
 \caption{报送窗口内逐日购电结构（电量单位：kWh）}
 \label{fig:q2-year}
 \end{figure}
@@ -527,7 +331,7 @@ E^{act}_{d,T}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/q2_soc.png}
+\includegraphics[width=0.78\textwidth]{figures/q2_soc.png}
 \caption{问题二报送窗口内日末储电量轨迹（电量单位：kWh）}
 \label{fig:q2-soc}
 \end{figure}
@@ -535,13 +339,9 @@ E^{act}_{d,T}
 报送窗口内日末储电量均值为 7\,046 kWh，全年仅 1 天触到 1\,200 kWh 的下限，说明 7 日滚动视野的终端价值设定有效，日末储电量没有被放空。
 %FIG:END q2-soc
 %MANDATED:BEGIN
-按题目表 1、表 2 与表 3 要求的格式，上述四个指定日期的结果整理如表~\ref{tab:m1-q2} 至表~\ref{tab:m3-q2}。
+按题目表 1、表 2 与表 3 要求的格式，四个指定日期的结果整理见后续横版页。
 
-\input{tables/tab1_q2}
-
-\input{tables/tab2_q2}
-
-\input{tables/tab3_q2}
+\input{tables/t_q2}
 
 %MANDATED:END
 
@@ -550,13 +350,19 @@ E^{act}_{d,T}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/q2_keydate.png}
+\includegraphics[width=0.78\textwidth]{figures/q2_keydate.png}
 \caption{问题二四个指定日期的计划购电与紧急购电（电量单位：kWh）}
 \label{fig:q2-key}
 \end{figure}
 
 四天中仅 09-23 触发紧急购电（5\,351.69 kWh，分 08:20—10:00 与 19:50—22:00 两段），其余三天均为零，与表~\ref{tab:7} 的逐日指标一致。
 %FIG:END q2-key
+
+
+
+
+
+
 
 
 为分析预测不确定性的成本，构造“全年联合完美信息—逐日完美信息—7 日滚动 SAA”三级信息集阶梯。三种模型对应费用分别为

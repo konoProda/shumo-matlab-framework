@@ -18,10 +18,13 @@
 用法：python3 insert_figures.py
 """
 import os
+import re
 import shutil
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# 本脚本在 scripts/paper_tools/ 下，产物一律写回 ../../paper/
+HERE = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), 'paper')
 ROOT = os.path.dirname(HERE)
 SRC_FIG = os.path.join(ROOT, 'figures')
 DST_FIG = os.path.join(HERE, 'figures')
@@ -122,7 +125,7 @@ def block(key, lead, expl, cap, lab, fname):
         lead, '',
         r'\begin{figure}[htbp]',
         r'\centering',
-        r'\includegraphics[width=\textwidth]{figures/%s}' % fname,
+        r'\includegraphics[width=0.86\textwidth]{figures/%s}' % fname,
         r'\caption{%s}' % cap,
         r'\label{%s}' % lab,
         r'\end{figure}', '',
@@ -174,15 +177,20 @@ def main():
             # 跳到锚点所在的**整个环境之后**（锚点可能是 \label{tab:12}，
             # 它后面还有 \end{table}——插在两者之间会让浮动体套浮动体，编译必报
             # "Not in outer par mode"）。按 \begin/\end 配对跳。
-            ins = pos
+            # 锚点本身在环境**内部**，所以要等到"第一个把该环境关掉的 \end"之后。
+            # 从锚点下一行开始走：遇到 \begin 加一层，遇到 \end 时若当前深度为 0
+            # 说明关掉的就是锚点所在的那个环境，插到它后面。
+            ins = pos + 1
             depth = 0
             while ins < len(lines):
-                s = lines[ins].strip()
-                if re.match(r'^\\(begin|end)\{', s):
-                    depth += (1 if s.startswith(r'\begin') else -1)
+                st = lines[ins].strip()
+                if re.match(r'^\\begin\{', st):
+                    depth += 1
+                elif re.match(r'^\\end\{', st):
                     if depth == 0:
                         ins += 1
                         break
+                    depth -= 1
                 ins += 1
             else:
                 print('  !! %s 中锚点 %r 之后未找到环境结束' % (fn, anchor[:30]))
@@ -198,12 +206,13 @@ def main():
         print('  %-18s 插入 %s 于第 %d 行' % (fn, '+'.join(keys), ins + 1))
 
     # ---- 3. 复查 ----
+    # 只数本文负责的 10 张（问题重述里的总体流程图不归本脚本管）
     n = 0
     for root, _, fs in os.walk(os.path.join(HERE, 'sections')):
         for x in fs:
             if x.endswith('.tex'):
-                n += open(os.path.join(root, x), encoding='utf-8').read().count(r'\includegraphics')
-    print('\n正文 includegraphics 合计 %d 张（应为 %d）' % (n, len(FIGS)))
+                n += open(os.path.join(root, x), encoding='utf-8').read().count('%FIG:BEGIN')
+    print('\n本文插入的结果图 %d 张（应为 %d）' % (n, len(FIGS)))
     return 0 if n == len(FIGS) else 1
 
 

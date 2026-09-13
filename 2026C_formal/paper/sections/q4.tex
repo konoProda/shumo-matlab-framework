@@ -100,53 +100,13 @@ PV^{(\omega)},
 \pi^{(\omega)}
 \right)\)。 第一阶段变量继续为 \(G^{plan}_{d,t}\)， 并对所有情景保持一致。
 
-第二阶段继续沿用问题二物理执行变量 \(G^L,\ G^{ch},\ PV^{ch},\ C,\ D,\ E,\ V,\ W,\ H,\ u\)。 计划与执行连接为
+第二阶段继续沿用问题二的物理执行变量 \(G^L,\ G^{ch},\ PV^{ch},\ C,\ D,\ E,\ V,\ W,\ H,\ u\)，
+物理约束与问题二逐条相同（负荷平衡、充电来源、光伏剩余、储能递推、容量与功率上下限、
+充放电互斥），只是情景由负荷与光伏两维扩展为负荷、光伏、电价三维。计划与执行的连接关系为
 
 \begin{equation}
-G^L+G^{ch}+W
-=
-G^{plan}.
+G^L+G^{ch}+W=G^{plan}.
 \end{equation}
-
-对情景 \(\omega\)，定义
-
-\[
-\overline L^{(\omega)}
-=
-\max(L^{(\omega)}-PV^{(\omega)},0),
-\]
-
-\[
-\overline{PV}^{(\omega)}
-=
-\max(PV^{(\omega)}-L^{(\omega)},0).
-\]
-
-物理约束为
-
-\begin{equation}
-G^L+D+H=\overline L,
-\end{equation}
-
-\begin{equation}
-PV^{ch}+G^{ch}=C,
-\end{equation}
-
-\begin{equation}
-PV^{ch}+V=\overline{PV},
-\end{equation}
-
-\begin{equation}
-E_t
-=
-E_{t-1}
-+
-0.9C_t\Delta t
--
-\frac{D_t\Delta t}{0.9},
-\end{equation}
-
-以及储电量上下限、充放电功率和充放电互斥约束。
 
 Q4-2 的随机优化目标为
 
@@ -327,182 +287,70 @@ A-P
 
 \subsection{H-1：负价格下的计划购电物理上界}
 
-如果负价格情景下计划购电没有物理上界，模型可能为了获得负成本收益而购买大量没有实际用途的电量，并全部进入 \(W\)。
-
-正常购电的实际用途只有“补负荷”和“给储能充电”，因此构造当前日计划购电物理上界
+负价格情景下若计划购电没有上界，模型可能为获得负成本收益而购买大量无实际用途的电量并全部进入 \(W\)。
+正常购电的实际用途只有补负荷与给储能充电，因此取当前日的计划购电物理上界为
 
 \begin{equation}
-U_{d,t}
-=
-\max_{\omega}
-\overline L_{d,t}^{(\omega)}
-+
-P_{\max}.
-\end{equation}
-
-即
-
-\[
-U_{d,t}
-=
-\max_{\omega}
-\overline L_{d,t}^{(\omega)}
-+
-5000.
-\]
-
-于是
-
-\[
+U_{d,t}=\max_{\omega}\overline L_{d,t}^{(\omega)}+P_{\max},
+\qquad
 0\le P_{d,t}\le U_{d,t},
-\]
-
-\begin{equation}
-0\le A^s_{d,t}\le U^s_{d,t}.
+\qquad
+0\le G_{\tau,t}^{plan,(\omega)}\le\overline L_{\tau,t}^{(\omega)}+5000,
 \end{equation}
 
-未来延续成本中的情景计划变量同样满足
-
-\begin{equation}
-0\le
-G_{\tau,t}^{plan,(\omega)}
-\le
-\overline L_{\tau,t}^{(\omega)}
-+
-5000.
-\end{equation}
-
-这样 \(W\) 只表示预测误差造成的已购未用电，而不能成为负价格套利通道。
+即最多补足最大情景的负荷缺口并按最大功率充电。这样 \(W\) 只表示预测误差造成的已购未用电，
+不能成为负价格套利通道。
 
 \subsection{H-2：调增与调减显式互斥}
 
-在负价格条件下，若只设置
+负价格条件下，只设置 \(A-P=\Delta^+-\Delta^-\) 与 \(\Delta^+,\Delta^-\ge0\) 可能出现两者同时为正的非业务解，
+故增加二元变量 \(z_t\) 使调增与调减互斥：
 
-\[
-A-P=\Delta^+-\Delta^-,
-\qquad
-\Delta^+,\Delta^-\ge0,
-\]
-
-可能出现两者同时为正的非业务解。
-
-因此增加二元变量 \(z_t\)：
-
-\[
+\begin{equation}
 0\le\Delta_t^+\le M_tz_t,
-\]
-
-\[
+\qquad
 0\le\Delta_t^-\le M_t(1-z_t),
-\]
-
-\begin{equation}
-z_t\in\{0,1\}.
+\qquad
+z_t\in\{0,1\},
+\qquad
+M_t=U_{d,t},
 \end{equation}
 
-Big-\(M\) 不使用人工大数，而取
-
-\begin{equation}
-M_t=U_{d,t}.
-\end{equation}
-
-从而严格实现
-
-\[
-\Delta^+
-=
-\max(A-P,0),
-\]
-
-\[
-\Delta^-
-=
-\max(P-A,0).
-\]
+其中 Big-\(M\) 不使用人工大数而取上一小节给出的物理上界 \(U_{d,t}\)，
+从而严格实现 \(\Delta^+=\max(A-P,0)\) 与 \(\Delta^-=\max(P-A,0)\)。
 
 \subsection{Q4-3 费用与目标函数}
 
-阶段 \(s\) 的优化价格采用情景价格 \(\pi^{(\omega,s)}\)。 时段调整结算为
-
-\begin{equation}
-C^{settle,s,(\omega)}
-=
-\left[
-\pi^{(\omega,s)}P
-+
-1.5\pi^{(\omega,s)}\Delta^+
--
-0.5\pi^{(\omega,s)}\Delta^-
-\right]\Delta t.
-\end{equation}
-
-紧急购电费用为 \(5\pi^{(\omega,s)}H\)。 0:00 目标函数为
-
-\begin{equation}
-\min Z_{d,0}^{4-3}
-=
-\frac1K
-\sum_\omega
-\left[
-C^{plan,(\omega)}
-+
-C^{em,(\omega)}
-+
-C^{future,(\omega)}
-\right].
-\end{equation}
-
-6:00、12:00、18:00 阶段目标函数为
+阶段 \(s\) 的优化价格采用情景价格 \(\pi^{(\omega,s)}\)，时段调整按 1.5 倍与 0.5 倍结算，
+紧急购电按 5 倍结算，因此 0:00 与各调整阶段的目标函数统一写为
 
 \begin{equation}
 \min Z_{d,s}^{4-3}
 =
-\frac1K
-\sum_\omega
-\left[
+\frac1K\sum_\omega\left[
+C^{settle,s,(\omega)}+C^{em,s,(\omega)}+C^{future,s,(\omega)}
+\right],
+\qquad
 C^{settle,s,(\omega)}
-+
-C^{em,s,(\omega)}
-+
-C^{future,s,(\omega)}
-\right].
-\end{equation}
-
-最终报送时全部替换为真实电价 \(\pi^{act}\)。
-
-真实正常购电与调整费用为
-
-\begin{equation}
-C_d^{normal,act}
 =
-\sum_t
-\left[
-\pi_{d,t}^{act}P_{d,t}
-+
-1.5\pi_{d,t}^{act}\Delta^+_{d,t}
--
-0.5\pi_{d,t}^{act}\Delta^-_{d,t}
-\right]\Delta t,
+\left[\pi^{(\omega,s)}P+1.5\pi^{(\omega,s)}\Delta^+-0.5\pi^{(\omega,s)}\Delta^-\right]\Delta t,
 \end{equation}
 
-紧急购电费用为
-
-\begin{equation}
-C_d^{em,act}
-=
-\sum_t
-5\pi_{d,t}^{act}
-H_{d,t}^{act}\Delta t,
-\end{equation}
-
-总费用为
+其中 0:00 阶段的结算基准为原始计划 \(P\)，调整阶段为各阶段的调整计划。
+最终报送时全部替换为真实电价 \(\pi^{act}\)：
 
 \begin{equation}
 C_d^{4-3,act}
 =
+C_d^{normal,act}+C_d^{em,act},
+\qquad
 C_d^{normal,act}
-+
-C_d^{em,act}.
+=
+\sum_t\left[\pi^{act}_{d,t}P_{d,t}+1.5\pi^{act}_{d,t}\Delta^+_{d,t}-0.5\pi^{act}_{d,t}\Delta^-_{d,t}\right]\Delta t,
+\qquad
+C_d^{em,act}
+=
+\sum_t 5\pi^{act}_{d,t}H^{act}_{d,t}\Delta t.
 \end{equation}
 
 \subsection{模型求解}
@@ -589,13 +437,19 @@ RMSE_\pi
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/q4_price_week.png}
+\includegraphics[width=0.78\textwidth]{figures/q4_price_week.png}
 \caption{一周中心电价预测与实测电价对照（电价单位：元/kWh）}
 \label{fig:q4-week}
 \end{figure}
 
 中心预测能够刻画日内峰谷形态，高低价时段基本对齐，该周预测对实测的 MAE 为 0.0371 元/kWh；但峰谷出现的具体时刻仍有偏差。本图只画实际电价与中心预测两条线，不含情景带——情景带是 SAA 的内部构造，不可直接观测。
 %FIG:END q4-week
+
+
+
+
+
+
 
 \begin{table}[H]
 \centering
@@ -622,7 +476,7 @@ RMSE & 0.0602 \\
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/q4_price_profile.png}
+\includegraphics[width=0.78\textwidth]{figures/q4_price_profile.png}
 \caption{电价预测的逐小时误差画像（误差单位：元/kWh）}
 \label{fig:q4-prof}
 \end{figure}
@@ -630,11 +484,15 @@ RMSE & 0.0602 \\
 经逐小时偏差校正后各小时误差普遍下降，整体 MAE 由 0.0489 降至 0.0432 元/kWh，改善 11.57\%，校正后残余偏差最大仅 0.0122 元/kWh。误差的时段分布并不均匀，清晨与傍晚相对更大，逐时 MAE 的最大值出现在 10:00—11:00。
 %FIG:END q4-prof
 
-同时比较只使用中心价格预测的方案 \(P0\) 与“中心预测 + 价格误差 SAA”的方案 \(P1\)，衡量价格风险建模的贡献。
+
+同时以只按中心价格预测的方案 \(P0\) 与含价格误差 SAA 的方案 \(P1\) 作消融对比，衡量价格风险建模的贡献。
 
 建立“未来真实价格提前已知”的完美价格信息基准，用于计算价格不确定性代价：
 
 \begin{equation}
+
+
+
 \Delta C_{\rm price}
 =
 C_{\rm forecast}
@@ -654,19 +512,7 @@ C_{\rm perfect-price}.
 
 问题四除继续检查能量平衡、储能递推、充放电互斥、正常购电守恒和非预见性外，还应检查：
 
-\begin{itemize}
-\item 未来真实价格无泄漏；
-\item 三类误差同日联合抽样；
-\item Q4-3 阶段价格更新的因果性；
-\item 最终费用按真实价格重算；
-\item 紧急购电使用 \(5\pi^{act}\)；
-\item 调增/调减使用 \(1.5\pi^{act}\) 与 \(0.5\pi^{act}\)；
-\item H-1 计划购电物理上界；
-\item H-2 调增/调减互斥；
-\item 负价格情景不导致模型无界；
-\item \(W\) 不出现负价套利；
-\item 阶段执行与最终重放一致。
-\end{itemize}
+校验覆盖未来真实价格无泄漏、三类误差同日联合抽样、Q4-3 阶段价格更新的因果性、最终费用按真实价格重算，以及紧急购电按 \(5\pi^{act}\)、调增调减按 \(1.5\pi^{act}\) 与 \(0.5\pi^{act}\) 结算；同时确认 H-1 计划购电物理上界与 H-2 调增调减互斥均生效，负价格情景不导致模型无界、\(W\) 不出现负价套利，阶段执行与最终重放一致。
 
 H-2 启用后，应有
 

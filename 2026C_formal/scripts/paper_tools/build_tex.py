@@ -18,7 +18,9 @@ import os
 import re
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# 本脚本在 scripts/paper_tools/ 下，产物一律写回 ../../paper/
+HERE = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), 'paper')
 SRC = os.path.join(HERE, '..', 'data', '论文正文融合初稿.md')
 SEC = os.path.join(HERE, 'sections')
 TAB = os.path.join(HERE, 'tables')

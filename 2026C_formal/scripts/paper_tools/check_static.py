@@ -14,15 +14,18 @@ import os
 import re
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-SECT = os.path.join(HERE, 'sections')
-TAB = os.path.join(HERE, 'tables')
-CODE = os.path.join(HERE, 'code')
+# 本脚本在 scripts/paper_tools/ 下，产物一律写回 ../../paper/
+PAPER = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), 'paper')
+HERE = os.path.dirname(os.path.abspath(__file__))   # 报告只落在工具目录
+SECT = os.path.join(PAPER, 'sections')
+TAB = os.path.join(PAPER, 'tables')
+CODE = os.path.join(PAPER, 'code')
 
 # 计数不变式（改稿后应同步更新这里的期望值）
-N_EQUATION = 85
+N_EQUATION = 58                     # 合并重复约束后由 85 降到 58
 N_FIG = 11                     # 10 张结果图 + 1 张总体流程图
-N_TAB = 19                     # 18 张 table + 1 张 longtable（符号说明）
+N_TAB = 31                     # tabular + longtable（含横版页内 15 张）
 N_SUB = 2                     # 附录 B/C 的 \subsection 数（不计 code_manifest 内的）
 
 R = []                        # (层, 项, 结果, 说明)
@@ -59,7 +62,7 @@ def strip_comment(line):
 
 
 def main():
-    tex_main = os.path.join(HERE, 'main.tex')
+    tex_main = os.path.join(PAPER, 'main.tex')
     all_tex = [tex_main] + files('*.tex', SECT) + files('*.tex', TAB)
     body = {os.path.basename(p): open(p, encoding='utf-8').read() for p in all_tex}
     print('自检 %d 个 .tex 文件\n' % len(all_tex))
@@ -125,14 +128,17 @@ def main():
     # ---------------- L2 计数不变式 ----------------
     j = '\n'.join(body.values())
     n_eq = j.count(r'\begin{equation}')
-    n_tab_env = j.count(r'\begin{table}') + j.count(r'\begin{longtable}')
-    n_tabular = j.count(r'\begin{tabular}') + j.count(r'\begin{longtable}')
+    # 表格体总数 = 普通 tabular + longtable。
+    # 横版强制表页里是**裸 tabular**（landscape 页即容器，不再套 table 浮动体），
+    # 因此不能用"table 环境数 == tabular 数"当不变式，直接核对表格体总数。
+    n_tab_env = j.count(r'\begin{tabular}') + j.count(r'\begin{longtable}')
+    n_tabular = n_tab_env
     n_fig = j.count(r'\includegraphics')
     n_inc = n_eq and None
     checks = [
         ('equation == %d' % N_EQUATION, n_eq == N_EQUATION, '实际 %d' % n_eq),
-        ('table 环境 == 表格体（含 longtable）', n_tab_env == n_tabular, '%d / %d' % (n_tab_env, n_tabular)),
-        ('table == %d' % N_TAB, n_tab_env == N_TAB, '实际 %d' % n_tab_env),
+        ('table 环境 + longtable + 横版裸 tabular 总数', n_tab_env == n_tabular, '%d / %d' % (n_tab_env, n_tabular)),
+        ('表格体总数 == %d' % N_TAB, n_tab_env == N_TAB, '实际 %d' % n_tab_env),
         ('includegraphics == %d' % N_FIG, n_fig == N_FIG, '实际 %d' % n_fig),
         ('\\tag 残留 == 0', j.count(r'\tag{') == 0, '实际 %d' % j.count(r'\tag{')),
         ('$$ 残留 == 0', j.count('$$') == 0, '实际 %d' % j.count('$$')),
@@ -307,12 +313,12 @@ def main():
                 break
     # includegraphics 路径存在
     for m in re.finditer(r'\\includegraphics\[[^\]]*\]\{([^}]*)\}', j):
-        p = os.path.join(HERE, m.group(1))
+        p = os.path.join(PAPER, m.group(1))
         if not os.path.exists(p):
             is6.append('图片不存在：%s' % m.group(1))
     # 附录 \input 的片段存在
     for m in re.finditer(r'\\input\{([^}]*)\}', j):
-        p = os.path.join(HERE, m.group(1) + '.tex')
+        p = os.path.join(PAPER, m.group(1) + '.tex')
         if not os.path.exists(p):
             is6.append('\\input 目标不存在：%s' % m.group(1))
     # 浮动体套浮动体：编译报 "Not in outer par mode"（曾因插图锚点取在

@@ -18,13 +18,16 @@ import os
 import re
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# 本脚本在 scripts/paper_tools/ 下，产物一律写回 ../../paper/
+PAPER = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), 'paper')
+HERE = os.path.dirname(os.path.abspath(__file__))   # 工具产物只落在工具目录
 V = json.load(open(os.path.join(HERE, 'values.json'), encoding='utf-8'))
-SEC = os.path.join(HERE, 'sections')
+SEC = os.path.join(PAPER, 'sections')
 
 TeX = '\n'.join(open(p, encoding='utf-8').read() for p in sorted(glob.glob(os.path.join(SEC, '*.tex'))))
 # 表格片段也要查（题目强制表与附录表里的数字同样是论文数字）
-TABT = '\n'.join(open(p, encoding='utf-8').read() for p in sorted(glob.glob(os.path.join(HERE, 'tables', '*.tex'))))
+TABT = '\n'.join(open(p, encoding='utf-8').read() for p in sorted(glob.glob(os.path.join(PAPER, 'tables', '*.tex'))))
 ALL = TeX + TABT
 
 

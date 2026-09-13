@@ -13,7 +13,9 @@ import numpy as np
 import h5py
 import openpyxl
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# 本脚本在 scripts/paper_tools/ 下，产物一律写回 ../../paper/
+HERE = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), 'paper')
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, 'outputs')
 V = {}
