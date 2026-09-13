@@ -1,0 +1,152 @@
+% 2026C 微网购电调控　论文主文件
+%
+% 编译：xelatex main.tex 连续两遍，或 latexmk -xelatex main.tex
+% 必须用 XeLaTeX（ctex 需要），PDFLaTeX 会在中文字体处报错。
+
+\documentclass[12pt,a4paper]{ctexart}
+
+% ---- 版面 ----
+\usepackage[a4paper,top=2.7cm,bottom=2.7cm,left=2.6cm,right=2.6cm]{geometry}
+
+% ---- 数学 ----
+\usepackage{amsmath,amssymb,bm}
+
+% ---- 表格与图 ----
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+
+% ---- 列表 ----
+\usepackage{enumitem}
+
+% ---- 代码（附录 B）----
+\usepackage{fvextra}
+
+
+% ---- 行距 ----
+\usepackage{setspace}
+
+% ---- 标题 ----
+\usepackage{titlesec}
+
+% ============================================================
+% 编号设置
+% ============================================================
+% 章节号显式重定义：\titleformat 只改显示标签，不改 \thesection 本身，
+% 不重定义会导致交叉引用与实际编号不一致。
+\renewcommand{\thesection}{\chinese{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}%
+  {\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+
+% 公式编号全文连续，不使用按节编号。
+\renewcommand{\theequation}{\arabic{equation}}
+
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+
+% ============================================================
+% 标题格式
+% ============================================================
+% 用 \titlespacing 的不带星形式，否则标题后首段不缩进。
+\titleformat{\section}{\centering\heiti\zihao{3}}{\thesection、}{0pt}{}
+\titlespacing{\section}{0pt}{0.8\baselineskip}{0.5\baselineskip}
+
+\titleformat{\subsection}{\heiti\zihao{4}}{\thesubsection}{0.8em}{}
+\titlespacing{\subsection}{0pt}{0.5\baselineskip}{0.3\baselineskip}
+
+\titleformat{\subsubsection}{\heiti\zihao{-4}}{\thesubsubsection}{0.6em}{}
+\titlespacing{\subsubsection}{0pt}{0.4\baselineskip}{0.2\baselineskip}
+
+% ============================================================
+% 版式细节
+% ============================================================
+\graphicspath{{figures/}}
+
+\captionsetup{
+  font=small,
+  labelfont=bf,
+  labelsep=quad,
+  skip=3pt
+}
+
+\setlist[itemize]{leftmargin=2em}
+\setlist[enumerate]{leftmargin=2em}
+
+% 列间距：默认值下多列表格会超出页边距，收到 4pt。
+\setlength{\tabcolsep}{4pt}
+
+% 行距
+\setstretch{1.0}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+% 公式上下间距
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+% ---- 浮动体摆放参数 ----
+% 放宽默认比例限制，使图能与正文同处一页，避免出现半空页面。
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.55}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.72}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{7pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+
+\pagestyle{plain}
+
+% 附录代码排版：无高亮、无行号、无边框；超宽行排版时软折行。
+\fvset{
+  fontsize=\fontsize{7.5pt}{9pt}\selectfont,   % 约六号，为把附录代码压到 ~30 页
+  breaklines=true,
+  breakanywhere=true,
+  breaksymbolleft={},
+  breaksymbolright={},
+  numbers=none,
+  frame=none,
+  tabsize=2
+}
+
+% ============================================================
+\begin{document}
+
+\input{sections/abstract}
+
+\input{sections/restatement}
+
+\input{sections/analysis}
+
+\input{sections/assumption}
+
+\input{sections/symbol}
+
+\input{sections/q1}
+
+\input{sections/q2}
+
+\input{sections/q3}
+
+\input{sections/q4}
+
+\input{sections/evaluation}
+
+\input{sections/references}
+
+\clearpage
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+\titleformat{\section}{\centering\heiti\zihao{3}}{附录\thesection}{1em}{}
+\titleformat{\subsection}{\heiti\zihao{4}}{\thesubsection}{0.8em}{}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+
+\input{sections/appendix}
+
+\end{document}
