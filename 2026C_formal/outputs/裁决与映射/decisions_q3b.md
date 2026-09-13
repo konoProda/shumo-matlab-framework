@@ -217,7 +217,7 @@ min Z_{d,0} = Σ_t π_t P_{d,t} Δt                                ← 第一阶
 
 | 序 | 事项 | 状态 |
 |---|---|---|
-| 1 | 旧版 Q3 全量备份 | ✅ `/home/sck/scktest/claude_test/_backup/2026C_formal_Q3旧版_20260912_2249/`（96 文件 / 13 MB），旧图件 11 张一并备份 |
+| 1 | 旧版 Q3 全量备份 | ✅ 项目外的独立备份目录（96 文件 / 13 MB），旧图件 11 张一并备份 |
 | 2 | 数据校验与附件3 索引口径复核 | ✅ `scripts/prep_check_q3b.m` → `outputs/测试记录/preprocess_log_q3b.txt` |
 | 3 | 建模裁决清单 / 映射表 / 求解策略 | ✅ 本文档 + `outputs/裁决与映射/math_to_code_mapping_q3b.md` + `outputs/裁决与映射/solve_strategy_q3b.md` |
 | 4 | 确认点 #1 交付单 | ✅ `建模手交接/交付建模手/致建模手_确认点1_q3b.md`（需回复项 C12/C13/C14） |
@@ -227,4 +227,4 @@ min Z_{d,0} = Σ_t π_t P_{d,t} Δt                                ← 第一阶
 | 8 | /report：四策略全年运行 + K=8 + 图件 | ⏳ |
 
 **环境约束提醒**：单 MATLAB 会话（3 GB 内存），四策略与 K=8 一律顺序执行，禁止并发；沿用 20 天断点 + 源码指纹 + `setsid` 脱离进程组 + 自动重试。
-**备份**：旧版 Q3 全部产物在 `/home/sck/scktest/claude_test/_backup/2026C_formal_Q3旧版_20260912_2249/`，不得删改。
+**备份**：旧版 Q3 全部产物在 项目外的独立备份目录，不得删改。

@@ -3,15 +3,15 @@ function out = func_roll_q4(price_act, load_m, pv_m, day_list, fc3, L1, PV1, prc
 %
 %   在问题二/问题三的骨架上加入"电价预测 + 电价随机情景"：
 %     cfg.stages = [0]           → Q4-2（只在 0:00 预测负荷/光伏/电价，对应 result4-2）
-%     cfg.stages = [0 6 12 18]   → Q4-3（日内更新光伏预报并**用已实现价格更新价格预测**，对应 result4-3）
+%     cfg.stages = [0 6 12 18]   → Q4-3（日内更新光伏预报并用已实现价格更新价格预测，对应 result4-3）
 %
 %   电价中心预测（裁决 C1/D-08）：
 %     基础预测 = 同星期回溯；偏差校正 = 最近 W 日同小时残差均值（不按日型分组）
-%     阶段 s 的**日内水平项**：L_{d,s} = mean_{t≤sl}[ π^act − π̂^{(d,0)} ]，
+%     阶段 s 的日内水平项：L_{d,s} = mean_{t≤sl}[ π^act − π̂^{(d,0)} ]，
 %     加到当天尚未执行时段；未来日不变。只用已实现价格 ⇒ 不泄漏未来。
 %
-%   三类误差（L / PV / π）取自**同一历史日**（§8 强制），情景由 func_scen_q4 生成。
-%   **最终费用一律用附件4 真实价格重算**（§17/§27/§37.9/§37.10）：不得把中心预测或情景价格写进交付费用。
+%   三类误差（L / PV / π）取自同一历史日（§8 强制），情景由 func_scen_q4 生成。
+%   最终费用一律用附件4 真实价格重算（§17/§27/§37.9/§37.10）：不得把中心预测或情景价格写进交付费用。
 %
 %   cfg.mode：'main' 正式（价格情景 SAA）｜'P0' 价格只取中心值（§38 消融）
 %             ｜'ideal' 价格情景替换为真实价格（§36 完美价格信息基准，仅评价用）
@@ -182,7 +182,7 @@ for d = d_from:cfg.d_max
 
         sl_next = T;  if si < S; sl_next = stages(si+1)*6; end
         seg = (sl+1):sl_next;
-        % 实际执行层用**附件4 真实电价**计费（价格只影响经济权衡，不改变物理优先级）
+        % 实际执行层用附件4 真实电价计费（价格只影响经济权衡，不改变物理优先级）
         o = func_exec_q3b(B(seg), load_m(d,seg).', pv_m(d,seg).', price_act(d,seg).', Ecur, prm);
         out.em_m(d,seg)   = o.H.';   out.chg_m(d,seg) = o.C.';   out.dis_m(d,seg) = o.D.';
         out.curt_m(d,seg) = o.V.';   out.waste_m(d,seg) = o.W.';
@@ -195,7 +195,7 @@ for d = d_from:cfg.d_max
     dP = max(B - P, 0);   dM = max(P - B, 0);
     out.buy_kw(d,:) = B.';   out.P_kw(d,:) = P.';
     out.cost_normal(d) = sum(pa.*P + 1.5*pa.*dP - 0.5*pa.*dM) * dt;
-    % 注意：em_m 已是 kWh（执行层输出前已乘 dt），此处**不得再乘 dt**
+    % 注意：em_m 已是 kWh（执行层输出前已乘 dt），此处不得再乘 dt
     out.cost_em(d)     = prm.kappa_em * sum(pa .* out.em_m(d,:).');
     out.cost(d)        = out.cost_normal(d) + out.cost_em(d);
     E_now = Ecur;

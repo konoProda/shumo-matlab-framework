@@ -1,9 +1,9 @@
 function out = func_roll_q3b(price_v, load_m, pv_m, day_list, fc3, L1, PV1, prm, cfg, verbose)
 %FUNC_ROLL_Q3B  问题三第二版：日内多阶段滚动 SAA-MILP（四时点预报更新 + 购电计划再调整）
 %
-%   对每个日期 d，按**求解 → 执行 → 更新真实状态 → 再求解**推进（裁决 N2）：
+%   对每个日期 d，按求解 → 执行 → 更新真实状态 → 再求解推进（裁决 N2）：
 %       阶段 0（0:00）求解全天计划 P → 执行 0:00–6:00 → 得到真实储电量
-%       阶段 6 / 12 / 18 同理，各阶段只调整**尚未执行**时段的购电计划 A^s
+%       阶段 6 / 12 / 18 同理，各阶段只调整尚未执行时段的购电计划 A^s
 %   最终生效计划 B 按时间片拼接 P→A^6→A^12→A^18；调整费统一相对 P 结算一次（裁决 C7）。
 %
 %   中心预测：负荷沿用问题二预测器（同星期回溯 + B3，日内不重训，裁决 C1）；
@@ -171,7 +171,7 @@ for d = d_from:cfg.d_max
     cost_norm = sum(price_v .* P + 1.5*price_v.*dP - 0.5*price_v.*dM) * dt;
     % 单位守卫：紧急购电量必须是 kWh 量级（执行层已乘 dt），若被误当功率存将在此暴露
     assert(max(out.em_m(d,:)) < 1e4, '紧急购电量量级异常（疑似单位错）');
-% 注意：em_m 已是 kWh（执行层输出前已乘 dt），此处**不得再乘 dt**
+% 注意：em_m 已是 kWh（执行层输出前已乘 dt），此处不得再乘 dt
     cost_em   = prm.kappa_em * sum(price_v .* out.em_m(d,:).');
     out.buy_kw(d,:) = B.';   out.P_kw(d,:) = P.';
     out.cost_normal(d) = cost_norm;  out.cost_em(d) = cost_em;

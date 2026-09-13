@@ -186,7 +186,7 @@ main_q3b 启动 2026-09-13 09:59:29
 === [收尾调度] main_q3b 起，上限 3000s  2026-09-13 10:18:34 ===
 [警告: 找不到 $documents/MATLAB 的个人文件夹。] 
 {错误使用 readcell (第 14 行)
-找不到或无法打开 '/home/sck/scktest/claude_test/shumo/2026C_formal/src/问题
+找不到或无法打开 'src/问题
 三/../data/附件/附件1.xlsx'。请检查路径和文件名或文件权限。
 
 出错 func_read_q2 (第 26 行)
