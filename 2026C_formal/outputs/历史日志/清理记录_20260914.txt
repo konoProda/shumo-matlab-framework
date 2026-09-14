@@ -1,0 +1,84 @@
+收官清理记录　2026C_formal
+生成时间：2026-09-14 11:08:58
+执行者：编程手（AI 辅助）
+指令原文：清除所有备份，注意保留全程log
+定档范围：编程手创建的全部备份 + 全部 _旧版_勿引用 归档 + data/0.8（由编程手裁定）
+提交方式：git 提交（历史版本 fbe8845 及更早仍可回档）
+
+────────────────────────────────────────
+一、删除清单（删除前实测）
+────────────────────────────────────────
+路径                                               文件数    大小 git跟踪
+_backup                                                  231       12M      231
+figures_备份_改样式前_1329                         209       14M      209
+figures/_图件定稿_备份                              10      1.6M       10
+figures/_未入选_勿引用                              16      1.1M       16
+figures/_已删除_勿引用                              22      1.2M       22
+figures/问题二/_初版11张_勿引用                  32      1.7M       32
+figures/问题二/_旧口径_勿引用                    32      2.1M       32
+figures/问题三/_旧版_勿引用                       49      2.7M       49
+outputs/_备份                                           10       30M        9
+outputs/_旧版_勿引用                                 18       39M        0
+scripts/_旧版_勿引用                                 59      308K       59
+scripts/paper_tools/backup                                32      324K       32
+src/_旧版_勿引用                                     18      116K       18
+data/0.8                                                  59      2.1M       59
+
+合计大小：107M
+
+注：git跟踪数=0 的项（outputs/_旧版_勿引用、outputs/_备份 内的 .mat）
+    被 .gitignore 的 *.mat 规则忽略，删除后工作区与历史中均不再存在。
+
+────────────────────────────────────────
+二、保留项
+────────────────────────────────────────
+  outputs/历史日志/     全部过程日志（含本轮清理记录）
+  outputs/测试记录/     各问 test_log / preprocess_log
+  outputs/log_*.txt     第三四问正式运行日志
+  outputs/final_results_*.mat  现行口径正式结果（论文数字出处）
+  outputs/裁决与映射/     decisions / mapping / solve_strategy
+  outputs/分析记录/  outputs/统计中间件/
+  建模手交接/           三确认点记录与往来件
+  deliver/              交付面
+  RETROSPECTIVE.md  IMPLEMENTATION_REPORT.md  PAPER_HANDOFF.md  FIGURES_GUIDE.md
+
+范围外未动：仓库配置层 .claude/skills/数学建模论文写作与排版 Skill.md.bak
+            （属配置层，非 2026C 产物，未纳入本次清理）
+
+────────────────────────────────────────
+三、执行结果（删除后复核）
+────────────────────────────────────────
+删除完成：14 项全部移除，全项目复核残留 0 处；实际释放约 107M。
+
+【例外与恢复】figures/_未入选_勿引用/ 已从 git 恢复（16 个文件，1.1M）。
+理由：该目录既非备份也非旧版本，而是"出图力求完整、选用由人工筛选"留下的成品图池；
+且其中两份 data.csv 是论文两个数字的唯一出处——
+  figures/_未入选_勿引用/问题四_02 峰谷时刻预测误差/data.csv    → 峰/谷时刻命中率 36.2% / 33.8%
+                                                              （lag_slot=0 行 121 / 113，/334 天）
+  figures/_未入选_勿引用/问题二_05 对照与灵敏度_四面板/data.csv → 问题二完美信息基准 12 227 142.86 元
+                                                              （ladder/全年联合/cost）
+恢复命令：git checkout HEAD -- "figures/_未入选_勿引用"
+该目录的删除属本次清理的范围误划，见 RETROSPECTIVE 第十一轮 R29。
+
+【文档同步】4 份导航文档已按清理后的目录树更新：
+  README.md         目录总览、各目录要点表、"不看的东西"、尚缺清单，并新增「收官记录」节
+  figures/README.md 定稿副本位置改指 paper/figures/ 与 deliver/图件/；归档目录表更新
+  outputs/README.md 子目录表去掉 _旧版_勿引用/ 与 _备份/；补清理记录指引
+  FIGURES_GUIDE.md  §五、§七自检清单改为只引 _未入选_勿引用/
+历史记录类文档不改写（复盘 RETROSPECTIVE、建模手往来件、自动工作总览）；
+自动工作总览_第三四问.md 加一条「2026-09-14 收官注」说明相关目录已不在。
+
+【确认点留档】三处确认点记录：
+  确认点 #1 建模裁决清单+求解策略：建模手交接/交付建模手/致建模手_确认点1_*.md（7 份，逐问）
+  确认点 #2 风险清单              ：建模手交接/交付建模手/致建模手_确认点2_*.md（4 份）
+  确认点 #3 数字一致性            ：scripts/paper_tools/number_check.txt —— 36 项一致 / 0 未找到
+                                   scripts/paper_tools/check_report.txt —— 静态自检 14 项全 PASS
+  确认点 #3 原报告列出 12 个"未直接对上出处的大额数字"，本轮补齐溯源：
+  全部出自 outputs/result2_q2c.xlsx（问题二题目模板结果表，四个指定日期的全天购电量/购电费）。
+  未决项：无。
+
+【保留的全程 log】本次未动任何日志：
+  outputs/*.txt             第三四问正式运行日志（log_q3b_run / log_q4_run / log_postprocess）
+  outputs/历史日志/         问题二/三各轮运行日志 20 份 + 本文件
+  outputs/测试记录/         各问 test_log / test_results / preprocess_log
+  scripts/paper_tools/*.txt 论文静态自检与数字核查报告
