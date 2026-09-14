@@ -82,3 +82,137 @@ data/0.8                                                  59      2.1M       59
   outputs/历史日志/         问题二/三各轮运行日志 20 份 + 本文件
   outputs/测试记录/         各问 test_log / test_results / preprocess_log
   scripts/paper_tools/*.txt 论文静态自检与数字核查报告
+
+────────────────────────────────────────
+四、项目外备份（2026-09-14 追加清点）
+────────────────────────────────────────
+位置：/home/sck/scktest/claude_test/_backup/（在 git 仓库之外，删除后无版本兜底）
+上一轮扫描限定在 shumo/ 内，漏掉这两项，由编程手补充裁定。
+
+【保留】2026C_formal_Q2b_20260912_1924（53M / 308 文件）
+  问题二第二轮（Q2b）全量快照：代码、M1/B0~B3 结果、日志、当时的 decisions 与报告章节、
+  建模手往来件全套。编程手裁定保留——它是问题二四轮演进中最完整的一轮记录。
+  备份自述见该目录 README_备份说明.md。
+
+【删除】2026C_formal_Q3旧版_20260912_2249（13M / 96 文件）
+  问题三第一版（分阶段确定性 MILP）全量快照，口径已被 Q3b 取代。
+  说明：其中下列文件是**唯一副本**（项目内同名文件已随本轮清理删除，且 *.mat 未被 git 跟踪）——
+    outputs/final_results_q3.mat、final_results_q3_nocorr.mat、final_results_q3_sens.mat
+    outputs/result3.xlsx（旧口径；项目内现行 result3.xlsx 为 Q3b 口径）
+  这些均为作废口径的留档，论文与交付不引用；删除经编程手 2026-09-14 裁定。
+  其余文件（decisions_q3.md、solve_strategy_q3.md、math_to_code_mapping_q3.md、figure_list_q3.md、
+  preprocess_log_q3.txt、log_q3_run.txt、log_q3_fig.txt、建模手交接/ 等）在项目内均有副本。
+
+  删除前完整文件清单：
+           833  长文档Q3章节行号.txt
+          6461  根目录文档/问题三_建模与实现总览.md
+          1392  根目录文档/run_q3_figures.sh
+          1022  根目录文档/run_q3_report.sh
+         16722  建模手交接/问题三_建模交接给编程手_v2.md
+         36107  建模手交接/问题三_正式建模与编程交接_新版.md
+          9403  建模手交接/致建模手_确认点1_q3.md
+          6724  建模手交接/致建模手_确认点2_q3.md
+         11056  建模手交接/致建模手_确认_Q3建模文档歧义_q3.md
+          7609  建模手交接/Q3建模确认回执_给编程手.md
+         44935  figures/问题三/01 光伏预报的精度画像/光伏预报的精度画像.pdf
+        186187  figures/问题三/01 光伏预报的精度画像/光伏预报的精度画像.png
+          1673  figures/问题三/01 光伏预报的精度画像/data.csv
+          2768  figures/问题三/01 光伏预报的精度画像/plot_q3_skill.m
+         38203  figures/问题三/02 预报的系统性形状偏差/预报的系统性形状偏差.pdf
+        154421  figures/问题三/02 预报的系统性形状偏差/预报的系统性形状偏差.png
+          1256  figures/问题三/02 预报的系统性形状偏差/data.csv
+          2306  figures/问题三/02 预报的系统性形状偏差/plot_q3_bias.m
+         36106  figures/问题三/03 全年费用的三项分解/全年费用的三项分解.pdf
+        132408  figures/问题三/03 全年费用的三项分解/全年费用的三项分解.png
+           811  figures/问题三/03 全年费用的三项分解/data.csv
+          1968  figures/问题三/03 全年费用的三项分解/plot_q3_cost.m
+         51337  figures/问题三/04 指定日期的四阶段轨迹/指定日期的四阶段轨迹.pdf
+        366844  figures/问题三/04 指定日期的四阶段轨迹/指定日期的四阶段轨迹.png
+          9784  figures/问题三/04 指定日期的四阶段轨迹/data_2025-03-20.csv
+          9126  figures/问题三/04 指定日期的四阶段轨迹/data_2025-06-21.csv
+          9756  figures/问题三/04 指定日期的四阶段轨迹/data_2025-09-23.csv
+         10242  figures/问题三/04 指定日期的四阶段轨迹/data_2025-12-21.csv
+          3041  figures/问题三/04 指定日期的四阶段轨迹/plot_q3_days.m
+         49372  figures/问题三/05 调整量的逐日演化/调整量的逐日演化.pdf
+        154562  figures/问题三/05 调整量的逐日演化/调整量的逐日演化.png
+         24004  figures/问题三/05 调整量的逐日演化/data.csv
+          2300  figures/问题三/05 调整量的逐日演化/plot_q3_adj.m
+         40560  figures/问题三/06 紧急购电的逐时分布/紧急购电的逐时分布.pdf
+        148032  figures/问题三/06 紧急购电的逐时分布/紧急购电的逐时分布.png
+          1196  figures/问题三/06 紧急购电的逐时分布/data.csv
+          1960  figures/问题三/06 紧急购电的逐时分布/plot_q3_em.m
+         50717  figures/问题三/07 储能储电量轨迹与日末分布/储能储电量轨迹与日末分布.pdf
+        224714  figures/问题三/07 储能储电量轨迹与日末分布/储能储电量轨迹与日末分布.png
+         23253  figures/问题三/07 储能储电量轨迹与日末分布/data.csv
+          3336  figures/问题三/07 储能储电量轨迹与日末分布/plot_q3_soc.m
+         44740  figures/问题三/08 策略对照与边际收益/策略对照与边际收益.pdf
+        202399  figures/问题三/08 策略对照与边际收益/策略对照与边际收益.png
+           665  figures/问题三/08 策略对照与边际收益/data.csv
+            72  figures/问题三/08 策略对照与边际收益/data_marginal.csv
+          3620  figures/问题三/08 策略对照与边际收益/plot_q3_sens.m
+         38071  figures/问题三/09 策略间的费用结构变化/策略间的费用结构变化.pdf
+        149203  figures/问题三/09 策略间的费用结构变化/策略间的费用结构变化.png
+           665  figures/问题三/09 策略间的费用结构变化/data.csv
+          2051  figures/问题三/09 策略间的费用结构变化/plot_q3_sens2.m
+         44431  figures/问题三/10 结算的分段线性费用结构/结算的分段线性费用结构.pdf
+        159665  figures/问题三/10 结算的分段线性费用结构/结算的分段线性费用结构.png
+          4737  figures/问题三/10 结算的分段线性费用结构/data.csv
+           127  figures/问题三/10 结算的分段线性费用结构/data_marginal.csv
+          2285  figures/问题三/10 结算的分段线性费用结构/plot_q3_tariff.m
+         36601  figures/问题三/11 四阶段锁定与拼接/四阶段锁定与拼接.pdf
+        133327  figures/问题三/11 四阶段锁定与拼接/四阶段锁定与拼接.png
+           134  figures/问题三/11 四阶段锁定与拼接/data.csv
+          1667  figures/问题三/11 四阶段锁定与拼接/plot_q3_stage.m
+         18125  outputs/decisions_q3.md
+          5074  outputs/figure_list_q3.md
+       1450357  outputs/final_results_q3.mat
+       1532722  outputs/final_results_q3_nocorr.mat
+       5654538  outputs/final_results_q3_sens.mat
+         66596  outputs/log_q3_fig.txt
+         17181  outputs/log_q3_run.txt
+         16930  outputs/math_to_code_mapping_q3.md
+         10380  outputs/preprocess_log_q3.txt
+         42958  outputs/q3_daily.csv
+         31665  outputs/q3_nocorr_daily.csv
+           575  outputs/q3_sens.csv
+        850617  outputs/result3.xlsx
+          9371  outputs/solve_strategy_q3.md
+          5231  outputs/test_log_q3.txt
+          2886  outputs/test_results_q3.mat
+          1002  scripts/data_q3_adj.m
+          2149  scripts/data_q3_bias.m
+          1209  scripts/data_q3_cost.m
+          1369  scripts/data_q3_days.m
+          1457  scripts/data_q3_em.m
+          2361  scripts/data_q3_sens.m
+          2515  scripts/data_q3_skill.m
+          1192  scripts/data_q3_soc.m
+          1281  scripts/data_q3_stage.m
+          1632  scripts/data_q3_tariff.m
+          3285  scripts/probe_q3_toy.m
+          2110  src/func_build_q3.m
+          3930  src/func_exec_q3.m
+          1370  src/func_interp_q3.m
+          1720  src/func_read_q3.m
+          7058  src/func_roll_q3.m
+          6420  src/func_write_q3.m
+          4599  src/main_q3.m
+          2279  src/main_q3_nocorr.m
+          4042  src/main_q3_sens.m
+         18240  tests/test_q3.m
+
+  随带的「长文档Q3章节行号.txt」原文：
+    Q3 旧版工作在长文档中的位置（备份时快照，行号以备份时刻为准）
+    （三份长文档为跨问单文件，旧章节不删改；本轮 Q3 重构以"追加新章节"方式写入）
+    
+    --- IMPLEMENTATION_REPORT.md ---
+      当前仅到「问题二 · 第四轮」(第 963 行起)。Q3 旧版代码虽已跑通，
+      但尚未在本文档写过 Q3 章节 —— 旧版 Q3 无残留章节需要保护。
+    
+    --- PAPER_HANDOFF.md ---
+      第 1046 行起：「问题三 · 分阶段调整（0/6/12/18 四阶段 + 差额结算 + 实际运行）」
+      第 1046–1162 行，共 6 节。★ 该章节属旧版 Q3，本轮重构后失效，
+      但依"不删改"原则原样保留，新 Q3 章节追加到文件末尾并标注"现行口径"。
+    
+    --- RETROSPECTIVE.md ---
+      无 Q3 专项章节（Q3 旧版的复盘未单独立节）。
